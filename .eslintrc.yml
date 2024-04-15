@@ -4,6 +4,8 @@ env:
 extends:
   - eslint:recommended
   - prettier
+  - plugin:vue/base
+  - plugin:vuetify/base
 overrides: []
 parserOptions:
   ecmaVersion: latest

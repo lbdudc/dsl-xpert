@@ -1,8 +1,12 @@
-node_modules
 .history
 .vscode
 .idea
+node_modules
 .DS_Store
-models/**
-.env
+output
+spec.json
+spec.dsl
+src/client/dist
+temp_config.json
+src/lps/**
 .env.local

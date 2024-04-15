@@ -5,6 +5,8 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
+    "build": "cd src/client && vite build",
+    "dev": "cd src/client && vite",
     "lint_eslint": "eslint --ext js,vue --fix src test",
     "lint_prettier": "prettier --write --ignore-unknown src test",
     "lint": "npm-run-all lint_eslint lint_prettier",
@@ -26,13 +28,30 @@
     ]
   },
   "devDependencies": {
+    "@mdi/font": "^7.1.96",
+    "@mdi/js": "^7.0.96",
+    "@vitejs/plugin-vue": "^4.5.0",
+    "autoprefixer": "^10.4.13",
+    "concurrently": "^8.2.2",
+    "cors": "^2.8.5",
     "dotenv": "16.4.5",
-    "eslint": "8.41.0",
     "eslint-config-prettier": "8.8.0",
+    "eslint-plugin-vuetify": "^2.1.0",
+    "eslint": "8.41.0",
     "express": "4.18.3",
     "husky": "8.0.3",
     "lint-staged": "13.2.2",
+    "material-design-icons-iconfont": "^6.7.0",
+    "mongoose": "^8.3.1",
+    "postcss": "^8.4.20",
     "prettier": "2.8.8",
-    "mongoose": "^8.3.1"
+    "tailwindcss": "^3.2.4",
+    "vite-plugin-vuetify": "2.0.1",
+    "vite": "^5.0.11"
+  },
+  "dependencies": {
+    "vue": "^3.2.41",
+    "vue-router": "^4.2.5",
+    "vuetify": "^3.4.3"
   }
 }
