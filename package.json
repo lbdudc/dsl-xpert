@@ -1,0 +1,38 @@
+{
+  "name": "llm-dsl-builder",
+  "version": "0.1.0",
+  "description": "Sensor LLM DSL Builder",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "lint_eslint": "eslint --ext js,vue --fix src test",
+    "lint_prettier": "prettier --write --ignore-unknown src test",
+    "lint": "npm-run-all lint_eslint lint_prettier",
+    "prepare": "husky install",
+    "serve": "node ./src/server/index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "LLM",
+    "DSL"
+  ],
+  "author": "Victor Lamas",
+  "license": "MIT",
+  "lint-staged": {
+    "*.{json,md,yml}": "prettier --write",
+    "*.{js}": [
+      "eslint --fix",
+      "prettier --write"
+    ]
+  },
+  "devDependencies": {
+    "dotenv": "16.4.5",
+    "eslint": "8.41.0",
+    "eslint-config-prettier": "8.8.0",
+    "express": "4.18.3",
+    "husky": "8.0.3",
+    "lint-staged": "13.2.2",
+    "prettier": "2.8.8",
+    "mongoose": "^8.3.1"
+  }
+}
