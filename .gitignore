@@ -1,0 +1,8 @@
+node_modules
+.history
+.vscode
+.idea
+.DS_Store
+models/**
+.env
+.env.local
