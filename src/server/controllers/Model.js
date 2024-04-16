@@ -4,10 +4,10 @@ import ModelSchema from '../schemas/Model.js';
 export default class ModelController {
 
     static async create(req, res) {
-        const { name, definition } = req.body;
+        const { name, definition, description, developer, modelType, temperature, seed } = req.body;
 
         try {
-            const model = new ModelSchema({ name, definition });
+            const model = new ModelSchema({ name, definition, description, developer, modelType, temperature, seed });
             await model.save();
             res.send(model);
         } catch (error) {
@@ -35,7 +35,7 @@ export default class ModelController {
                 name: name
             });
             if (!model) {
-                res.status(404).send({ message: `Model with name ${id} not found` });
+                res.status(404).send({ message: `Model with name ${name} not found` });
             } else {
                 res.send(model);
             }
@@ -47,7 +47,7 @@ export default class ModelController {
 
     static async update(req, res) {
         const id = req.params.id;
-        const { name, definition } = req.body;
+        const { name, definition, description, developer, modelType, temperature, seed } = req.body;
 
         try {
             const model = await ModelSchema.findByIdAndUpdate(
@@ -56,7 +56,12 @@ export default class ModelController {
                 },
                 {
                     name,
-                    definition
+                    definition,
+                    description,
+                    developer,
+                    modelType,
+                    temperature,
+                    seed
                 },
                 {
                     new: true

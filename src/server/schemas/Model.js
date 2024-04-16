@@ -8,6 +8,28 @@ const ModelSchema = new Schema({
         required: true,
         unique: true
     },
+    description: {
+        type: String,
+        default: ''
+    },
+    developer: {
+        type: String,
+        required: true
+    },
+    modelType: {
+        type: String,
+        required: true
+    },
+    temperature: {
+        type: Number,
+        required: false,
+        default: 1
+    },
+    seed: {
+        type: Number,
+        required: false,
+        default: null
+    },
     definition: {
         type: String,
         required: true
