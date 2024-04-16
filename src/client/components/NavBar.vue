@@ -3,7 +3,9 @@ const baseURL = import.meta.env.BASE_URL;
 </script>
 
 <template>
-  <header class="flex h-16 w-full items-center text-black px-4 md:px-6">
+  <header
+    class="flex h-16 w-full items-center text-white bg-slate-800 px-4 md:px-6"
+  >
     <router-link class="flex items-center" :to="baseURL">
       <svg
         xmlns="http://www.w3.org/2000/svg"

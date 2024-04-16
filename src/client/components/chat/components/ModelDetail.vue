@@ -1,6 +1,4 @@
 <script setup>
-import { ref } from "vue";
-
 defineProps({
   model: {
     type: Object,
@@ -9,7 +7,7 @@ defineProps({
 });
 </script>
 <template>
-  <v-card class="flexcard">
+  <v-card class="flexcard mt-5">
     <v-card-title>
       <h1
         class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
