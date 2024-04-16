@@ -55,12 +55,12 @@ const submit = () => {
 </script>
 
 <template>
-  <div class="w-screen px-40 pt-4">
+  <div class="w-screen px-40 pt-4 flex-grow flex flex-col">
     <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl mb-6">
       New Model
     </h1>
 
-    <v-form ref="myForm" @submit.prevent="submit">
+    <v-form ref="myForm" @submit.prevent="submit" class="flex flex-col gap-4">
       <v-text-field
         v-model="name"
         label="Model name"
@@ -152,5 +152,13 @@ const submit = () => {
 </template>
 
 
-<style lang="scss" scoped>
+<style scoped>
+.flexcard {
+  display: flex;
+  flex-direction: column;
+}
+
+.flexcard .v-toolbar {
+  flex: 0;
+}
 </style>

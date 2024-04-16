@@ -4,7 +4,7 @@ import ModelListVue from "@/components/models/ModelList.vue";
 
 <template>
   <section
-    class="flex flex-col gap-10 justify-center items-center bg-white dark:bg-gray-900"
+    class="flex flex-col flex-grow gap-10 justify-center items-center bg-white dark:bg-gray-900"
   >
     <ModelListVue />
   </section>
