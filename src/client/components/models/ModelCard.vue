@@ -1,25 +1,37 @@
 <script setup>
 const props = defineProps({
-  model: Object,
+  model: {
+    type: Object,
+    required: true,
+  },
 });
 </script>
 <template>
-  <div
-    class="bg-white rounded-lg shadow-md p-4 flex items-center justify-between space-x-4"
-  >
-    <img alt="Avatar" class="rounded-full h-10 w-10 object-cover" />
-    <div class="space-y-1">
+  <v-card class="bg-white rounded-lg shadow-md">
+    <v-card-title>
       <h2 class="text-base font-semibold">{{ props.model.name }}</h2>
-      <p class="text-sm">
-        {{ props.model.description }}
-      </p>
-    </div>
-    <button
-      class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-    >
-      Edit
-    </button>
-  </div>
+    </v-card-title>
+
+    <v-card-subtitle>
+      {{ props.model.description }}
+    </v-card-subtitle>
+
+    <v-card-text>
+      <v-chip class="text-xs" color="green" variant="outlined" size="small">
+        {{ props.model.developer }}
+      </v-chip>
+      <v-chip class="text-xs" color="blue" variant="outlined" size="small">
+        {{ props.model.modelType }}
+      </v-chip>
+    </v-card-text>
+    <v-card-actions>
+      <button
+        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
+      >
+        Chat
+      </button>
+    </v-card-actions>
+  </v-card>
 </template>
 
 

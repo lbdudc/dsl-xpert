@@ -1,35 +1,27 @@
 
 <script setup>
+import { onMounted, ref } from "vue";
 import ModelCardVue from "./ModelCard.vue";
 
-const modelCardExamples = [
-  {
-    id: 1,
-    name: "Marketing Campaign",
-    description:
-      "Models for the marketing team to predict campaign performance.",
-  },
-  {
-    id: 2,
-    name: "Support Tickets",
-    description: "Models for predicting ticket volume and response times.",
-  },
-  {
-    id: 3,
-    name: "Sales Forecast",
-    description: "Models for predicting future sales based on historical data.",
-  },
-  {
-    id: 4,
-    name: "Sales Forecast",
-    description: "Models for predicting future sales based on historical data.",
-  },
-  {
-    id: 5,
-    name: "Sales Forecast",
-    description: "Models for predicting future sales based on historical data.",
-  },
-];
+const SERVER_URL = `${import.meta.env.SERVER_URL || "http://localhost:5000"}`;
+
+const modelCardExamples = ref([]);
+
+onMounted(() => {
+  fetchModels();
+});
+
+const fetchModels = async () => {
+  const res = await fetch(`${SERVER_URL}/api/models`);
+
+  if (!res.ok) {
+    console.error("Failed to fetch models");
+    return;
+  }
+
+  const data = await res.json();
+  modelCardExamples.value = data;
+};
 </script>
 <template>
   <div class="container px-4 md:px-6">
@@ -67,7 +59,7 @@ const modelCardExamples = [
       </div>
 
       <!-- CARDS -->
-      <div class="grid gap-4">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
         <ModelCardVue
           v-for="model in modelCardExamples"
           :key="model.id"
