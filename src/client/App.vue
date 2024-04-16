@@ -16,5 +16,9 @@ import NavBar from "@/components/NavBar.vue";
   min-height: 100vh;
   min-width: 100vw;
   padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 </style>

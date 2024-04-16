@@ -5,13 +5,14 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "build": "cd src/client && vite build",
-    "dev": "cd src/client && vite",
+    "build:client": "cd src/client && vite build",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:serve\"",
+    "dev:client": "cd src/client && vite",
+    "dev:serve": "node ./src/server/index.js",
     "lint_eslint": "eslint --ext js,vue --fix src test",
     "lint_prettier": "prettier --write --ignore-unknown src test",
     "lint": "npm-run-all lint_eslint lint_prettier",
     "prepare": "husky install",
-    "serve": "node ./src/server/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

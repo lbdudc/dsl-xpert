@@ -1,6 +1,7 @@
 
 <script setup>
 import ModelCardVue from "./ModelCard.vue";
+import ModelFormVue from "./ModelForm.vue";
 
 const modelCardExamples = [
   {
@@ -32,7 +33,8 @@ const modelCardExamples = [
 ];
 </script>
 <template>
-  <div class="container px-4 md:px-6">
+  <ModelFormVue />
+  <!-- <div class="container px-4 md:px-6">
     <div class="flex flex-col gap-6">
       <div class="grid gap-2">
         <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
@@ -67,16 +69,16 @@ const modelCardExamples = [
       </div>
 
       <!-- CARDS -->
-      <!-- <ModelCardVue /> -->
-      <div class="grid gap-4">
+  <!-- <ModelCardVue /> -->
+  <!-- <div class="grid gap-4">
         <ModelCardVue
           v-for="model in modelCardExamples"
           :key="model.id"
           :model="model"
         />
-      </div>
-    </div>
-  </div>
+      </div> -->
+  <!-- </div> -->
+  <!-- </div> -->
 </template>
 
 <style lang="scss" scoped>

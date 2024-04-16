@@ -1,7 +1,4 @@
 <script setup>
-import { defineProps } from "vue";
-// read model object from props
-
 const props = defineProps({
   model: Object,
 });

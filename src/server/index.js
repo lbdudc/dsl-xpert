@@ -1,5 +1,6 @@
 // Node Express server
 import express from 'express';
+import cors from "cors";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
@@ -19,7 +20,15 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 
 
 // Start Express server
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
 const app = express();
+app.use(cors(
+    {
+        origin: CLIENT_URL,
+        optionsSuccessStatus: 200
+    }
+));
 app.use(express.json());
 
 

@@ -10,7 +10,7 @@ const ModelSchema = new Schema({
     },
     description: {
         type: String,
-        default: ''
+        default: null
     },
     developer: {
         type: String,
