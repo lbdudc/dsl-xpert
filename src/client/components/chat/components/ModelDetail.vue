@@ -10,19 +10,37 @@ defineProps({
   <v-card class="flexcard mt-5">
     <v-card-title>
       <h1
-        class="text-2xl font-bold tracking-tight text-gray-900 dark:text-white"
+        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
       >
         Model: {{ model.name }}
       </h1>
+      <v-chip class="text-xs mr-2" color="green" variant="outlined" size="small"
+        >{{ model.developer }}
+      </v-chip>
+      <v-chip class="text-xs" color="blue" variant="outlined" size="small">
+        {{ model.modelType }}
+      </v-chip>
     </v-card-title>
 
-    <v-card-subtitle class="py-4"> {{ model.description }} </v-card-subtitle>
+    <v-card-subtitle class="py-4">
+      <p>
+        {{ model.description }}
+      </p>
+    </v-card-subtitle>
 
     <v-card-text>
-      <div>Developer: {{ model.developer }}</div>
-      <div>Model Type: {{ model.modelType }}</div>
-      <div>Temperature: {{ model.temperature }}</div>
-      <div>Seed: {{ model.seed }}</div>
+      <p>
+        <strong class="text-lg text-slate-900"> Model Details</strong>
+      </p>
+      <div class="mt-5 flex flex-col">
+        <span class="text-slate-700">
+          <strong>Temperature:</strong> {{ model.temperature }}
+        </span>
+
+        <span class="text-slate-700">
+          <strong>Seed:</strong> {{ model.seed }}
+        </span>
+      </div>
 
       <div class="mt-10">Definition: {{ model.definition }}</div>
     </v-card-text>
