@@ -1,14 +1,16 @@
 <script setup>
-import { ref } from "vue";
-import { useRouter } from "vue-router";
+import { onMounted, ref } from "vue";
+import { useRouter, useRoute } from "vue-router";
 
 const SERVER_URL = `${import.meta.env.SERVER_URL || "http://localhost:5000"}`;
 
+const route = useRoute();
 const router = useRouter();
 
 const modelDeveloperItems = ["OpenAI", "LLama", "Mistral", "Alpaca"];
 const modelTypeItems = ["gpt-3.5", "gpt-3.5-turbo", "gpt-4"];
 
+const id = ref(null);
 const modelDeveloper = ref(null);
 const modelType = ref(null);
 const name = ref(null);
@@ -20,37 +22,88 @@ const definition = ref("");
 const myForm = ref();
 const loading = ref(false);
 
-const submit = () => {
+onMounted(() => {
+  if (route.params.id) {
+    fetch(`${SERVER_URL}/api/models/${route.params.id}`).then((res) => {
+      res.json().then((res) => {
+        id.value = res._id;
+        modelDeveloper.value = res.developer;
+        modelType.value = res.modelType;
+        name.value = res.name;
+        temperature.value = res.temperature;
+        seed.value = res.seed;
+        description.value = res.description;
+        definition.value = res.definition;
+      });
+    });
+  }
+});
+
+const submit = async () => {
   // reset validation
   myForm.value.resetValidation();
 
-  myForm.value.validate().then(({ valid: isValid }) => {
-    if (!isValid) {
-      return;
-    }
+  const { valid } = await myForm.value.validate();
 
-    loading.value = true;
-    fetch(`${SERVER_URL}/api/models`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        developer: modelDeveloper.value,
-        modelType: modelType.value,
-        name: name.value,
-        temperature: temperature.value,
-        seed: seed.value,
-        description: description.value,
-        definition: definition.value,
-      }),
-    }).then((res) => {
-      res.json().then((res) => {
-        loading.value = false;
-        router.push({ name: "ModelChat", params: { id: res.name } });
-      });
-    });
+  if (!valid) {
+    return;
+  }
+
+  let res;
+
+  loading.value = true;
+
+  if (id.value) {
+    res = await updateModel();
+  } else {
+    res = await createModel();
+  }
+
+  loading.value = false;
+  router.push({ name: "ModelChat", params: { id: res.name } });
+};
+
+const createModel = async () => {
+  const res = await fetch(`${SERVER_URL}/api/models`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      developer: modelDeveloper.value,
+      modelType: modelType.value,
+      name: name.value,
+      temperature: temperature.value,
+      seed: seed.value,
+      description: description.value,
+      definition: definition.value,
+    }),
   });
+
+  const json = await res.json();
+  return json;
+};
+
+const updateModel = async () => {
+  const res = await fetch(`${SERVER_URL}/api/models/${id.value}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      developer: modelDeveloper.value,
+      modelType: modelType.value,
+      name: name.value,
+      temperature: temperature.value,
+      seed: seed.value,
+      description: description.value,
+      definition: definition.value,
+    }),
+  });
+
+  const json = await res.json();
+
+  return json;
 };
 </script>
 
@@ -144,9 +197,9 @@ const submit = () => {
 
       <!-- TODO EJEMPLOS -->
 
-      <v-btn type="submit" color="blue-darken-4" :loading="loading"
-        >Create Model</v-btn
-      >
+      <v-btn type="submit" color="blue-darken-4" :loading="loading">
+        {{ id ? "Update" : "Create" }} Model
+      </v-btn>
     </v-form>
   </div>
 </template>

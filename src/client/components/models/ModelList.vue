@@ -2,6 +2,9 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import ModelCardVue from "./ModelCard.vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const SERVER_URL = `${import.meta.env.SERVER_URL || "http://localhost:5000"}`;
 
@@ -37,12 +40,15 @@ const fetchModels = async () => {
       <div
         class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between lg:gap-4"
       >
-        <a
-          href="#"
-          class="inline-flex h-10 p-3 items-center justify-center rounded-md border border-gray-200 bg-white text-sm font-medium shadow-sm transition-colors hover:bg-gray-100 hover:text-gray-900 dark:border-gray-800 dark:bg-gray-950 dark:hover:bg-gray-800 dark:hover:text-gray-50 dark:focus-visible:ring-gray-300"
+        <v-btn
+          class="text-none"
+          variant="text"
+          color="#2878ff"
+          border
+          @click="router.push({ name: 'ModelCreate' })"
         >
           New Model
-        </a>
+        </v-btn>
         <div
           class="flex items-center space-x-2 text-sm/relaxed md:space-x-4 lg:space-x-6"
         >
@@ -59,7 +65,7 @@ const fetchModels = async () => {
       </div>
 
       <!-- CARDS -->
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
         <ModelCardVue
           v-for="model in modelCardExamples"
           :key="model.id"

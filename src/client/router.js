@@ -13,14 +13,19 @@ const routes = [
     component: Home,
   },
   {
-    path: `${base}/models/new`,
-    name: "ModelForm",
+    path: `${base}models/new`,
+    name: "ModelCreate",
     component: ModelForm,
   },
   {
-    path: `${base}/models/:id`,
+    path: `${base}models/:id/chat`,
     name: "ModelChat",
     component: ModelChat,
+  },
+  {
+    path: `${base}models/:id/edit`,
+    name: "ModelForm",
+    component: ModelForm,
   }
 ];
 

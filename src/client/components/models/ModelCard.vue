@@ -1,19 +1,40 @@
 <script setup>
+import { defineProps } from "vue";
+import { useRouter } from "vue-router";
+
 const props = defineProps({
   model: {
     type: Object,
     required: true,
   },
 });
+
+const router = useRouter();
+
+const goToDetail = () => {
+  router.push({ name: "ModelChat", params: { id: props.model.name } });
+};
+
+const goToForm = () => {
+  router.push({ name: "ModelForm", params: { id: props.model.name } });
+};
 </script>
 <template>
-  <v-card class="bg-white rounded-lg shadow-md">
+  <v-card
+    @click="goToDetail()"
+    class="bg-white rounded-lg shadow-md max-w-[400px] min-w-[300px]"
+  >
     <v-card-title>
       <h2 class="text-base font-semibold">{{ props.model.name }}</h2>
     </v-card-title>
 
-    <v-card-subtitle>
-      {{ props.model.description }}
+    <v-card-subtitle v-if="props.model.description">
+      <span class="text-ellipsis overflow-hidden ...">
+        {{ props.model.description }}
+      </span>
+    </v-card-subtitle>
+    <v-card-subtitle v-else>
+      <br />
     </v-card-subtitle>
 
     <v-card-text>
@@ -25,11 +46,25 @@ const props = defineProps({
       </v-chip>
     </v-card-text>
     <v-card-actions>
-      <button
-        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:bg-blue-600"
-      >
-        Chat
-      </button>
+      <v-row no-gutters justify="space-between">
+        <v-btn
+          class="me-2 text-none"
+          color="#1e293b"
+          prepend-icon="mdi-chat"
+          variant="flat"
+        >
+          Chat
+        </v-btn>
+        <v-btn
+          @click.stop="goToForm()"
+          class="me-2 text-none"
+          color="#f08b26"
+          prepend-icon="mdi-pencil"
+          variant="text"
+        >
+          Edit
+        </v-btn>
+      </v-row>
     </v-card-actions>
   </v-card>
 </template>
