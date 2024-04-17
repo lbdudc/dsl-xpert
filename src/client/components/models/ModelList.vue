@@ -1,6 +1,6 @@
 
 <script setup>
-import { onMounted, ref } from "vue";
+import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
 import { useRouter } from "vue-router";
 
@@ -8,7 +8,16 @@ const router = useRouter();
 
 const SERVER_URL = `${import.meta.env.SERVER_URL || "http://localhost:5000"}`;
 
-const modelCardExamples = ref([]);
+// computed models based on search
+const search = ref("");
+
+const modelsSearch = computed(() => {
+  return models.value.filter((model) =>
+    model.name.toLowerCase().includes(search.value.toLowerCase())
+  );
+});
+
+const models = ref([]);
 
 onMounted(() => {
   fetchModels();
@@ -23,12 +32,12 @@ const fetchModels = async () => {
   }
 
   const data = await res.json();
-  modelCardExamples.value = data;
+  models.value = data;
 };
 </script>
 <template>
-  <div class="container px-4 md:px-6">
-    <div class="flex flex-col gap-6">
+  <div class="container px-4 md:px-6 pt-10 min-h-[800px] ">
+    <div class="flex flex-col gap-6 ">
       <div class="grid gap-2">
         <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
         <p
@@ -52,14 +61,17 @@ const fetchModels = async () => {
         <div
           class="flex items-center space-x-2 text-sm/relaxed md:space-x-4 lg:space-x-6"
         >
-          <div class="flex items-center space-x-1">
-            <label for="search" class="text-sm">Search</label>
-            <input
-              id="search"
-              type="text"
+          <div class="flex items-center space-x-2 min-w-96">
+            <v-text-field
+              v-model="search"
               placeholder="Search models"
-              class="border rounded-md px-3 py-2 focus:outline-none focus:border-blue-500 focus:ring focus:ring-blue-200"
-            />
+              density="compact"
+              hide-details
+              variant="outlined"
+              prepend-inner-icon="mdi-magnify"
+              class="text-sm"
+            </v-text-field>
+            
           </div>
         </div>
       </div>
@@ -67,7 +79,7 @@ const fetchModels = async () => {
       <!-- CARDS -->
       <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
         <ModelCardVue
-          v-for="model in modelCardExamples"
+          v-for="model in modelsSearch"
           :key="model.id"
           :model="model"
         />
