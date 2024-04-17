@@ -1,4 +1,12 @@
 <script setup>
+import { ref } from "vue";
+
+const message = ref();
+
+const sendMessage = () => {
+  console.log(message.value);
+  message.value = null;
+};
 </script>
 <template>
   <div
@@ -77,6 +85,7 @@
             rows="3"
             placeholder="Type your message…"
             v-model="message"
+            @keydown.enter="sendMessage"
           ></v-textarea>
         </div>
       </div>
