@@ -1,13 +1,99 @@
 <script setup>
-import { ref } from "vue";
+import { ref, reactive } from "vue";
 
-const message = ref();
+const SERVER_URL = `${
+  import.meta.env.SERVER_URL || "http://localhost:5000"
+}/api/models/:id`;
+let message = ref("");
+let conversation = reactive([]);
+let nTokensConversation = 0;
+const loadingResponse = ref(false);
 
-const sendMessage = () => {
-  console.log(message.value);
-  message.value = null;
+// Counts the approximate number of tokens in the input while adding the total number for the whole conversation
+async function tokenCounter(text) {
+  const words = text.split(/\s+/);
+  const nWords = words.length;
+  const tokenCount = nWords * 2 + nTokensConversation; // The number of words is doubled to take into account the possible response as well
+
+  return tokenCount;
+}
+
+const getModelOutput = async () => {
+  if (loadingResponse.value) return;
+
+  try {
+    const userMessage = message.value;
+
+    // Add the new message to the chat messages array
+    if (userMessage != "") {
+      conversation.push({
+        text: userMessage,
+        timestamp: new Date().toLocaleTimeString(),
+        isUser: true,
+      });
+      message.value = "";
+    }
+
+    // Check that the amount of tokens does not exceed the maximum number of 4096 (as the counting is approximate we use 4000 instead)
+    if (tokenCounter(userMessage) > 4000) {
+      console.log(
+        'The amount of tokens in the conversation will exceed the maximum limit for the specified model. You need to start a new conversation. To do so, just write "Reset".'
+      );
+      process.exit(1);
+    }
+
+    // Send petition with the user input
+    loadingResponse.value = true;
+    const response = await fetch(`${SERVER_URL}/chat`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        message: userMessage,
+      }),
+    });
+    if (!response.ok) {
+      const error = await response.text();
+      loadingResponse.value = false;
+      throw new Error(JSON.stringify(JSON.parse(error), null, 4));
+    }
+
+    // Get response and update conversation and number of tokens
+    const openAIData = await response.json();
+    const lastMessage = openAIData.messagesHistory.slice(-1)[0];
+    if (lastMessage) {
+      conversation.push({
+        text: lastMessage.content,
+        timestamp: new Date().toLocaleTimeString(),
+        isUser: false,
+      });
+    }
+    nTokensConversation = openAIData.nTokens;
+    loadingResponse.value = false;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+// Copy to clipboard the model output
+const copyToClipboard = (text) => {
+  navigator.clipboard
+    .writeText(text)
+    .then(() => {
+      console.log("Text copied to clipboard:", text);
+    })
+    .catch((error) => {
+      console.error("Error copying text to clipboard:", error);
+    });
+};
+
+// Replace newline characters with <br> and tab characters with spaces
+const formatText = (text) => {
+  return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
 };
 </script>
+
 <template>
   <div
     class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center pb-2"
@@ -40,10 +126,12 @@ const sendMessage = () => {
                 }"
                 class="p-3 rounded-lg relative"
               >
-                <p class="text-sm">{{ message.text }}</p>
+                <!-- Use v-html to render formatted text -->
+                <p class="text-sm" v-html="formatText(message.text)"></p>
                 <!-- Add copy to clipboard button -->
                 <button
                   v-if="!message.isUser"
+                  @click="copyToClipboard(message.text)"
                   class="absolute top-1/2 transform -translate-y-1/2 left-full mt-0 ml-0 text-gray-500 hover:text-gray-700 focus:outline-none"
                 >
                   <svg
@@ -85,7 +173,7 @@ const sendMessage = () => {
             rows="3"
             placeholder="Type your message…"
             v-model="message"
-            @keydown.enter="sendMessage"
+            @keydown.enter="getModelOutput"
           ></v-textarea>
         </div>
       </div>

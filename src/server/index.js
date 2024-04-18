@@ -38,10 +38,7 @@ app.get('/api/models', ModelController.findAll);
 app.get('/api/models/:name', ModelController.findOne);
 app.put('/api/models/:id', ModelController.update);
 app.delete('/api/models/:id', ModelController.delete);
-
-
-// TODO
-// app.post('/api/models/:id/chat', ModelController.createChat);
+app.post('/api/models/:id/chat', ModelController.createChat);
 
 
 const PORT = process.env.PORT || 5000;
