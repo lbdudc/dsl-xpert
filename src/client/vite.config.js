@@ -13,7 +13,10 @@ const CLIENT_PORT = process.env.CLIENT_PORT || 5173;
 export default defineConfig({
   plugins: [vue(), vuetify({ autoImport: true })],
   server: {
-    port: CLIENT_PORT
+    port: CLIENT_PORT,
+    hmr: {
+      overlay: false,
+    }
   },
   resolve: {
     alias: {

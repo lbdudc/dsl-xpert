@@ -9,7 +9,6 @@ const router = useRouter();
 const SERVER_URL = `${
   import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
 }`;
-console.log(SERVER_URL);
 
 // computed models based on search
 const search = ref("");

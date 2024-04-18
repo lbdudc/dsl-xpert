@@ -32,6 +32,8 @@ services:
       - "27017:27017"
     networks:
       - llm-network
+    volumes:
+      - mongodb-data:/data/db
 
   nginx:
     image: nginx:latest
@@ -53,3 +55,7 @@ services:
 networks:
   llm-network:
     driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local
