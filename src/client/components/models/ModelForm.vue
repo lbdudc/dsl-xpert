@@ -2,7 +2,9 @@
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
 
-const SERVER_URL = `${import.meta.env.SERVER_URL || "http://localhost:5000"}`;
+const SERVER_URL = `${
+  import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
+}`;
 
 const route = useRoute();
 const router = useRouter();

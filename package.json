@@ -6,13 +6,15 @@
   "type": "module",
   "scripts": {
     "build:client": "cd src/client && vite build",
-    "dev": "concurrently \"npm run dev:client\" \"npm run dev:serve\"",
     "dev:client": "cd src/client && vite",
     "dev:serve": "node ./src/server/index.js",
+    "dev": "concurrently \"npm run dev:client\" \"npm run dev:serve\"",
     "lint_eslint": "eslint --ext js,vue --fix src test",
     "lint_prettier": "prettier --write --ignore-unknown src test",
     "lint": "npm-run-all lint_eslint lint_prettier",
     "prepare": "husky install",
+    "prod:client": "cd src/client && vite --host",
+    "prod": "concurrently \"npm run prod:client\" \"npm run dev:serve\"",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [

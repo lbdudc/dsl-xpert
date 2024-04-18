@@ -41,7 +41,7 @@ app.delete('/api/models/:id', ModelController.delete);
 app.post('/api/models/:id/chat', ModelController.createChat);
 
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
