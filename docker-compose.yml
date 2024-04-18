@@ -1,0 +1,36 @@
+version: '3.8'
+
+services:
+  server:
+    build:
+      context: ./src/server
+      dockerfile: Dockerfile
+    ports:
+      - "${SERVER_PORT:-5000}:5000"
+    environment:
+      - PORT=${SERVER_PORT:-5000}
+      - MONGODB_URI=mongodb://mongodb:27017/llm-dsl-builder
+    networks:
+      - llm-network
+    depends_on:
+      - mongodb
+
+  # client:
+  #   build: ./src/client/Dockerfile
+  #   ports:
+  #     - "${CLIENT_PORT:-5173}:5173"
+  #   environment:
+  #     - CLIENT_URL=http://server:${SERVER_PORT:-5000}
+  #   networks:
+  #     - llm-network
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - llm-network
+
+networks:
+  llm-network:
+    driver: bridge
