@@ -2,8 +2,9 @@
 import { ref, reactive } from "vue";
 
 const SERVER_URL = `${
-  import.meta.env.SERVER_URL || "http://localhost:5000"
+  import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
 }/api/models/:id`;
+
 let message = ref("");
 let conversation = reactive([]);
 let nTokensConversation = 0;
@@ -90,7 +91,7 @@ const copyToClipboard = (text) => {
 
 // Replace newline characters with <br> and tab characters with spaces
 const formatText = (text) => {
-  return text.replace(/\n/g, '<br>').replace(/\t/g, '&nbsp;&nbsp;&nbsp;&nbsp;');
+  return text.replace(/\n/g, "<br>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
 };
 </script>
 
@@ -109,14 +110,14 @@ const formatText = (text) => {
             v-for="(message, index) in conversation"
             :key="index"
             :class="{ 'ml-auto justify-end': message.isUser }"
-            class="flex w-full mt-2 space-x-3 max-w-xs"
+            class="flex w-full mt-2 space-x-3 max-w-xs mr-4"
           >
             <div
               v-if="!message.isUser"
               class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-200 items-center justify-center flex"
             >
               <!-- Image centered -->
-              <img width="30" height="30" alt="" />
+              <img width="30" height="30" alt="" src="/openailogo.webp" />
             </div>
             <div :class="{ 'ml-0': !message.isUser, 'mr-0': message.isUser }">
               <div
@@ -154,10 +155,6 @@ const formatText = (text) => {
                 message.timestamp
               }}</span>
             </div>
-            <div
-              v-if="message.isUser"
-              class="flex-shrink-0 h-10 w-10 rounded-full bg-gray-300"
-            ></div>
           </div>
         </div>
 
