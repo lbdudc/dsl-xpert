@@ -6,9 +6,9 @@ import mongoose from 'mongoose';
 
 import ModelController from './controllers/Model.js';
 
-//read the env file
+//read the env file and local env file if exists
 dotenv.config();
-
+dotenv.config({ path: `.env.local`, override: true });
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI).then(() => {
