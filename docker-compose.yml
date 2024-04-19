@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  llm-dsl-builder:
+    container_name: llm-dsl-builder
+    build:
+      context: ./src # Replace this with the path to your Vue + Vite app
+      dockerfile: Dockerfile
+    volumes:
+      - ".:/app" # Mount the entire project directory to /app in the container
+    # ports:
+    #   - "5000:5000" # Map the Express Node server port
+    #   - "5173:5173" # Map the Vite client port
+    environment:
+      - SERVER_PORT=5000 ## This is the internal port of the Express Node server
+      - CLIENT_URL=http://localhost:5173
+      - VITE_SERVER_URL=http://localhost:5555 ## This is the URL of the Nginx server
+      - MONGODB_URI=mongodb://mongodb:27017/llm-dsl-builder
+    networks:
+      - llm-network
+    depends_on:
+      - mongodb
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:5000" ]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+
+  mongodb:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    networks:
+      - llm-network
+    volumes:
+      - mongodb-data:/data/db
+
+  nginx:
+    image: nginx:latest
+    ports:
+      - "5555:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    depends_on:
+      - llm-dsl-builder
+    restart: always
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://llm-dsl-builder:5173" ]
+      interval: 30s
+      timeout: 10s
+      retries: 20
+    networks:
+      - llm-network
+
+networks:
+  llm-network:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local

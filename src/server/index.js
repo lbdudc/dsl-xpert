@@ -1,5 +1,6 @@
 // Node Express server
 import express from 'express';
+import cors from "cors";
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 
@@ -19,7 +20,15 @@ mongoose.connect(process.env.MONGODB_URI).then(() => {
 
 
 // Start Express server
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:5173";
+
 const app = express();
+app.use(cors(
+    {
+        origin: CLIENT_URL,
+        optionsSuccessStatus: 200
+    }
+));
 app.use(express.json());
 
 
@@ -29,13 +38,10 @@ app.get('/api/models', ModelController.findAll);
 app.get('/api/models/:name', ModelController.findOne);
 app.put('/api/models/:id', ModelController.update);
 app.delete('/api/models/:id', ModelController.delete);
+app.post('/api/models/:id/chat', ModelController.createChat);
 
 
-// TODO
-// app.post('/api/models/:id/chat', ModelController.createChat);
-
-
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is listening on port ${PORT}`);
 });
