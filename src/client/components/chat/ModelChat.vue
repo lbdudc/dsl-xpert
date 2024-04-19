@@ -1,7 +1,7 @@
 <script setup>
 import { ref } from "vue";
 import { onMounted } from "vue";
-import { useRoute } from "vue-router";
+import { useRoute, useRouter } from "vue-router";
 import NotFoundVue from "../404.vue";
 import ChatVue from "./components/Chat.vue";
 import ModelDetailVue from "./components/ModelDetail.vue";
@@ -11,6 +11,8 @@ const SERVER_URL = `${
 }`;
 
 const route = useRoute();
+const router = useRouter();
+
 const id = route.params.id;
 
 const show404 = ref(false);
@@ -30,6 +32,19 @@ const fetchModel = async () => {
 
   const data = await res.json();
   model.value = data;
+};
+
+const deleteModel = async () => {
+  const res = await fetch(`${SERVER_URL}/api/models/${id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    console.error("Error deleting model");
+    return;
+  }
+
+  router.push("/");
 };
 </script>
 

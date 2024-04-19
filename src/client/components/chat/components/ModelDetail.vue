@@ -1,10 +1,37 @@
 <script setup>
-defineProps({
+import { useRouter } from "vue-router";
+
+const router = useRouter();
+
+const SERVER_URL = `${
+  import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
+}`;
+
+const props = defineProps({
   model: {
     type: Object,
     required: true,
   },
 });
+
+const deleteModel = async () => {
+  const { _id } = props.model;
+
+  const res = await fetch(`${SERVER_URL}/api/models/${_id}`, {
+    method: "DELETE",
+  });
+
+  if (!res.ok) {
+    console.error("Error deleting model");
+    return;
+  }
+
+  router.push("/");
+};
+
+const goToForm = () => {
+  router.push({ name: "ModelForm", params: { id: props.model.name } });
+};
 </script>
 <template>
   <v-card class="flexcard mt-5">
@@ -45,9 +72,21 @@ defineProps({
       <div class="mt-10">Definition: {{ model.definition }}</div>
     </v-card-text>
 
-    <v-card-actions class="flex justify-start">
-      <v-btn color="orange" variant="text">Edit</v-btn>
-      <v-btn color="red" variant="text">Delete</v-btn>
+    <v-card-actions class="flex justify-start ml-2">
+      <v-btn
+        color="orange"
+        variant="tonal"
+        prepend-icon="mdi-pencil"
+        @click="goToForm"
+        >Edit</v-btn
+      >
+      <v-btn
+        color="red"
+        variant="tonal"
+        prepend-icon="mdi-delete"
+        @click="deleteModel"
+        >Delete</v-btn
+      >
     </v-card-actions>
   </v-card>
 </template>
