@@ -1,14 +1,26 @@
 <script setup>
-import { ref, reactive } from "vue";
+import { onMounted, ref, reactive } from "vue";
+import { useRoute } from "vue-router";
 
 const SERVER_URL = `${
   import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-}/api/models/:id`;
+}`;
 
 let message = ref("");
 let conversation = reactive([]);
 let nTokensConversation = 0;
 const loadingResponse = ref(false);
+const route = useRoute();
+const id = ref(null);
+onMounted(() => {
+  if (route.params.id) {
+    fetch(`${SERVER_URL}/api/models/${route.params.id}`).then((res) => {
+      res.json().then((res) => {
+        id.value = res._id;
+      });
+    });
+  }
+});
 
 // Counts the approximate number of tokens in the input while adding the total number for the whole conversation
 async function tokenCounter(text) {
@@ -45,7 +57,7 @@ const getModelOutput = async () => {
 
     // Send petition with the user input
     loadingResponse.value = true;
-    const response = await fetch(`${SERVER_URL}/chat`, {
+    const response = await fetch(`${SERVER_URL}/api/models/${id.value}/chat`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
