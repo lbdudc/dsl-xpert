@@ -22,16 +22,37 @@ const ModelSchema = new Schema({
     },
     temperature: {
         type: Number,
-        required: false,
+        default: 0.2
+    },
+    maximumLength: {
+        type: Number,
+        default: 4095
+    },
+    topP: {
+        type: Number,
         default: 1
+    },
+    repetitionPenalty: {
+        type: Number,
+        default: 0
+    },
+    stopSequences: {
+        type: [String],
+        default: [';', '###']
     },
     seed: {
         type: Number,
-        required: false,
-        default: null
+        default: 6
     },
     definition: {
         type: String,
+        required: true
+    },
+    definitionExamples: {
+        type: [{
+            userInstruction: String,
+            modelAnswer: String
+        }],
         required: true
     },
     created_date: {
