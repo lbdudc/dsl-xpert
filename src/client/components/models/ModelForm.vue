@@ -199,6 +199,14 @@ const removeCard = (cardIndex) => {
             type="number"
             variant="outlined"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>From OpenAI docs: What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
         </v-col>
         <v-col cols="12" md="6">
@@ -209,6 +217,14 @@ const removeCard = (cardIndex) => {
             type="number"
             variant="outlined"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>From OpenAI docs: If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
         </v-col>
       </v-row>
@@ -222,6 +238,14 @@ const removeCard = (cardIndex) => {
             type="number"
             variant="outlined"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>The maximum number of tokens that can be generated for each model response. Take into account that each model type may have its own limitations in this regard.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
         </v-col>
         <v-col cols="12" md="6">
@@ -232,6 +256,14 @@ const removeCard = (cardIndex) => {
             type="number"
             variant="outlined"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>From OpenAI docs: An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
         </v-col>
       </v-row>
@@ -245,6 +277,14 @@ const removeCard = (cardIndex) => {
             type="number"
             variant="outlined"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>From OpenAI docs: Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency and whether they appear in the text so far, decreasing the model's likelihood to repeat the same line verbatim and increasing its likelihood to talk about new topics.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
         </v-col>
         <v-col cols="12" md="6">
@@ -257,6 +297,14 @@ const removeCard = (cardIndex) => {
             @keyup.enter="addStopSequence"
             @click:append="addStopSequence"
           >
+            <template v-slot:append>
+              <v-tooltip bottom max-width="250px">
+                <template v-slot:activator="{ props }">
+                  <v-icon v-bind="props"> mdi-information </v-icon>
+                </template>
+                <span>From OpenAI docs: Up to 4 sequences where the model will stop generating further tokens.</span>
+              </v-tooltip>
+            </template>
           </v-text-field>
           <v-chip
             v-for="(singleStopSequence, stopSequenceIndex) in stopSequences"
