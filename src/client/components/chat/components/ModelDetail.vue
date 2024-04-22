@@ -57,7 +57,7 @@ const goToForm = () => {
 
     <v-card-text>
       <p>
-        <strong class="text-lg text-slate-900"> Model Details</strong>
+        <strong class="text-lg text-slate-900"> Model details</strong>
       </p>
       <div class="mt-5 flex flex-col">
         <span class="text-slate-700">
@@ -67,9 +67,41 @@ const goToForm = () => {
         <span class="text-slate-700">
           <strong>Seed:</strong> {{ model.seed }}
         </span>
+
+        <span class="text-slate-700">
+          <strong>Maximum length:</strong> {{ model.maximumLength }}
+        </span>
+
+        <span class="text-slate-700">
+          <strong>Top P:</strong> {{ model.topP }}
+        </span>
+
+        <span class="text-slate-700">
+          <strong>Repetition penalty:</strong> {{ model.repetitionPenalty }}
+        </span>
+
+        <span class="text-slate-700">
+          <strong>Stop sequences:</strong> {{ model.stopSequences }}
+        </span>
       </div>
 
-      <div class="mt-10">Definition: {{ model.definition }}</div>
+      <div class="mt-10"><strong>Definition:</strong> {{ model.definition }}</div>
+
+      <div class="mt-10">
+        <strong>Examples:</strong>
+        <ul class="example-list">
+          <li v-for="example in model.definitionExamples" :key="example._id" class="example-item">
+            <div class="example-item-content">
+              <div class="example-item-label">User instruction:</div>
+              <div class="example-item-value">{{ example.userInstruction }}</div>
+            </div>
+            <div class="example-item-content">
+              <div class="example-item-label">Model answer:</div>
+              <div class="example-item-value">{{ example.modelAnswer }}</div>
+            </div>
+          </li>
+        </ul>
+      </div>
     </v-card-text>
 
     <v-card-actions class="flex justify-start ml-2">
@@ -100,5 +132,27 @@ const goToForm = () => {
 
 .flexcard .v-toolbar {
   flex: 0;
+}
+
+.example-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.example-item {
+  margin-bottom: 10px;
+}
+
+.example-item-content {
+  display: flex;
+}
+
+.example-item-label {
+  flex-basis: 150px;
+}
+
+.example-item-value {
+  flex-grow: 1;
+  padding-left: 20px;
 }
 </style>
