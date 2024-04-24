@@ -38,7 +38,7 @@ const ModelSchema = new Schema({
     },
     stopSequences: {
         type: [String],
-        default: [';', '###']
+        default: ['###']
     },
     seed: {
         type: Number,

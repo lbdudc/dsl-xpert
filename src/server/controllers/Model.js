@@ -99,7 +99,8 @@ export default class ModelController {
             const { modelType, temperature, maximumLength, topP, repetitionPenalty, stopSequences, seed, definition, definitionExamples } = model;
 
             // Format definition examples
-            const formattedDefinitionExamples = "";
+            let formattedDefinitionExamples = "";
+            let defExample = "";
             definitionExamples.forEach(item => {
                 defExample = "\n<s>[INST] " + item.userInstruction + " [/INST]\n" + item.modelAnswer + " <s>\n";
                 formattedDefinitionExamples += defExample;
