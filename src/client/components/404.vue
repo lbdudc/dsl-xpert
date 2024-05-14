@@ -1,7 +1,9 @@
 <script setup>
 </script>
 <template>
-  <div class="flex items-center justify-center min-h-full bg-white py-72">
+  <div
+    class="flex items-center justify-center min-h-full bg-white dark:bg-gray-900 py-72"
+  >
     <div class="flex flex-col">
       <!-- Error Container -->
       <div class="flex flex-col items-center">

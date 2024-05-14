@@ -21,10 +21,13 @@ const goToForm = () => {
 <template>
   <v-card
     @click="goToDetail()"
-    class="bg-white rounded-lg shadow-md max-w-[400px] min-w-[300px]"
+    variant="elevated"
+    class="model-card rounded-lg shadow-md max-w-[400px] min-w-[300px]"
   >
     <v-card-title>
-      <h2 class="text-base font-semibold">{{ props.model.name }}</h2>
+      <h2 class="text-base font-semibold">
+        {{ props.model.name }}
+      </h2>
     </v-card-title>
 
     <v-card-subtitle v-if="props.model.description">
@@ -59,7 +62,7 @@ const goToForm = () => {
           class="me-2 text-none"
           color="#f08b26"
           prepend-icon="mdi-pencil"
-          variant="text"
+          variant="flat"
         >
           Edit
         </v-btn>
@@ -69,5 +72,17 @@ const goToForm = () => {
 </template>
 
 
-<style lang="scss" scoped>
+<style scoped>
+.model-card {
+  background-color: white;
+  color: black;
+}
+
+/* prefers color scheme */
+@media (prefers-color-scheme: dark) {
+  .model-card {
+    background-color: #1e293b;
+    color: white;
+  }
+}
 </style>

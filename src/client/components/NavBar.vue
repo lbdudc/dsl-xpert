@@ -32,7 +32,7 @@ const baseURL = import.meta.env.BASE_URL;
         <path d="M8 10h.01"></path>
         <path d="M8 14h.01"></path>
       </svg>
-      <h1 class="text-left text-xl font-bold">LLM DSL Oracle</h1>
+      <h1 class="text-left text-xl font-bold">DSL XPert</h1>
     </router-link>
   </header>
 </template>

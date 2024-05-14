@@ -3,9 +3,7 @@ import ModelListVue from "@/components/models/ModelList.vue";
 </script>
 
 <template>
-  <section
-    class="flex flex-col flex-grow gap-10 justify-center items-center bg-white dark:bg-gray-900"
-  >
+  <section class="flex flex-col flex-grow gap-10 justify-center items-center">
     <ModelListVue />
   </section>
 </template>

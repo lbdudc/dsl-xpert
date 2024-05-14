@@ -1,6 +1,6 @@
 {
-  "name": "llm-dsl-builder",
-  "version": "0.1.0",
+  "name": "@lbdudc/dsl-xpert",
+  "version": "0.1.1",
   "description": "Sensor LLM DSL Builder",
   "main": "index.js",
   "type": "module",
