@@ -34,11 +34,9 @@ const goToForm = () => {
 };
 </script>
 <template>
-  <v-card class="flexcard mt-5">
+  <v-card class="flexcard">
     <v-card-title>
-      <h1
-        class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white"
-      >
+      <h1 class="text-2xl font-bold tracking-tight text-slate-900 mb-2">
         Model: {{ model.name }}
       </h1>
       <v-chip class="text-xs mr-2" color="green" variant="outlined" size="small"
@@ -107,14 +105,14 @@ const goToForm = () => {
     <v-card-actions class="flex justify-start ml-2">
       <v-btn
         color="orange"
-        variant="tonal"
+        variant="outlined"
         prepend-icon="mdi-pencil"
         @click="goToForm"
         >Edit</v-btn
       >
       <v-btn
         color="red"
-        variant="tonal"
+        variant="outlined"
         prepend-icon="mdi-delete"
         @click="deleteModel"
         >Delete</v-btn
