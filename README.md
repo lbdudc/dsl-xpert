@@ -1,4 +1,4 @@
-# LLM DSL Builder
+# DSL X-Pert
 
 This tool provides a web interface  and a REST API to manage Large Language Models (LLM) for Domain Specific Languages (DSL). It allows to create, train and use LLMs for specific domains. The tool is designed to be used as a library or as a standalone application.
 
@@ -79,13 +79,13 @@ TBD
 To use it as a library, it is necessary to install it as a dependency:
 
 ```bash
-npm install @lbdudc/llm-dsl-builder
+npm install @lbdudc/dsl-xpert
 ```
 
 And then import it in the code:
 
 ```javascript
-import { createModel, getModel } from '@lbdudc/llm-dsl-builder';
+import { createModel, getModel } from '@lbdudc/dsl-xpert';
 
 // Create a new model
 const model = createModel({
