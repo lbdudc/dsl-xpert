@@ -1,4 +1,4 @@
-# DSL X-Pert
+# DSL-Xpert
 
 This tool provides a web interface  and a REST API to manage Large Language Models (LLM) for Domain Specific Languages (DSL). It allows to create, train and use LLMs for specific domains. The tool is designed to be used as a library or as a standalone application.
 
