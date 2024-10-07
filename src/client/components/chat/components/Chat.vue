@@ -135,7 +135,7 @@ const formatText = (text) => {
               <div
                 :class="{
                   'bg-blue-600 text-white align-end': message.isUser,
-                  'bg-gray-300': !message.isUser,
+                  'bg-gray-300 text-black': !message.isUser,
                 }"
                 class="p-3 rounded-lg relative"
               >
