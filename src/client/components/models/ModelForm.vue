@@ -15,6 +15,7 @@ const modelTypeItems = ["gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-16
 const id = ref(null);
 const modelDeveloper = ref(null);
 const modelType = ref(null);
+const apiKey = ref("");
 const name = ref(null);
 const temperature = ref(0.2);
 const maximumLength = ref(4095);
@@ -85,6 +86,7 @@ const createModel = async () => {
     body: JSON.stringify({
       developer: modelDeveloper.value,
       modelType: modelType.value,
+      apiKey: apiKey.value,
       name: name.value,
       temperature: temperature.value,
       maximumLength: maximumLength.value,
@@ -160,6 +162,16 @@ const removeCard = (cardIndex) => {
         placeholder="Enter model name"
         required
         :rules="[(v) => !!v || 'Name is required']"
+        variant="outlined"
+      >
+      </v-text-field>
+
+      <v-text-field
+        v-model="apiKey"
+        label="Api Key name"
+        placeholder="Enter api key name"
+        required
+        :rules="[(v) => !!v || 'Api key is required']"
         variant="outlined"
       >
       </v-text-field>
