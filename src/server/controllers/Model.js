@@ -1,4 +1,5 @@
 // Import Mongoose model
+import Model from '../schemas/Model.js';
 import ModelSchema from '../schemas/Model.js';
 import OpenAI from "openai";
 
@@ -39,7 +40,7 @@ export default class ModelController {
             if (!model) {
                 return res.status(404).send({ message: `Model with name ${name} not found` });
             }
-
+            model.apiKey = model.decryptApiKey();
             res.send(model); 
         } catch (error) {
             console.error(error);
@@ -50,26 +51,25 @@ export default class ModelController {
 
     static async update(req, res) {
         const id = req.params.id;
-
         try {
-            const model = await ModelSchema.findByIdAndUpdate(
-                {
-                    _id: id
-                },
-                req.body,
-                {
-                    new: true
-                }
-            );
+            let model = await ModelSchema.findById(id);
             if (!model) {
-                res.status(404).send({ message: `Model with id ${id} not found` });
+                return res.status(404).send({ message: `Model with id ${id} not found` });
             }
+            if (req.body.apiKey) {
+                model.encryptApiKey(req.body.apiKey);
+                delete req.body.apiKey;  
+            }
+            Object.assign(model, req.body); 
+            await model.save();
             res.send(model);
         } catch (error) {
             console.error(error);
             res.status(500).send(error);
         }
     }
+    
+    
 
     static async delete(req, res) {
         const id = req.params.id;

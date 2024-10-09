@@ -39,6 +39,7 @@ onMounted(() => {
         modelDeveloper.value = res.developer;
         modelType.value = res.modelType;
         name.value = res.name;
+        apiKey.value = res.apiKey;
         temperature.value = res.temperature;
         maximumLength.value = res.maximumLength;
         topP.value = res.topP;
@@ -113,6 +114,7 @@ const updateModel = async () => {
     body: JSON.stringify({
       developer: modelDeveloper.value,
       modelType: modelType.value,
+      apiKey: apiKey.value,
       name: name.value,
       temperature: temperature.value,
       maximumLength: maximumLength.value,
