@@ -168,16 +168,6 @@ const removeCard = (cardIndex) => {
       >
       </v-text-field>
 
-      <v-text-field
-        v-model="apiKey"
-        label="Api Key name"
-        placeholder="Enter api key name"
-        required
-        :rules="[(v) => !!v || 'Api key is required']"
-        variant="outlined"
-      >
-      </v-text-field>
-
       <v-row no-gutters class="pb-2">
         <v-col cols="12" md="6" class="pr-6">
           <v-select
@@ -203,6 +193,17 @@ const removeCard = (cardIndex) => {
           </v-select>
         </v-col>
       </v-row>
+
+      <v-text-field
+          v-if="modelDeveloper === 'OpenAI'"
+          v-model="apiKey"
+          label="Api Key name"
+          placeholder="Enter api key name"
+          required
+          :rules="[(v) => !!v || 'Api key is required']"
+          variant="outlined"
+        >
+      </v-text-field>
 
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pr-6">
