@@ -84,9 +84,22 @@ const getModelOutput = async () => {
     }
     nTokensConversation = openAIData.nTokens;
     loadingResponse.value = false;
-  } catch (error) {
-    throw new Error(error);
+    } catch (error) {
+    let errorMessage = error.message;
+    try {
+      const parsedError = JSON.parse(errorMessage);
+      errorMessage = parsedError.error || "An unexpected error occurred";
+    } catch (parseError) {
+      errorMessage = error.message;
+    }
+    conversation.push({
+      text: errorMessage,
+      timestamp: new Date().toLocaleTimeString(),
+      isUser: false,
+    });
+    loadingResponse.value = false;
   }
+
 };
 
 // Copy to clipboard the model output

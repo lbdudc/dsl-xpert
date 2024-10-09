@@ -141,32 +141,35 @@ export default class ModelController {
             // Connect with OpenAI API
             let modelResponse = "";
             const doPetition = async () => {
-                const stream = await openai.chat.completions.create({
-                    messages: messagesHistory,
-                    model: modelType,
-                    temperature: temperature,
-                    max_tokens: maximumLength,
-                    top_p: topP,
-                    frequency_penalty: repetitionPenalty,
-                    presence_penalty: repetitionPenalty,
-                    stop: stopSequences,
-                    seed: seed,
-                });
-
-                // Get model output and consumed tokens
-                modelResponse = stream.choices[0].message.content;
-                nTokens = stream.usage.total_tokens;
-
-                // Format model output and add to the conversation
-                const modelOutput = { role: "assistant", content: modelResponse };
-                messagesHistory.push(modelOutput);
-
-                res.send(
-                    JSON.stringify({
-                        messagesHistory: messagesHistory,
-                        nTokens: nTokens,
-                    })
-                );
+                try {
+                    const stream = await openai.chat.completions.create({
+                        messages: messagesHistory,
+                        model: modelType,
+                        temperature: temperature,
+                        max_tokens: maximumLength,
+                        top_p: topP,
+                        frequency_penalty: repetitionPenalty,
+                        presence_penalty: repetitionPenalty,
+                        stop: stopSequences,
+                        seed: seed,
+                    });
+    
+                    modelResponse = stream.choices[0].message.content;
+                    nTokens = stream.usage.total_tokens;
+    
+                    const modelOutput = { role: "assistant", content: modelResponse };
+                    messagesHistory.push(modelOutput);
+    
+                    res.send({
+                        messagesHistory,
+                        nTokens,
+                    });
+                } catch (err) {
+                    console.error("Error during API request:", err);
+                    res.status(500).send({
+                        error: "Failed to retrieve response from OpenAI API. Please check your API key or try again later.",
+                    });
+                }
             };
             doPetition();
         } catch (error) {
