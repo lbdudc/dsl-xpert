@@ -37,7 +37,7 @@
     "autoprefixer": "^10.4.13",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
-    "dotenv": "16.4.5",
+    "dotenv": "^16.4.5",
     "eslint": "8.41.0",
     "eslint-config-prettier": "8.8.0",
     "eslint-plugin-vuetify": "^2.1.0",

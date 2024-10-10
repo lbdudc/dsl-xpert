@@ -1,14 +1,12 @@
-// Import Mongoose model
 import ModelSchema from '../schemas/Model.js';
 import OpenAI from "openai";
-
-const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 export default class ModelController {
 
     static async create(req, res) {
         try {
             const model = new ModelSchema(req.body);
+             model.encryptApiKey(req.body.apiKey);
             await model.save();
             res.send(model);
         } catch (error) {
@@ -30,44 +28,44 @@ export default class ModelController {
     // get model by name
     static async findOne(req, res) {
         const name = req.params.name;
-
+    
         try {
             const model = await ModelSchema.findOne({
                 name: name
             });
             if (!model) {
-                res.status(404).send({ message: `Model with name ${name} not found` });
-            } else {
-                res.send(model);
+                return res.status(404).send({ message: `Model with name ${name} not found` });
             }
+            model.apiKey = model.decryptApiKey();
+            res.send(model); 
         } catch (error) {
             console.error(error);
             res.status(500).send(error);
         }
     }
+    
 
     static async update(req, res) {
         const id = req.params.id;
-
         try {
-            const model = await ModelSchema.findByIdAndUpdate(
-                {
-                    _id: id
-                },
-                req.body,
-                {
-                    new: true
-                }
-            );
+            let model = await ModelSchema.findById(id);
             if (!model) {
-                res.status(404).send({ message: `Model with id ${id} not found` });
+                return res.status(404).send({ message: `Model with id ${id} not found` });
             }
+            if (req.body.apiKey) {
+                model.encryptApiKey(req.body.apiKey);
+                delete req.body.apiKey;  
+            }
+            Object.assign(model, req.body); 
+            await model.save();
             res.send(model);
         } catch (error) {
             console.error(error);
             res.status(500).send(error);
         }
     }
+    
+    
 
     static async delete(req, res) {
         const id = req.params.id;
@@ -97,7 +95,6 @@ export default class ModelController {
                 res.status(404).send({ message: `Model with id ${id} not found` });
             }
             const { modelType, temperature, maximumLength, topP, repetitionPenalty, stopSequences, seed, definition, definitionExamples } = model;
-
             // Format definition examples
             let formattedDefinitionExamples = "";
             let defExample = "";
@@ -107,8 +104,9 @@ export default class ModelController {
             });
 
             // Initialize the variables and the context for correct model inference
+            const apiKey = model.decryptApiKey();
             const openai = new OpenAI({
-                apiKey: OPENAI_KEY,
+                apiKey: apiKey,
             });
             let nTokens = 0;
             const initialContext = [
@@ -139,32 +137,35 @@ export default class ModelController {
             // Connect with OpenAI API
             let modelResponse = "";
             const doPetition = async () => {
-                const stream = await openai.chat.completions.create({
-                    messages: messagesHistory,
-                    model: modelType,
-                    temperature: temperature,
-                    max_tokens: maximumLength,
-                    top_p: topP,
-                    frequency_penalty: repetitionPenalty,
-                    presence_penalty: repetitionPenalty,
-                    stop: stopSequences,
-                    seed: seed,
-                });
-
-                // Get model output and consumed tokens
-                modelResponse = stream.choices[0].message.content;
-                nTokens = stream.usage.total_tokens;
-
-                // Format model output and add to the conversation
-                const modelOutput = { role: "assistant", content: modelResponse };
-                messagesHistory.push(modelOutput);
-
-                res.send(
-                    JSON.stringify({
-                        messagesHistory: messagesHistory,
-                        nTokens: nTokens,
-                    })
-                );
+                try {
+                    const stream = await openai.chat.completions.create({
+                        messages: messagesHistory,
+                        model: modelType,
+                        temperature: temperature,
+                        max_tokens: maximumLength,
+                        top_p: topP,
+                        frequency_penalty: repetitionPenalty,
+                        presence_penalty: repetitionPenalty,
+                        stop: stopSequences,
+                        seed: seed,
+                    });
+    
+                    modelResponse = stream.choices[0].message.content;
+                    nTokens = stream.usage.total_tokens;
+    
+                    const modelOutput = { role: "assistant", content: modelResponse };
+                    messagesHistory.push(modelOutput);
+    
+                    res.send({
+                        messagesHistory,
+                        nTokens,
+                    });
+                } catch (err) {
+                    console.error("Error during API request:", err);
+                    res.status(500).send({
+                        error: "Failed to retrieve response from OpenAI API. Please check your API key or try again later.",
+                    });
+                }
             };
             doPetition();
         } catch (error) {

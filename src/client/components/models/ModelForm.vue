@@ -15,6 +15,8 @@ const modelTypeItems = ["gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-16
 const id = ref(null);
 const modelDeveloper = ref(null);
 const modelType = ref(null);
+const apiKey = ref("");
+const showApiKey = ref(false);
 const name = ref(null);
 const temperature = ref(0.2);
 const maximumLength = ref(4095);
@@ -38,6 +40,7 @@ onMounted(() => {
         modelDeveloper.value = res.developer;
         modelType.value = res.modelType;
         name.value = res.name;
+        apiKey.value = res.apiKey;
         temperature.value = res.temperature;
         maximumLength.value = res.maximumLength;
         topP.value = res.topP;
@@ -85,6 +88,7 @@ const createModel = async () => {
     body: JSON.stringify({
       developer: modelDeveloper.value,
       modelType: modelType.value,
+      apiKey: apiKey.value,
       name: name.value,
       temperature: temperature.value,
       maximumLength: maximumLength.value,
@@ -111,6 +115,7 @@ const updateModel = async () => {
     body: JSON.stringify({
       developer: modelDeveloper.value,
       modelType: modelType.value,
+      apiKey: apiKey.value,
       name: name.value,
       temperature: temperature.value,
       maximumLength: maximumLength.value,
@@ -127,6 +132,10 @@ const updateModel = async () => {
   const json = await res.json();
 
   return json;
+};
+
+const toggleShowApiKey = () => {
+      showApiKey.value = !showApiKey.value;  // Alternar entre mostrar y ocultar
 };
 
 const addStopSequence = () => {
@@ -189,6 +198,22 @@ const removeCard = (cardIndex) => {
           </v-select>
         </v-col>
       </v-row>
+
+      <v-text-field
+        v-if="modelDeveloper === 'OpenAI'"
+        v-model="apiKey"
+        label="Api Key"
+        placeholder="Enter api key"
+        required
+        :type="showApiKey ? 'text' : 'password'"
+        :append-icon="showApiKey ? 'mdi-eye-off' : 'mdi-eye'" 
+        @click:append="toggleShowApiKey"  
+        autocomplete="off"
+        :rules="[(v) => !!v || 'Api key is required']"
+        variant="outlined"
+      >
+      </v-text-field>
+
 
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pr-6">
