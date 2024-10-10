@@ -16,6 +16,7 @@ const id = ref(null);
 const modelDeveloper = ref(null);
 const modelType = ref(null);
 const apiKey = ref("");
+const showApiKey = ref(false);
 const name = ref(null);
 const temperature = ref(0.2);
 const maximumLength = ref(4095);
@@ -133,6 +134,10 @@ const updateModel = async () => {
   return json;
 };
 
+const toggleShowApiKey = () => {
+      showApiKey.value = !showApiKey.value;  // Alternar entre mostrar y ocultar
+};
+
 const addStopSequence = () => {
   stopSequences.value.push(singleStopSequence.value);
   singleStopSequence.value = '';
@@ -195,15 +200,20 @@ const removeCard = (cardIndex) => {
       </v-row>
 
       <v-text-field
-          v-if="modelDeveloper === 'OpenAI'"
-          v-model="apiKey"
-          label="Api Key name"
-          placeholder="Enter api key name"
-          required
-          :rules="[(v) => !!v || 'Api key is required']"
-          variant="outlined"
-        >
+        v-if="modelDeveloper === 'OpenAI'"
+        v-model="apiKey"
+        label="Api Key"
+        placeholder="Enter api key"
+        required
+        :type="showApiKey ? 'text' : 'password'"
+        :append-icon="showApiKey ? 'mdi-eye-off' : 'mdi-eye'" 
+        @click:append="toggleShowApiKey"  
+        autocomplete="off"
+        :rules="[(v) => !!v || 'Api key is required']"
+        variant="outlined"
+      >
       </v-text-field>
+
 
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pr-6">

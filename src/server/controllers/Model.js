@@ -1,9 +1,5 @@
-// Import Mongoose model
-import Model from '../schemas/Model.js';
 import ModelSchema from '../schemas/Model.js';
 import OpenAI from "openai";
-
-const OPENAI_KEY = process.env.OPENAI_API_KEY;
 
 export default class ModelController {
 
