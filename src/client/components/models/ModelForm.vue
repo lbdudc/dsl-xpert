@@ -10,7 +10,14 @@ const route = useRoute();
 const router = useRouter();
 
 const modelDeveloperItems = ["OpenAI", "Meta", "Mistral", "Google"];
-const modelTypeItems = ["gpt-3.5-turbo", "gpt-3.5-turbo-0125", "gpt-3.5-turbo-16k", "gpt-4", "gpt-4-turbo"];
+const grammarTypeItems = ["no grammar validator", "bnf", "antlr4", "langium"];
+const modelTypeItems = [
+  "gpt-3.5-turbo",
+  "gpt-3.5-turbo-0125",
+  "gpt-3.5-turbo-16k",
+  "gpt-4",
+  "gpt-4-turbo",
+];
 
 const id = ref(null);
 const modelDeveloper = ref(null);
@@ -26,7 +33,9 @@ const stopSequences = ref([";", "###"]);
 const seed = ref(6);
 const description = ref();
 const definition = ref("");
-const definitionExamples = ref([{ userInstruction: '', modelAnswer: '' }]);
+const validationMessage = ref("");
+const hasErrors = ref(false);
+const definitionExamples = ref([{ userInstruction: "", modelAnswer: "" }]);
 
 const myForm = ref();
 const loading = ref(false);
@@ -54,6 +63,173 @@ onMounted(() => {
     });
   }
 });
+
+const escapeHtml = (unsafe) => {
+  return unsafe
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#039;");
+};
+
+const validateGrammar = (grammarType, definition) => {
+  validationMessage.value = "";
+  if (grammarType._value === "bnf") {
+    const bnfErrors = validateBnfGrammar(definition);
+    if (bnfErrors) {
+      return false;
+    }
+  }
+  if (grammarType._value === "antlr4") {
+    const bnfErrors = validateAntlr4Grammar(definition);
+    if (bnfErrors) {
+      return false;
+    }
+  }
+  if (grammarType._value === "langium") {
+    const bnfErrors = validateLangiumGrammar(definition);
+    if (bnfErrors) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const validateBnfGrammar = (definition) => {
+  const lines = definition._value.split("\n");
+  let errors = [];
+  hasErrors.value = false;
+
+  lines.forEach((line, index) => {
+    const trimmedLine = line.trim();
+
+    if (trimmedLine) {
+      const match = /^<[^<>]+>\s*::=\s*.+$/.test(trimmedLine);
+      const hasOpeningBracket = trimmedLine.includes("<");
+      const hasClosingBracket = trimmedLine.includes(">");
+      if (!match || !hasOpeningBracket || !hasClosingBracket) {
+        errors.push(
+          `Error in the line ${index + 1}: "${escapeHtml(
+            line
+          )}" does not have the correct format ${escapeHtml(
+            "<name>"
+          )} ::= ${escapeHtml("<expression>")}`
+        );
+      }
+    }
+  });
+
+  if (errors.length > 0) {
+    hasErrors.value = true;
+    validationMessage.value =
+      "Errors in grammar were found:<br>" + errors.join("<br>");
+    return true;
+  }
+};
+const validateAntlr4Grammar = (definition) => {
+  const lines = definition._value.split("\n");
+  let errors = [];
+  hasErrors.value = false;
+
+  const grammarDeclaration = lines[0].trim();
+  const grammarMatch = /^grammar\s+[a-zA-Z_][a-zA-Z0-9_]*;/.test(
+    grammarDeclaration
+  );
+  if (!grammarMatch) {
+    errors.push(
+      `Error in line 1: "${escapeHtml(
+        lines[0]
+      )}" is not a valid grammar declaration. It should be in the format ${escapeHtml(
+        "grammar Name;"
+      )}.`
+    );
+  }
+
+  for (let index = 1; index < lines.length; index++) {
+    const line = lines[index].trim();
+    const lineWithoutComment = line.split("//")[0].trim();
+
+    if (lineWithoutComment) {
+      const match = /^[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*.*?;/g.test(
+        lineWithoutComment
+      );
+      const hasColon = lineWithoutComment.includes(":");
+      const hasSemicolon = lineWithoutComment.endsWith(";");
+
+      if (!match || !hasColon || !hasSemicolon) {
+        errors.push(
+          `Error in line ${index + 1}: "${escapeHtml(
+            line
+          )}" does not have the correct format ${escapeHtml(
+            "<ruleName>"
+          )} : <expression>;`
+        );
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    hasErrors.value = true;
+    validationMessage.value =
+      "Errors in grammar were found:<br>" + errors.join("<br>");
+    return true;
+  }
+
+  return false;
+};
+
+const validateLangiumGrammar = (definition) => {
+  const lines = definition._value.split("\n");
+  let errors = [];
+  hasErrors.value = false;
+
+  const grammarDeclaration = lines[0].trim();
+  const grammarMatch = /^grammar\s+[a-zA-Z_][a-zA-Z0-9_]*;/.test(
+    grammarDeclaration
+  );
+  if (!grammarMatch) {
+    errors.push(
+      `Error in line 1: "${escapeHtml(
+        lines[0]
+      )}" is not a valid grammar declaration. It should be in the format ${escapeHtml(
+        "grammar Name;"
+      )}.`
+    );
+  }
+
+  for (let index = 1; index < lines.length; index++) {
+    const line = lines[index].trim();
+    const lineWithoutComment = line.split("//")[0].trim();
+
+    if (lineWithoutComment) {
+      const match = /^[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*.*?;/g.test(
+        lineWithoutComment
+      );
+      const hasColon = lineWithoutComment.includes(":");
+      const hasSemicolon = lineWithoutComment.endsWith(";");
+
+      if (!match || !hasColon || !hasSemicolon) {
+        errors.push(
+          `Error in line ${index + 1}: "${escapeHtml(
+            line
+          )}" does not have the correct format ${escapeHtml(
+            "<ruleName>"
+          )} : <expression>;`
+        );
+      }
+    }
+  }
+
+  if (errors.length > 0) {
+    hasErrors.value = true;
+    validationMessage.value =
+      "Errors in grammar were found:<br>" + errors.join("<br>");
+    return true;
+  }
+
+  return false;
+};
 
 const submit = async () => {
   // reset validation
@@ -135,20 +311,20 @@ const updateModel = async () => {
 };
 
 const toggleShowApiKey = () => {
-      showApiKey.value = !showApiKey.value;  // Alternar entre mostrar y ocultar
+  showApiKey.value = !showApiKey.value; // Alternar entre mostrar y ocultar
 };
 
 const addStopSequence = () => {
   stopSequences.value.push(singleStopSequence.value);
-  singleStopSequence.value = '';
+  singleStopSequence.value = "";
 };
-  
+
 const removeStopSequence = (stopSequenceIndex) => {
   stopSequences.value.splice(stopSequenceIndex, 1);
-}
+};
 
 const addCard = () => {
-  definitionExamples.value.push({ userInstruction: '', modelAnswer: '' });
+  definitionExamples.value.push({ userInstruction: "", modelAnswer: "" });
 };
 
 const removeCard = (cardIndex) => {
@@ -206,14 +382,13 @@ const removeCard = (cardIndex) => {
         placeholder="Enter api key"
         required
         :type="showApiKey ? 'text' : 'password'"
-        :append-icon="showApiKey ? 'mdi-eye-off' : 'mdi-eye'" 
-        @click:append="toggleShowApiKey"  
+        :append-icon="showApiKey ? 'mdi-eye-off' : 'mdi-eye'"
+        @click:append="toggleShowApiKey"
         autocomplete="off"
         :rules="[(v) => !!v || 'Api key is required']"
         variant="outlined"
       >
       </v-text-field>
-
 
       <v-row no-gutters>
         <v-col cols="12" md="6" class="pr-6">
@@ -225,11 +400,17 @@ const removeCard = (cardIndex) => {
             variant="outlined"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>From OpenAI docs: What sampling temperature to use, between 0 and 2. Higher values like 0.8 will make the output more random, while lower values like 0.2 will make it more focused and deterministic. We generally recommend altering this or top_p but not both.</span>
+                <span
+                  >From OpenAI docs: What sampling temperature to use, between 0
+                  and 2. Higher values like 0.8 will make the output more
+                  random, while lower values like 0.2 will make it more focused
+                  and deterministic. We generally recommend altering this or
+                  top_p but not both.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
@@ -243,11 +424,16 @@ const removeCard = (cardIndex) => {
             variant="outlined"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>From OpenAI docs: If specified, our system will make a best effort to sample deterministically, such that repeated requests with the same seed and parameters should return the same result.</span>
+                <span
+                  >From OpenAI docs: If specified, our system will make a best
+                  effort to sample deterministically, such that repeated
+                  requests with the same seed and parameters should return the
+                  same result.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
@@ -264,11 +450,15 @@ const removeCard = (cardIndex) => {
             variant="outlined"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>The maximum number of tokens that can be generated for each model response. Take into account that each model type may have its own limitations in this regard.</span>
+                <span
+                  >The maximum number of tokens that can be generated for each
+                  model response. Take into account that each model type may
+                  have its own limitations in this regard.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
@@ -282,11 +472,18 @@ const removeCard = (cardIndex) => {
             variant="outlined"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>From OpenAI docs: An alternative to sampling with temperature, called nucleus sampling, where the model considers the results of the tokens with top_p probability mass. So 0.1 means only the tokens comprising the top 10% probability mass are considered. We generally recommend altering this or temperature but not both.</span>
+                <span
+                  >From OpenAI docs: An alternative to sampling with
+                  temperature, called nucleus sampling, where the model
+                  considers the results of the tokens with top_p probability
+                  mass. So 0.1 means only the tokens comprising the top 10%
+                  probability mass are considered. We generally recommend
+                  altering this or temperature but not both.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
@@ -303,11 +500,17 @@ const removeCard = (cardIndex) => {
             variant="outlined"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>From OpenAI docs: Number between -2.0 and 2.0. Positive values penalize new tokens based on their existing frequency and whether they appear in the text so far, decreasing the model's likelihood to repeat the same line verbatim and increasing its likelihood to talk about new topics.</span>
+                <span
+                  >From OpenAI docs: Number between -2.0 and 2.0. Positive
+                  values penalize new tokens based on their existing frequency
+                  and whether they appear in the text so far, decreasing the
+                  model's likelihood to repeat the same line verbatim and
+                  increasing its likelihood to talk about new topics.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
@@ -323,26 +526,37 @@ const removeCard = (cardIndex) => {
             @click:append="addStopSequence"
           >
             <template v-slot:append>
-              <v-tooltip bottom max-width="250px">
+              <v-tooltip location="bottom" max-width="250px">
                 <template v-slot:activator="{ props }">
                   <v-icon v-bind="props"> mdi-information </v-icon>
                 </template>
-                <span>From OpenAI docs: Up to 4 sequences where the model will stop generating further tokens.</span>
+                <span
+                  >From OpenAI docs: Up to 4 sequences where the model will stop
+                  generating further tokens.</span
+                >
               </v-tooltip>
             </template>
           </v-text-field>
           <v-chip
             v-for="(singleStopSequence, stopSequenceIndex) in stopSequences"
-              :key="stopSequenceIndex"
-              class="ma-1"
-              closable
-              @click:close="removeStopSequence(stopSequenceIndex)"
+            :key="stopSequenceIndex"
+            class="ma-1"
+            closable
+            @click:close="removeStopSequence(stopSequenceIndex)"
           >
             {{ singleStopSequence }}
           </v-chip>
         </v-col>
       </v-row>
-
+      <v-select
+        v-model="grammarType"
+        :items="grammarTypeItems"
+        label="Grammar type"
+        :rules="[(v) => !!v || 'Grammar type is required']"
+        placeholder="Select a grammar type"
+        variant="outlined"
+      >
+      </v-select>
       <v-textarea
         v-model="description"
         label="Model description"
@@ -365,30 +579,34 @@ const removeCard = (cardIndex) => {
       >
       </v-textarea>
 
-      <v-card v-for="(card, cardIndex) in definitionExamples" :key="cardIndex" class="outlined-card">
+      <v-card
+        v-for="(card, cardIndex) in definitionExamples"
+        :key="cardIndex"
+        class="outlined-card"
+      >
         <v-card-title>
           <div>Usage example</div>
         </v-card-title>
         <v-card-text>
-          <v-textarea 
-            v-model="card.userInstruction" 
+          <v-textarea
+            v-model="card.userInstruction"
             label="User instruction"
             placeholder="Enter an instruction for the model"
             rows="2"
             auto-grow
             variant="outlined"
-            >
+          >
           </v-textarea>
         </v-card-text>
         <v-card-text>
-          <v-textarea 
-            v-model="card.modelAnswer" 
+          <v-textarea
+            v-model="card.modelAnswer"
             label="Model answer"
             placeholder="Enter the desired result for that instruction"
             rows="2"
             auto-grow
             variant="outlined"
-            >
+          >
           </v-textarea>
         </v-card-text>
         <v-card-actions>
@@ -417,5 +635,9 @@ const removeCard = (cardIndex) => {
 
 .outlined-card {
   border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+.error-message {
+  color: red;
 }
 </style>
