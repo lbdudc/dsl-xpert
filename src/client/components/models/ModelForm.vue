@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, ref } from "vue";
 import { useRouter, useRoute } from "vue-router";
+import ModelGrammarValidator from "./ModelGrammarValidator.vue";
 
 const SERVER_URL = `${
   import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
@@ -31,10 +32,9 @@ const topP = ref(1);
 const repetitionPenalty = ref(0);
 const stopSequences = ref([";", "###"]);
 const seed = ref(6);
+const grammarType = ref(null);
 const description = ref();
 const definition = ref("");
-const validationMessage = ref("");
-const hasErrors = ref(false);
 const definitionExamples = ref([{ userInstruction: "", modelAnswer: "" }]);
 
 const myForm = ref();
@@ -64,171 +64,8 @@ onMounted(() => {
   }
 });
 
-const escapeHtml = (unsafe) => {
-  return unsafe
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;")
-    .replace(/'/g, "&#039;");
-};
-
-const validateGrammar = (grammarType, definition) => {
-  validationMessage.value = "";
-  if (grammarType._value === "bnf") {
-    const bnfErrors = validateBnfGrammar(definition);
-    if (bnfErrors) {
-      return false;
-    }
-  }
-  if (grammarType._value === "antlr4") {
-    const bnfErrors = validateAntlr4Grammar(definition);
-    if (bnfErrors) {
-      return false;
-    }
-  }
-  if (grammarType._value === "langium") {
-    const bnfErrors = validateLangiumGrammar(definition);
-    if (bnfErrors) {
-      return false;
-    }
-  }
-  return true;
-};
-
-const validateBnfGrammar = (definition) => {
-  const lines = definition._value.split("\n");
-  let errors = [];
-  hasErrors.value = false;
-
-  lines.forEach((line, index) => {
-    const trimmedLine = line.trim();
-
-    if (trimmedLine) {
-      const match = /^<[^<>]+>\s*::=\s*.+$/.test(trimmedLine);
-      const hasOpeningBracket = trimmedLine.includes("<");
-      const hasClosingBracket = trimmedLine.includes(">");
-      if (!match || !hasOpeningBracket || !hasClosingBracket) {
-        errors.push(
-          `Error in the line ${index + 1}: "${escapeHtml(
-            line
-          )}" does not have the correct format ${escapeHtml(
-            "<name>"
-          )} ::= ${escapeHtml("<expression>")}`
-        );
-      }
-    }
-  });
-
-  if (errors.length > 0) {
-    hasErrors.value = true;
-    validationMessage.value =
-      "Errors in grammar were found:<br>" + errors.join("<br>");
-    return true;
-  }
-};
-const validateAntlr4Grammar = (definition) => {
-  const lines = definition._value.split("\n");
-  let errors = [];
-  hasErrors.value = false;
-
-  const grammarDeclaration = lines[0].trim();
-  const grammarMatch = /^grammar\s+[a-zA-Z_][a-zA-Z0-9_]*;/.test(
-    grammarDeclaration
-  );
-  if (!grammarMatch) {
-    errors.push(
-      `Error in line 1: "${escapeHtml(
-        lines[0]
-      )}" is not a valid grammar declaration. It should be in the format ${escapeHtml(
-        "grammar Name;"
-      )}.`
-    );
-  }
-
-  for (let index = 1; index < lines.length; index++) {
-    const line = lines[index].trim();
-    const lineWithoutComment = line.split("//")[0].trim();
-
-    if (lineWithoutComment) {
-      const match = /^[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*.*?;/g.test(
-        lineWithoutComment
-      );
-      const hasColon = lineWithoutComment.includes(":");
-      const hasSemicolon = lineWithoutComment.endsWith(";");
-
-      if (!match || !hasColon || !hasSemicolon) {
-        errors.push(
-          `Error in line ${index + 1}: "${escapeHtml(
-            line
-          )}" does not have the correct format ${escapeHtml(
-            "<ruleName>"
-          )} : <expression>;`
-        );
-      }
-    }
-  }
-
-  if (errors.length > 0) {
-    hasErrors.value = true;
-    validationMessage.value =
-      "Errors in grammar were found:<br>" + errors.join("<br>");
-    return true;
-  }
-
-  return false;
-};
-
-const validateLangiumGrammar = (definition) => {
-  const lines = definition._value.split("\n");
-  let errors = [];
-  hasErrors.value = false;
-
-  const grammarDeclaration = lines[0].trim();
-  const grammarMatch = /^grammar\s+[a-zA-Z_][a-zA-Z0-9_]*;/.test(
-    grammarDeclaration
-  );
-  if (!grammarMatch) {
-    errors.push(
-      `Error in line 1: "${escapeHtml(
-        lines[0]
-      )}" is not a valid grammar declaration. It should be in the format ${escapeHtml(
-        "grammar Name;"
-      )}.`
-    );
-  }
-
-  for (let index = 1; index < lines.length; index++) {
-    const line = lines[index].trim();
-    const lineWithoutComment = line.split("//")[0].trim();
-
-    if (lineWithoutComment) {
-      const match = /^[a-zA-Z_][a-zA-Z0-9_]*\s*:\s*.*?;/g.test(
-        lineWithoutComment
-      );
-      const hasColon = lineWithoutComment.includes(":");
-      const hasSemicolon = lineWithoutComment.endsWith(";");
-
-      if (!match || !hasColon || !hasSemicolon) {
-        errors.push(
-          `Error in line ${index + 1}: "${escapeHtml(
-            line
-          )}" does not have the correct format ${escapeHtml(
-            "<ruleName>"
-          )} : <expression>;`
-        );
-      }
-    }
-  }
-
-  if (errors.length > 0) {
-    hasErrors.value = true;
-    validationMessage.value =
-      "Errors in grammar were found:<br>" + errors.join("<br>");
-    return true;
-  }
-
-  return false;
+const handleContentUpdate = (content) => {
+  definition.value = content;
 };
 
 const submit = async () => {
@@ -548,6 +385,7 @@ const removeCard = (cardIndex) => {
           </v-chip>
         </v-col>
       </v-row>
+
       <v-select
         v-model="grammarType"
         :items="grammarTypeItems"
@@ -557,23 +395,20 @@ const removeCard = (cardIndex) => {
         variant="outlined"
       >
       </v-select>
+
+      <ModelGrammarValidator 
+        v-if="grammarType" 
+        :key="grammarType" 
+        :grammarType="grammarType"
+        @updateContent="handleContentUpdate">
+      </ModelGrammarValidator>
+
       <v-textarea
         v-model="description"
         label="Model description"
         placeholder="Enter a description for the model"
         rows="2"
         no-resize
-        clearable
-        variant="outlined"
-      >
-      </v-textarea>
-
-      <v-textarea
-        v-model="definition"
-        label="Model grammar definition"
-        placeholder="Enter a definition for the model"
-        :rules="[(v) => !!v || 'Definition is required']"
-        auto-grow
         clearable
         variant="outlined"
       >
