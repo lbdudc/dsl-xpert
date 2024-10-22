@@ -26,7 +26,7 @@ const routes = [
     path: `${base}models/:id/edit`,
     name: "ModelForm",
     component: ModelForm,
-  }
+  },
 ];
 
 const history = createWebHistory();

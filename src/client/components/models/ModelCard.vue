@@ -71,7 +71,6 @@ const goToForm = () => {
   </v-card>
 </template>
 
-
 <style scoped>
 .model-card {
   background-color: white;

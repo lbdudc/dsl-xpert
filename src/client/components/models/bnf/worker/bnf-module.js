@@ -1,16 +1,19 @@
-import { inject } from 'langium';
-import { createDefaultModule, createDefaultSharedModule } from 'langium/lsp';
-import { BnfGeneratedModule, BnfGeneratedSharedModule } from './generated/module.js';
-import { BnfValidator, registerValidationChecks } from './bnf-validator.js';
+import { inject } from "langium";
+import { createDefaultModule, createDefaultSharedModule } from "langium/lsp";
+import {
+  BnfGeneratedModule,
+  BnfGeneratedSharedModule,
+} from "./generated/module.js";
+import { BnfValidator, registerValidationChecks } from "./bnf-validator.js";
 /**
  * Dependency injection module that overrides Langium default services and contributes the
  * declared custom services. The Langium defaults can be partially specified to override only
  * selected services, while the custom services must be fully specified.
  */
 export const BnfModule = {
-    validation: {
-        BnfValidator: () => new BnfValidator()
-    }
+  validation: {
+    BnfValidator: () => new BnfValidator(),
+  },
 };
 /**
  * Create the full set of services required by Langium.
@@ -28,15 +31,22 @@ export const BnfModule = {
  * @returns An object wrapping the shared services and the language-specific services
  */
 export function createBnfServices(context) {
-    const shared = inject(createDefaultSharedModule(context), BnfGeneratedSharedModule);
-    const Bnf = inject(createDefaultModule({ shared }), BnfGeneratedModule, BnfModule);
-    shared.ServiceRegistry.register(Bnf);
-    registerValidationChecks(Bnf);
-    if (!context.connection) {
-        // We don't run inside a language server
-        // Therefore, initialize the configuration provider instantly
-        shared.workspace.ConfigurationProvider.initialized({});
-    }
-    return { shared, Bnf };
+  const shared = inject(
+    createDefaultSharedModule(context),
+    BnfGeneratedSharedModule
+  );
+  const Bnf = inject(
+    createDefaultModule({ shared }),
+    BnfGeneratedModule,
+    BnfModule
+  );
+  shared.ServiceRegistry.register(Bnf);
+  registerValidationChecks(Bnf);
+  if (!context.connection) {
+    // We don't run inside a language server
+    // Therefore, initialize the configuration provider instantly
+    shared.workspace.ConfigurationProvider.initialized({});
+  }
+  return { shared, Bnf };
 }
 //# sourceMappingURL=bnf-module.js.map

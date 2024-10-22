@@ -4,32 +4,39 @@
  * ------------------------------------------------------------------------------------------ */
 /// <reference lib="WebWorker" />
 
-import { EmptyFileSystem } from 'langium';
-import { DefaultSharedModuleContext, startLanguageServer } from 'langium/lsp';
-import { createLangiumGrammarServices } from 'langium/grammar';
-import { BrowserMessageReader, BrowserMessageWriter, createConnection } from 'vscode-languageserver/browser.js';
+import { EmptyFileSystem } from "langium";
+import { DefaultSharedModuleContext, startLanguageServer } from "langium/lsp";
+import { createLangiumGrammarServices } from "langium/grammar";
+import {
+  BrowserMessageReader,
+  BrowserMessageWriter,
+  createConnection,
+} from "vscode-languageserver/browser.js";
 
-const messageReader = new BrowserMessageReader(self as DedicatedWorkerGlobalScope);
-const messageWriter = new BrowserMessageWriter(self as DedicatedWorkerGlobalScope);
+const messageReader = new BrowserMessageReader(
+  self as DedicatedWorkerGlobalScope
+);
+const messageWriter = new BrowserMessageWriter(
+  self as DedicatedWorkerGlobalScope
+);
 
 // Create the connection
 const connection = createConnection(messageReader, messageWriter);
 
-
 connection.onInitialize((params) => {
-    console.log("Langium Server: Initialize", params);
-    return { capabilities: {} }; // Return actual server capabilities
+  console.log("Langium Server: Initialize", params);
+  return { capabilities: {} }; // Return actual server capabilities
 });
 
 connection.onCompletion((params) => {
-    console.log("Langium Server: Completion request", params);
-    return [];
+  console.log("Langium Server: Completion request", params);
+  return [];
 });
 
 // Setup Langium services
 const { shared } = createLangiumGrammarServices({
-    connection,
-    ...EmptyFileSystem
+  connection,
+  ...EmptyFileSystem,
 });
 
 // Start the language server

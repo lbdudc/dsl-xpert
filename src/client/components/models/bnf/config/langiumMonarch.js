@@ -4,13 +4,13 @@
  * ------------------------------------------------------------------------------------------ */
 
 export const LangiumMonarchContent = {
-    keywords: ['::=', '|', '<', '>'],
-    tokenizer: {
-        root: [
-            [/[<][^>]+[>]/, 'variable'], // Highlight BNF non-terminals
-            [/::=/, 'operator'], // BNF assignment
-            [/\|/, 'operator'], // BNF OR symbol
-            [/[^<|>]+/, 'string'] // Everything else is string
-        ]
-    }
-}
+  keywords: ["::=", "|", "<", ">"],
+  tokenizer: {
+    root: [
+      [/[<][^>]+[>]/, "variable"], // Highlight BNF non-terminals
+      [/::=/, "operator"], // BNF assignment
+      [/\|/, "operator"], // BNF OR symbol
+      [/[^<|>]+/, "string"], // Everything else is string
+    ],
+  },
+};

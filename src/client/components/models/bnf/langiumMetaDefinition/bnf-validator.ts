@@ -4,52 +4,58 @@
 
 //eslint-disable
 
-import type { ValidationChecks, ValidationAcceptor } from 'langium';
-import type { BnfAstType, Model } from './generated/ast.js';
-import type { BnfServices } from './bnf-module.js';
+import type { ValidationChecks, ValidationAcceptor } from "langium";
+import type { BnfAstType, Model } from "./generated/ast.js";
+import type { BnfServices } from "./bnf-module.js";
 
 /**
  * Register custom validation checks.
  */
 export function registerValidationChecks(services: BnfServices) {
-    const registry = services.validation.ValidationRegistry;
-    const validator = services.validation.BnfValidator;
-    const checks: ValidationChecks<BnfAstType> = {
-        // Add your validation checks
-        Model: validator.checkReferenceIDIsPreviuoslyDefined,
-    };
-    registry.register(checks, validator);
+  const registry = services.validation.ValidationRegistry;
+  const validator = services.validation.BnfValidator;
+  const checks: ValidationChecks<BnfAstType> = {
+    // Add your validation checks
+    Model: validator.checkReferenceIDIsPreviuoslyDefined,
+  };
+  registry.register(checks, validator);
 }
 
 /**
  * Implementation of custom validations.
  */
 export class BnfValidator {
+  /**
+   * Check if the reference ID is previously defined.
+   */
+  checkReferenceIDIsPreviuoslyDefined(
+    model: Model,
+    accept: ValidationAcceptor
+  ): void {
+    const referenceIDs: string[] = [];
 
-    /**
-     * Check if the reference ID is previously defined.
-     */
-    checkReferenceIDIsPreviuoslyDefined(model: Model, accept: ValidationAcceptor): void {
-        const referenceIDs: string[] = [];
+    // Get all reference IDs
+    model.rules.forEach((rule) => {
+      referenceIDs.push(rule.name);
+    });
 
-        // Get all reference IDs
-        model.rules.forEach(rule => {
-            referenceIDs.push(rule.name);
+    // Check if the reference ID is previously defined
+    model.rules.forEach((rule) => {
+      rule.alternatives.forEach((alternative) => {
+        alternative.elements.forEach((element) => {
+          if (element.reference) {
+            if (!referenceIDs.includes(element.reference)) {
+              accept(
+                "error",
+                `Reference ${element.reference}  is not previously defined`,
+                {
+                  node: element,
+                }
+              );
+            }
+          }
         });
-
-        // Check if the reference ID is previously defined
-        model.rules.forEach(rule => {
-           rule.alternatives.forEach(alternative => {
-                alternative.elements.forEach(element => {
-                    if (element.reference) {
-                        if (!referenceIDs.includes(element.reference)) {
-                            accept('error', `Reference ${element.reference}  is not previously defined`, {
-                                node: element
-                            });
-                        }
-                    }
-                });
-            });
-        });
-    }
+      });
+    });
+  }
 }

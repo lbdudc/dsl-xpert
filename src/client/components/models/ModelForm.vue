@@ -396,11 +396,12 @@ const removeCard = (cardIndex) => {
       >
       </v-select>
 
-      <ModelGrammarValidator 
-        v-if="grammarType" 
-        :key="grammarType" 
+      <ModelGrammarValidator
+        v-if="grammarType"
+        :key="grammarType"
         :grammarType="grammarType"
-        @updateContent="handleContentUpdate">
+        @updateContent="handleContentUpdate"
+      >
       </ModelGrammarValidator>
 
       <v-textarea
@@ -456,7 +457,6 @@ const removeCard = (cardIndex) => {
     </v-form>
   </div>
 </template>
-
 
 <style scoped>
 .flexcard {
