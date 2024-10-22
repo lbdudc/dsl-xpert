@@ -11,7 +11,7 @@ const route = useRoute();
 const router = useRouter();
 
 const modelDeveloperItems = ["OpenAI", "Meta", "Mistral", "Google"];
-const grammarTypeItems = ["no grammar validator", "bnf", "antlr4", "langium"];
+const grammarTypeItems = ["no grammar validator", "bnf", "langium"];
 const modelTypeItems = [
   "gpt-3.5-turbo",
   "gpt-3.5-turbo-0125",
@@ -414,7 +414,7 @@ const removeCard = (cardIndex) => {
         variant="outlined"
       >
       </v-textarea>
-
+      
       <v-card
         v-for="(card, cardIndex) in definitionExamples"
         :key="cardIndex"
@@ -472,7 +472,8 @@ const removeCard = (cardIndex) => {
   border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
-.error-message {
-  color: red;
+.v-card {
+  background-color: var(--v-background-base) !important;
+  color: var(--v-text-base) !important;
 }
 </style>

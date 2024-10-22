@@ -11,23 +11,12 @@ let wrapper;
 
 export const startLangiumClientClassic = async (htmlElem) => {
   try {
-    if (checkStarted()) return;
     const config = await setupLangiumClientClassic();
     wrapper = new MonacoEditorLanguageClientWrapper();
     await wrapper.initAndStart(config, htmlElem);
   } catch (e) {
     console.log(e);
   }
-};
-
-const checkStarted = () => {
-  if (wrapper?.isStarted() ?? false) {
-    alert(
-      "Editor was already started!\nPlease reload the page to test the alternative editor."
-    );
-    return true;
-  }
-  return false;
 };
 
 export const disposeEditor = async () => {
