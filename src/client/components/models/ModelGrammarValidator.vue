@@ -1,6 +1,5 @@
 <script setup>
-import { ref, watch, nextTick  } from "vue";
-import * as monacoEditor from "monaco-editor"; 
+import { ref, watch } from "vue";
 
 const props = defineProps({
   grammarType: {
@@ -11,12 +10,10 @@ const props = defineProps({
 
 const emit = defineEmits(["updateContent"]);
 const monaco = ref(null);
-let editorInstance = null;
 
 const loadClient = async (grammarType) => {
   if (grammarType === "no grammar validator") {
-    loadBasicMonacoEditor();
-    return;
+    grammarType = "no-grammar-validator";
   }
   try {
     const module = await import(`./${grammarType}/wrapperLangium.js`);
@@ -29,21 +26,6 @@ const loadClient = async (grammarType) => {
     console.error(`Error loading module for ${grammarType}:`, error);
     return null;
   }
-};
-
-const loadBasicMonacoEditor = () => {
-  nextTick(() => {
-    if (editorInstance) {
-      editorInstance.dispose();
-    }
-
-    editorInstance = monacoEditor.editor.create(monaco.value, {
-      value: "",
-      language: "plaintext",
-      theme: "vs-dark", 
-      automaticLayout: true, 
-    });
-  });
 };
 
 const emitContent = () => {
