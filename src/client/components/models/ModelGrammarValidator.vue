@@ -53,7 +53,7 @@ watch(
   </div>
 </template>
 
-<style>
+<style scoped>
 #monaco-editor-root {
   width: 100%;
   height: 50vh;
