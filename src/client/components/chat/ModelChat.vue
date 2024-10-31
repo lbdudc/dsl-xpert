@@ -39,7 +39,7 @@ const fetchModel = async () => {
     <div class="model-container w-1/3 h-full">
       <ModelDetailVue :model="model" />
     </div>
-    <ChatVue :model="model" class="flex flex-grow w-2/3"/>
+    <ChatVue :model="model" class="flex flex-grow w-2/3" />
   </div>
   <div v-else>
     <div v-if="show404"><NotFoundVue /></div>
@@ -47,10 +47,9 @@ const fetchModel = async () => {
   </div>
 </template>
 
-
 <style scoped>
 .model-container {
-  height: 100%; 
-  overflow-y: auto; 
+  height: 100%;
+  overflow-y: auto;
 }
 </style>

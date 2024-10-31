@@ -1,4 +1,3 @@
-
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
@@ -38,8 +37,8 @@ const fetchModels = async () => {
 };
 </script>
 <template>
-  <div class="container px-4 md:px-6 pt-10 min-h-[800px] ">
-    <div class="flex flex-col gap-6 ">
+  <div class="container px-4 md:px-6 pt-10 min-h-[800px]">
+    <div class="flex flex-col gap-6">
       <div class="grid gap-2">
         <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
         <p
@@ -72,8 +71,7 @@ const fetchModels = async () => {
               variant="outlined"
               prepend-inner-icon="mdi-magnify"
               class="text-sm"
-            </v-text-field>
-            
+            ></v-text-field>
           </div>
         </div>
       </div>
@@ -90,5 +88,4 @@ const fetchModels = async () => {
   </div>
 </template>
 
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

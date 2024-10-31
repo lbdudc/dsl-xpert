@@ -83,15 +83,23 @@ const goToForm = () => {
         </span>
       </div>
 
-      <div class="mt-10"><strong>Definition:</strong> {{ model.definition }}</div>
+      <div class="mt-10">
+        <strong>Definition:</strong> {{ model.definition }}
+      </div>
 
       <div class="mt-10">
         <strong>Examples:</strong>
         <ul class="example-list">
-          <li v-for="example in model.definitionExamples" :key="example._id" class="example-item">
+          <li
+            v-for="example in model.definitionExamples"
+            :key="example._id"
+            class="example-item"
+          >
             <div class="example-item-content">
               <div class="example-item-label">User instruction:</div>
-              <div class="example-item-value">{{ example.userInstruction }}</div>
+              <div class="example-item-value">
+                {{ example.userInstruction }}
+              </div>
             </div>
             <div class="example-item-content">
               <div class="example-item-label">Model answer:</div>
@@ -120,7 +128,6 @@ const goToForm = () => {
     </v-card-actions>
   </v-card>
 </template>
-
 
 <style scoped>
 .flexcard {

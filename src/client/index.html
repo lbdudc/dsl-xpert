@@ -1,40 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>DSL-Xpert</title>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DSL-Xpert</title>
-</head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="./main.js"></script>
+  </body>
 
-<body>
-  <div id="app"></div>
-  <script type="module" src="./main.js"></script>
-</body>
-
-<style>
-  body {
-    margin: 0;
-    padding: 0;
-    font-family: Arial, sans-serif;
-    background-color: white;
-  }
-
-  #app {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100vw;
-    min-height: 100vh;
-  }
-
-  /* // if the user prefers dark mode then change the background color */
-  @media (prefers-color-scheme: dark) {
+  <style>
     body {
-      background-color: #171c2e;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: white;
     }
-  }
-</style>
 
+    #app {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 100vw;
+      min-height: 100vh;
+    }
+
+    /* // if the user prefers dark mode then change the background color */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #171c2e;
+      }
+    }
+  </style>
 </html>

@@ -1,5 +1,4 @@
-<script setup>
-</script>
+<script setup></script>
 <template>
   <div
     class="flex items-center justify-center min-h-full bg-white dark:bg-gray-900 py-72"
@@ -25,6 +24,4 @@
   </div>
 </template>
 
-
-<style lang="scss" scoped>
-</style>
+<style lang="scss" scoped></style>

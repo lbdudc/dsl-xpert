@@ -2,7 +2,7 @@ import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
 import vuetify from "vite-plugin-vuetify";
 import path from "path";
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
 
 // get port from env file
 dotenv.config();
@@ -16,7 +16,7 @@ export default defineConfig({
     port: CLIENT_PORT,
     hmr: {
       overlay: false,
-    }
+    },
   },
   resolve: {
     alias: {

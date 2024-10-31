@@ -8,5 +8,4 @@ import vuetify from "./plugins/vuetify";
 // Router
 import router from "./router";
 
-
 createApp(App).use(router).use(vuetify).mount("#app");

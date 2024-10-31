@@ -84,7 +84,7 @@ const getModelOutput = async () => {
     }
     nTokensConversation = openAIData.nTokens;
     loadingResponse.value = false;
-    } catch (error) {
+  } catch (error) {
     let errorMessage = error.message;
     try {
       const parsedError = JSON.parse(errorMessage);
@@ -99,7 +99,6 @@ const getModelOutput = async () => {
     });
     loadingResponse.value = false;
   }
-
 };
 
 // Copy to clipboard the model output
@@ -203,7 +202,6 @@ const formatText = (text) => {
     </div>
   </div>
 </template>
-
 
 <style coped>
 .v-input__details {
