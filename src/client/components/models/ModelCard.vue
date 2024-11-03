@@ -19,69 +19,42 @@ const goToForm = () => {
 };
 </script>
 <template>
-  <v-card
-    @click="goToDetail()"
-    variant="elevated"
-    class="model-card rounded-lg shadow-md max-w-[400px] min-w-[300px]"
-  >
-    <v-card-title>
-      <h2 class="text-base font-semibold">
+
+  <!-- Card when user hover rise te card a little -->
+  <Card @click="goToDetail()"
+    class="flex flex-col justify-between h-full max-h-[40vh] overflow-auto hover:cursor-pointer">
+    <template #title>
+      <h2 class="text-lg font-bold">
         {{ props.model.name }}
       </h2>
-    </v-card-title>
+    </template>
 
-    <v-card-subtitle v-if="props.model.description">
-      <span class="text-ellipsis overflow-hidden ...">
+    <template #subtitle>
+      <div class="flex gap-2">
+        <Chip :label="props.model.developer" icon="pi pi-user" class="text-xs" />
+        <Chip :label="props.model.modelType" icon="pi pi-desktop" class="text-xs text-nowrap" />
+      </div>
+    </template>
+
+    <template #content>
+      <!-- Max 3 lines of text -->
+      <span class="text-sm text-gray-500 line-clamp-3">
         {{ props.model.description }}
       </span>
-    </v-card-subtitle>
-    <v-card-subtitle v-else>
-      <br />
-    </v-card-subtitle>
+    </template>
 
-    <v-card-text>
-      <v-chip class="text-xs" color="green" variant="outlined" size="small">
-        {{ props.model.developer }}
-      </v-chip>
-      <v-chip class="text-xs" color="blue" variant="outlined" size="small">
-        {{ props.model.modelType }}
-      </v-chip>
-    </v-card-text>
-    <v-card-actions>
-      <v-row no-gutters justify="space-between">
-        <v-btn
-          class="me-2 text-none"
-          color="#1e293b"
-          prepend-icon="mdi-chat"
-          variant="flat"
-        >
-          Chat
-        </v-btn>
-        <v-btn
-          @click.stop="goToForm()"
-          class="me-2 text-none"
-          color="#f08b26"
-          prepend-icon="mdi-pencil"
-          variant="flat"
-        >
-          Edit
-        </v-btn>
-      </v-row>
-    </v-card-actions>
-  </v-card>
+    <template #footer class="h-full">
+      <div class="flex gap-4 mt-1 h-full">
+        <Button @click.stop="goToForm()" label="Edit" severity="secondary" variant="text" class="w-full" />
+        <Button label="Chat" class="w-full" @click.stop="goToDetail()" icon="pi pi-comments" />
+      </div>
+
+    </template>
+  </Card>
 </template>
 
 <style scoped>
-.model-card {
-  background-color: white;
-  color: black;
-}
-
-/* prefers color scheme */
-@media (prefers-color-scheme: dark) {
-  .model-card {
-    background-color: #1e293b;
-    color: white;
-  }
+.p-card-body {
+  height: 100% !important;
 }
 </style>

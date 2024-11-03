@@ -1,11 +1,34 @@
 import { createApp } from "vue";
 import "./style.css";
 import App from "./App.vue";
-import "material-design-icons-iconfont/dist/material-design-icons.css";
-// Vuetify
-import "vuetify/styles";
-import vuetify from "./plugins/vuetify";
-// Router
 import router from "./router";
 
-createApp(App).use(router).use(vuetify).mount("#app");
+// PrimeVue
+import Aura from '@primevue/themes/aura';
+import PrimeVue from "primevue/config";
+import 'primeicons/primeicons.css'
+import { Tooltip } from "primevue";
+import { definePreset } from "@primevue/themes";
+import customTheme from "./plugins/primevue.js"
+
+const Noir = definePreset(Aura, customTheme);
+
+
+createApp(App)
+    .use(router)
+    .use(
+        PrimeVue,
+        {
+            theme: {
+                preset: Noir,
+                options: {
+                    prefix: 'p',
+                    darkModeSelector: 'system',
+                    cssLayer: false
+                }
+            },
+        }
+    ).directive(
+        'tooltip',
+        Tooltip
+    ).mount("#app");

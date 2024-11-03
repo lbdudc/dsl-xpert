@@ -5,20 +5,18 @@ import NavBar from "@/components/NavBar.vue";
 </script>
 
 <template>
-  <v-container fluid class="main-container">
+  <div class="main-container">
     <NavBar />
     <router-view />
-  </v-container>
+  </div>
 </template>
 
 <style scoped>
 .main-container {
-  min-height: 100vh;
-  min-width: 100vw;
-  padding: 0;
-  margin: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  overflow-x: hidden;
 }
 </style>
