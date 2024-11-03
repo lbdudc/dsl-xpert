@@ -21,8 +21,6 @@ The project can be run in different ways. The following sections describe how to
 
 ### Prerequisites
 
-Change the `OPENAI_API_KEY=your_open_api_key` in the `.env` file to your OpenAI API key. If you don't have one, you can get it [here](https://beta.openai.com/signup/).
-
 ### Docker
 
 The project can be run using Docker. To do so, execute the following commands:

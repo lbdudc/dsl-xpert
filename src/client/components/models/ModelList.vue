@@ -5,14 +5,15 @@ import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const SERVER_URL = `${
-  import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-}`;
+const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
+  }`;
 
 // computed models based on search
 const search = ref("");
 
 const modelsSearch = computed(() => {
+
+  // multiply the models to simulate a bigger list
   return models.value.filter((model) =>
     model.name.toLowerCase().includes(search.value.toLowerCase())
   );
@@ -37,53 +38,29 @@ const fetchModels = async () => {
 };
 </script>
 <template>
-  <div class="container px-4 md:px-6 pt-10 min-h-[800px]">
-    <div class="flex flex-col gap-6">
-      <div class="grid gap-2">
-        <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
-        <p
-          class="text-gray-500 leading-loose sm:text-xl/relaxed dark:text-gray-400"
-        >
-          Create a new model or manage existing ones.
-        </p>
-      </div>
-      <div
-        class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between lg:gap-4"
-      >
-        <v-btn
-          class="text-none"
-          variant="text"
-          color="#2878ff"
-          border
-          @click="router.push({ name: 'ModelCreate' })"
-        >
-          New Model
-        </v-btn>
-        <div
-          class="flex items-center space-x-2 text-sm/relaxed md:space-x-4 lg:space-x-6"
-        >
-          <div class="flex items-center space-x-2 min-w-96">
-            <v-text-field
-              v-model="search"
-              placeholder="Search models"
-              density="compact"
-              hide-details
-              variant="outlined"
-              prepend-inner-icon="mdi-magnify"
-              class="text-sm"
-            ></v-text-field>
-          </div>
-        </div>
-      </div>
+  <div class="flex flex-col w-screen p-4 gap-8 px-10">
 
-      <!-- CARDS -->
-      <div class="grid grid-cols-1 gap-4 md:grid-cols-3 lg:grid-cols-3">
-        <ModelCardVue
-          v-for="model in modelsSearch"
-          :key="model.id"
-          :model="model"
-        />
+    <!-- HEADER -->
+    <div class="flex flex-col gap-2 items-center">
+      <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
+      <p class="text-gray-500 leading-loose sm:text-xl/relaxed">
+        Create a new model or manage existing ones.
+      </p>
+      <div class="flex gap-2 md:flex-row md:justify-center">
+        <Button @click="router.push({ name: 'ModelCreate' })" severity="success" icon="pi pi-plus"
+          class="w-full md:w-auto" label="New Model" />
+
+        <IconField>
+          <InputIcon class="pi pi-search" />
+          <InputText v-model="search" placeholder="Search models" />
+        </IconField>
+
       </div>
+    </div>
+
+    <!-- CARDS -->
+    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full pt-8">
+      <ModelCardVue v-for="model in modelsSearch" :key="model.id" :model="model" />
     </div>
   </div>
 </template>

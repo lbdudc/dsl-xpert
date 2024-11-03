@@ -1,11 +1,11 @@
 <script setup>
+import { ref } from "vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-const SERVER_URL = `${
-  import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-}`;
+const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
+  }`;
 
 const props = defineProps({
   model: {
@@ -13,6 +13,8 @@ const props = defineProps({
     required: true,
   },
 });
+
+const activeTab = ref(0);
 
 const deleteModel = async () => {
   const { _id } = props.model;
@@ -34,130 +36,105 @@ const goToForm = () => {
 };
 </script>
 <template>
-  <v-card class="flexcard">
-    <v-card-title>
-      <h1 class="text-2xl font-bold tracking-tight text-slate-900 mb-2">
+  <Card id="my-card">
+    <template #title>
+      <h1 class="text-xl tracking-tight">
         Model: {{ model.name }}
       </h1>
-      <v-chip class="text-xs mr-2" color="green" variant="outlined" size="small"
-        >{{ model.developer }}
-      </v-chip>
-      <v-chip class="text-xs" color="blue" variant="outlined" size="small">
-        {{ model.modelType }}
-      </v-chip>
-    </v-card-title>
+    </template>
 
-    <v-card-subtitle class="py-4">
-      <p>
+    <template #subtitle>
+      <span class="text-sm">
         {{ model.description }}
-      </p>
-    </v-card-subtitle>
+      </span>
+      <div class="flex items-center gap-2">
+        <Chip class="text-xs mr-2" size="small">{{ model.developer }}
+        </Chip>
+        <Chip class="text-xs" size="small">
+          {{ model.modelType }}
+        </Chip>
+      </div>
+    </template>
 
-    <v-card-text>
-      <p>
-        <strong class="text-lg text-slate-900"> Model details</strong>
-      </p>
-      <div class="mt-5 flex flex-col">
-        <span class="text-slate-700">
-          <strong>Temperature:</strong> {{ model.temperature }}
+    <template #content>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+        <span class="text-sm">
+          <span>Temperature:</span> {{ model.temperature }}
         </span>
 
-        <span class="text-slate-700">
-          <strong>Seed:</strong> {{ model.seed }}
+        <span class="text-sm">
+          <span>Seed:</span> {{ model.seed }}
         </span>
 
-        <span class="text-slate-700">
-          <strong>Maximum length:</strong> {{ model.maximumLength }}
+        <span class="text-sm">
+          <span>Maximum length:</span> {{ model.maximumLength }}
         </span>
 
-        <span class="text-slate-700">
-          <strong>Top P:</strong> {{ model.topP }}
+        <span class="text-sm">
+          <span>Top P:</span> {{ model.topP }}
         </span>
 
-        <span class="text-slate-700">
-          <strong>Repetition penalty:</strong> {{ model.repetitionPenalty }}
+        <span class="text-sm">
+          <span>Repetition penalty:</span> {{ model.repetitionPenalty }}
         </span>
 
-        <span class="text-slate-700">
-          <strong>Stop sequences:</strong> {{ model.stopSequences }}
+        <span class="text-sm">
+          <span>Stop sequences:</span>
+          <Chip v-for="seq in model.stopSequences" class="text-xs" size="small" :label="seq" />
         </span>
       </div>
 
-      <div class="mt-10">
-        <strong>Definition:</strong> {{ model.definition }}
+      <div class="mt-6">
+        <h1 class="text-lg">
+          <i class="pi pi-info-circle"></i>
+          Model Definition
+        </h1>
+        <div class="text-sm max-w-full overflow-auto min-h-[200px]">
+          {{ model.definition }}
+        </div>
       </div>
 
-      <div class="mt-10">
-        <strong>Examples:</strong>
-        <ul class="example-list">
-          <li
-            v-for="example in model.definitionExamples"
-            :key="example._id"
-            class="example-item"
-          >
-            <div class="example-item-content">
-              <div class="example-item-label">User instruction:</div>
-              <div class="example-item-value">
-                {{ example.userInstruction }}
+      <div class="mt-4">
+        <Tabs :value="activeTab" scrollable>
+          <TabList>
+            <Tab v-for="(example, index) in model.definitionExamples" :key="index" :value="index">
+              Example {{ index + 1 }}
+            </Tab>
+          </TabList>
+          <TabPanel v-for="(example, index) in model.definitionExamples" :key="index" :value="index">
+            <div class="flex flex-col gap-4 min-h-[200px] max-w-full overflow-auto mt-4 px-1">
+              <div class="text-sm">
+                <strong>User Instruction:</strong>
+                <div>{{ example.userInstruction }}</div>
+              </div>
+              <div class="text-sm">
+                <strong>Model Answer:</strong>
+                <div>{{ example.modelAnswer }}</div>
               </div>
             </div>
-            <div class="example-item-content">
-              <div class="example-item-label">Model answer:</div>
-              <div class="example-item-value">{{ example.modelAnswer }}</div>
-            </div>
-          </li>
-        </ul>
+          </TabPanel>
+        </Tabs>
       </div>
-    </v-card-text>
+    </template>
 
-    <v-card-actions class="flex justify-start ml-2">
-      <v-btn
-        color="orange"
-        variant="outlined"
-        prepend-icon="mdi-pencil"
-        @click="goToForm"
-        >Edit</v-btn
-      >
-      <v-btn
-        color="red"
-        variant="outlined"
-        prepend-icon="mdi-delete"
-        @click="deleteModel"
-        >Delete</v-btn
-      >
-    </v-card-actions>
-  </v-card>
+    <template #footer>
+      <div class="flex gap-2 md:flex-row md:justify-center">
+        <Button @click="goToForm" icon="pi pi-pencil" class="w-full md:w-auto" variant="text" severity="warn"
+          label="Edit" />
+        <Button @click="deleteModel" icon="pi pi-trash" class="w-full md:w-auto" variant="text" severity="danger"
+          label="Delete" />
+      </div>
+    </template>
+
+  </Card>
 </template>
 
 <style scoped>
-.flexcard {
-  display: flex;
-  flex-direction: column;
+h1 {
+  color: var(--p-button-success-background) !important;
 }
 
-.flexcard .v-toolbar {
-  flex: 0;
-}
-
-.example-list {
-  list-style-type: none;
-  padding: 0;
-}
-
-.example-item {
-  margin-bottom: 10px;
-}
-
-.example-item-content {
-  display: flex;
-}
-
-.example-item-label {
-  flex-basis: 150px;
-}
-
-.example-item-value {
-  flex-grow: 1;
-  padding-left: 20px;
+#my-card {
+  box-shadow: none !important;
 }
 </style>

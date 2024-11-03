@@ -1,7 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 
 import Home from "./pages/Home.vue";
-import ModelForm from "@/components/models/ModelForm.vue";
+import ModelForm from "@/components/models/form/ModelForm.vue";
 import ModelChat from "@/components/chat/ModelChat.vue";
 
 const base = import.meta.env.BASE_URL;

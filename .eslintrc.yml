@@ -5,12 +5,11 @@ extends:
   - eslint:recommended
   - prettier
   - plugin:vue/base
-  - plugin:vuetify/base
 ignorePatterns:
   - node_modules/
   - dist/
   - public/
-  - src/client/components/models/bnf/worker/**/*.js
+  - src/client/components/models/form/monco/bnf/worker/**/*.js
 overrides: []
 parserOptions:
   ecmaVersion: latest
