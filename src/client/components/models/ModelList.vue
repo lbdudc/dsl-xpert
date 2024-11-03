@@ -21,6 +21,14 @@ const modelsSearch = computed(() => {
 
 const models = ref([]);
 
+const modelCreateItems = [
+  // add to query params ?m=template
+  { label: "OpenAi Model", icon: "pi pi-clone", command: () => router.push({ name: "ModelCreate", query: { m: "openai" } }) },
+  { label: "Hugging Face Model", icon: "pi pi-clone", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface" } }) },
+  { label: "Custom Model", icon: "pi pi-clone", command: () => router.push({ name: "ModelCreate", query: { m: "webllm" } }) },
+];
+
+
 onMounted(() => {
   fetchModels();
 });
@@ -47,8 +55,9 @@ const fetchModels = async () => {
         Create a new model or manage existing ones.
       </p>
       <div class="flex gap-2 md:flex-row md:justify-center">
-        <Button @click="router.push({ name: 'ModelCreate' })" severity="success" icon="pi pi-plus"
-          class="w-full md:w-auto" label="New Model" />
+
+        <SplitButton label="New Model" @click="router.push({ name: 'ModelCreate' })" :model="modelCreateItems"
+          class="w-full md:w-auto" severity="success" icon="pi pi-plus" />
 
         <IconField>
           <InputIcon class="pi pi-search" />

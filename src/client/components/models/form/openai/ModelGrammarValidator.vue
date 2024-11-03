@@ -16,7 +16,7 @@ const loadClient = async (grammarType) => {
     grammarType = "no-grammar-validator";
   }
   try {
-    const module = await import(`../grammars/${grammarType}/wrapperLangium.js`);
+    const module = await import(`../../grammars/${grammarType}/wrapperLangium.js`);
     const startClient = module.startLangiumClientClassic;
 
     if (startClient) {

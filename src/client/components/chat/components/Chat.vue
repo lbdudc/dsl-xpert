@@ -153,7 +153,7 @@ const formatText = (text) => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-              }}</span>
+                }}</span>
             </div>
           </div>
         </div>
