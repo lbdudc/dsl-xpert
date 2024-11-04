@@ -56,7 +56,7 @@ const fetchModels = async () => {
       </p>
       <div class="flex gap-2 md:flex-row md:justify-center">
 
-        <SplitButton label="New Model" @click="router.push({ name: 'ModelCreate' })" :model="modelCreateItems"
+        <SplitButton label="New Model" @click="router.push({ name: 'ModelSelect' })" :model="modelCreateItems"
           class="w-full md:w-auto" severity="success" icon="pi pi-plus" />
 
         <IconField>

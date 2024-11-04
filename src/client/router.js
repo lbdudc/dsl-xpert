@@ -3,6 +3,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "./pages/Home.vue";
 import ModelForm from "@/components/models/form/ModelForm.vue";
 import ModelChat from "@/components/chat/ModelChat.vue";
+import ModelSelect from "@/components/models/form/ModelSelector.vue";
 
 const base = import.meta.env.BASE_URL;
 
@@ -11,6 +12,11 @@ const routes = [
     path: base,
     name: "home",
     component: Home,
+  },
+  {
+    path: `${base}models/select`,
+    name: "ModelSelect",
+    component: ModelSelect,
   },
   {
     path: `${base}models/new`,

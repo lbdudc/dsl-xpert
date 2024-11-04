@@ -3,7 +3,7 @@ import { ref, watch } from "vue";
 
 const props = defineProps({
   grammarType: {
-    type: String,
+    type: Object,
     required: true,
   },
 });
@@ -12,18 +12,15 @@ const emit = defineEmits(["updateContent"]);
 const monaco = ref(null);
 
 const loadClient = async (grammarType) => {
-  if (grammarType === "no grammar validator") {
-    grammarType = "no-grammar-validator";
-  }
   try {
-    const module = await import(`../../grammars/${grammarType}/wrapperLangium.js`);
+    const module = await import(`../../grammars/${grammarType.code}/wrapperLangium.js`);
     const startClient = module.startLangiumClientClassic;
 
     if (startClient) {
       return startClient(monaco.value);
     }
   } catch (error) {
-    console.error(`Error loading module for ${grammarType}:`, error);
+    console.error(`Error loading module for ${grammarType.code}:`, error);
     return null;
   }
 };

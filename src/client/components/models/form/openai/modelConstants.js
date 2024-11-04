@@ -1,5 +1,18 @@
-export const modelDeveloperItems = ["OpenAI", "Meta", "Mistral", "Google"];
-export const grammarTypeItems = ["no grammar validator", "bnf", "langium"];
+export const grammarTypeItems = [
+    {
+        name: "No grammar validator",
+        code: "no-grammar-validator",
+    },
+    {
+        name: "BNF",
+        code: "bnf",
+    },
+    {
+        name: "Langium",
+        code: "langium",
+    }
+];
+
 export const modelTypeItems = [
     "gpt-3.5-turbo",
     "gpt-3.5-turbo-0125",
