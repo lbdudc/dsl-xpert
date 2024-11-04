@@ -36,18 +36,18 @@ export const assignModelProperties = (model, refs) => {
         topP, repetitionPenalty, stopSequences, seed, description, definition, definitionExamples
     } = model;
 
-    refs.id.value = _id;
-    refs.modelDeveloper.value = developer;
-    refs.modelType.value = modelType;
-    refs.name.value = name;
-    refs.apiKey.value = apiKey;
-    refs.temperature.value = temperature;
-    refs.maximumLength.value = maximumLength;
-    refs.topP.value = topP;
-    refs.repetitionPenalty.value = repetitionPenalty;
-    refs.stopSequences.value = stopSequences;
-    refs.seed.value = seed;
-    refs.description.value = description;
-    refs.definition.value = definition;
-    refs.definitionExamples.value = definitionExamples;
+    refs.id = _id;
+    refs.modelDeveloper = developer;
+    refs.modelType = modelType;
+    refs.name = name;
+    refs.apiKey = apiKey;
+    refs.temperature = temperature;
+    refs.maximumLength = maximumLength;
+    refs.topP = topP;
+    refs.repetitionPenalty = repetitionPenalty;
+    refs.stopSequences = stopSequences;
+    refs.seed = seed;
+    refs.description = description;
+    refs.definition = definition;
+    refs.definitionExamples = definitionExamples;
 };

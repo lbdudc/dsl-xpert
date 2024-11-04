@@ -15,7 +15,7 @@ const goToDetail = () => {
 };
 
 const goToForm = () => {
-  router.push({ name: "ModelForm", params: { id: props.model.name } });
+  router.push({ name: "ModelForm", params: { id: props.model.name }, query: { m: "openai" } });
 };
 </script>
 <template>
