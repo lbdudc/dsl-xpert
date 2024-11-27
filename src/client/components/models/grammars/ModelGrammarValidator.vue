@@ -12,8 +12,9 @@ const emit = defineEmits(["updateContent"]);
 const monaco = ref(null);
 
 const loadClient = async (grammarType) => {
+
   try {
-    const module = await import(`../../grammars/${grammarType.code}/wrapperLangium.js`);
+    const module = await import(`./${grammarType.code}/wrapperLangium.js`);
     const startClient = module.startLangiumClientClassic;
 
     if (startClient) {
