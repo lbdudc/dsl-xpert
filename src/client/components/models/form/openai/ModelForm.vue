@@ -120,11 +120,7 @@ const removeCard = (cardIndex) => {
 </script>
 
 <template>
-  <div class="w-screen pt-4 flex-grow flex flex-col pl-10 pr-14">
-    <h1 class="text-xl tracking-tighter sm:text-xl mb-6">
-      New OpenAI Model
-    </h1>
-
+  <div class="flex-grow flex flex-col">
     <Form v-slot="$form" :initialValues :resolver @submit="onFormSubmit" class="flex flex-col gap-4">
       <FloatLabel class="flex flex-col gap-4" variant="in">
         <InputText name="modelName" id="modelName" v-model="model.name" label="Model name" fluid>
