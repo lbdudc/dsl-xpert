@@ -4,10 +4,8 @@ import ModelFormOpenAiVue from "./openai/ModelForm.vue";
 import ModelFormWebLlmVue from "./web-llm/ModelForm.vue";
 import ModelFormHuggingFaceVue from "./huggingface/ModelForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
-import { fetchModel, createModel, updateModel, assignModelProperties } from "./openai/modelService.js";
+import { fetchModel, createModel, updateModel } from "./openai/modelService.js";
 import { initialValues } from "./consts.js";
-
-import NotFoundVue from "../../404.vue";
 import { onMounted, ref, reactive } from "vue";
 
 const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"}`;
