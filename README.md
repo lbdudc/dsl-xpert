@@ -7,6 +7,7 @@ This tool provides a web interface  and a REST API to manage Large Language Mode
     - [Prerequisites](#prerequisites)
     - [Docker](#docker)
     - [Standalone server](#standalone-server)
+    - [HuggingFace](#huggingface)
     - [Library](#library)
 - [Usage](#usage)
   - [API Routes](#api-routes)
@@ -68,6 +69,18 @@ It will be necessary to have a MongoDB database running. The connection string m
 
 ```bash
 MONGODB_URI=mongodb://localhost:27017/llm-dsl-builder
+```
+
+### HuggingFace
+
+To run the huggingface server in local, you can use the following command:
+
+```bash
+cd ./src/python
+
+docker run -d --name mycontainer -p 80:80 myimage
+
+docker build -t myimage .
 ```
 
 ### Library
