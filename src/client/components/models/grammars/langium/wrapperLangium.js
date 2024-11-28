@@ -14,6 +14,7 @@ export const startLangiumClientClassic = async (htmlElem) => {
     const config = await setupLangiumClientClassic();
     wrapper = new MonacoEditorLanguageClientWrapper();
     await wrapper.initAndStart(config, htmlElem);
+    return wrapper;
   } catch (e) {
     console.log(e);
   }

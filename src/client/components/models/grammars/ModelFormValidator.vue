@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, defineProps } from "vue";
+import { reactive } from "vue";
 import { grammarTypeItems } from "./consts.js";
 import ModelGrammarValidator from "./ModelGrammarValidator.vue";
 
@@ -46,12 +46,11 @@ const removeCard = (cardIndex) => {
             label="Grammar type" placeholder="Select a grammar type">
         </Select>
 
-        <ModelGrammarValidator v-if="model.grammarType" :key="model.grammarType" :grammarType="model.grammarType"
-            @updateContent="handleContentUpdate">
+        <ModelGrammarValidator v-if="model.grammarType" :model="model" :key="model.grammarType"
+            :grammarType="model.grammarType" @updateContent="handleContentUpdate">
         </ModelGrammarValidator>
 
         <!-- Trick to appear the form the model content -->
-
         <InputText name="definition" id="definition" v-show="false" v-model="model.definition" label="Model definition"
             fluid>
         </InputText>

@@ -1,11 +1,16 @@
 <script setup>
-import { ref, watch } from "vue";
+import { editor } from "monaco-editor";
+import { onMounted, ref, watch } from "vue";
 
 const props = defineProps({
   grammarType: {
     type: Object,
     required: true,
   },
+  model: {
+    type: Object,
+    required: true,
+  }
 });
 
 const emit = defineEmits(["updateContent"]);
@@ -18,13 +23,19 @@ const loadClient = async (grammarType) => {
     const startClient = module.startLangiumClientClassic;
 
     if (startClient) {
-      return startClient(monaco.value);
+      const client = await startClient(monaco.value);
+      const editor = client.editorApp.editor;
+      editor.trigger("keyboard",
+        "type",
+        { text: props.model.definition }
+      )
     }
   } catch (error) {
     console.error(`Error loading module for ${grammarType.code}:`, error);
     return null;
   }
 };
+
 
 const emitContent = () => {
   const content = monaco.value.innerText;

@@ -36,7 +36,7 @@ const removeStopSequence = (stopSequenceIndex) => {
     </FloatLabel>
 
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <Select name=" modelType" v-model="model.modelType" :options="modelTypeItems" label="Model type"
+      <Select name="modelType" v-model="model.modelType" :options="modelTypeItems" label="Model type"
         placeholder="Select a model type">
       </Select>
       <Password fluid v-model="model.apiKey" name="apiKey" label="OpenAI API key" placeholder="Enter OpenAI API key"
