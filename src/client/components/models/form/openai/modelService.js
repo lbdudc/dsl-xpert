@@ -29,25 +29,3 @@ export const updateModel = async (SERVER_URL, id, modelData) => {
     const json = await res.json();
     return json;
 };
-
-export const assignModelProperties = (model, refs) => {
-    const {
-        _id, developer, modelType, name, apiKey, temperature, maximumLength,
-        topP, repetitionPenalty, stopSequences, seed, description, definition, definitionExamples
-    } = model;
-
-    refs.id = _id;
-    refs.modelDeveloper = developer;
-    refs.modelType = modelType;
-    refs.name = name;
-    refs.apiKey = apiKey;
-    refs.temperature = temperature;
-    refs.maximumLength = maximumLength;
-    refs.topP = topP;
-    refs.repetitionPenalty = repetitionPenalty;
-    refs.stopSequences = stopSequences;
-    refs.seed = seed;
-    refs.description = description;
-    refs.definition = definition;
-    refs.definitionExamples = definitionExamples;
-};

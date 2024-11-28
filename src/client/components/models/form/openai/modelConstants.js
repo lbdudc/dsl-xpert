@@ -5,5 +5,3 @@ export const modelTypeItems = [
     "gpt-4",
     "gpt-4-turbo",
 ];
-
-
