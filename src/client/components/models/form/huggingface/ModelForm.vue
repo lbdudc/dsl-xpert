@@ -171,7 +171,7 @@ onMounted(async () => {
         <ProgressSpinner v-else="hfModels?.length == 0"></ProgressSpinner>
     </section>
 
-    <Dialog v-model:visible="hfModelDialog" maximizable modal header="HuggingFace Model" :style="{ width: '75rem' }">
+    <Dialog v-model:visible="hfModelDialog" maximizable modal header="HuggingFace Model" :style="{ width: '80vw' }">
         <span class="text-surface-500 dark:text-surface-400 block mb-8">This is the model information.</span>
         <!-- // view thr information as a json but pretty printed -->
         <div class="overflow-auto min-w-screen pb-20">

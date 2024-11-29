@@ -135,6 +135,10 @@ const onFormSubmit = async (valid) => {
     router.push({ name: "ModelChat", params: { id: res.name } });
 };
 
+const changeModelDeveloper = (type) => {
+    model.developer = type.value;
+    model.modelType = null;
+}
 
 </script>
 <template>
@@ -150,8 +154,9 @@ const onFormSubmit = async (valid) => {
                     <section class="mt-4">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
-                                :options="modelDeveloperItems" label="Model type" optionLabel="name" optionValue="code"
-                                placeholder="Select a model type" inputId="in_label">
+                                @change="changeModelDeveloper" :options="modelDeveloperItems" label="Model type"
+                                optionLabel="name" optionValue="code" placeholder="Select a model type"
+                                inputId="in_label">
                                 <template #value="slotProps">
                                     <div v-if="slotProps.value" class="flex items-center">
                                         <div class="mr-2">{{ slotProps.value }}</div>

@@ -45,6 +45,7 @@
     "@codingame/monaco-vscode-configuration-service-override": "~10.1.4",
     "@codingame/monaco-vscode-keybindings-service-override": "~10.1.4",
     "@codingame/monaco-vscode-standalone-languages": "~10.1.4",
+    "@mlc-ai/web-llm": "^0.2.77",
     "@primevue/auto-import-resolver": "^4.2.1",
     "@primevue/forms": "^4.2.1",
     "@primevue/themes": "^4.2.1",
