@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 import mongoose from "mongoose";
 
 import ModelController from "./controllers/Model.js";
+import CurlController from "./controllers/Curl.js";
 
 //read the env file and local env file if exists
 dotenv.config();
@@ -40,6 +41,7 @@ app.get("/api/models/:name", ModelController.findOne);
 app.put("/api/models/:id", ModelController.update);
 app.delete("/api/models/:id", ModelController.delete);
 app.post("/api/models/:id/chat", ModelController.createChat);
+app.post("/api/curl/test", CurlController.test);
 
 const PORT = process.env.SERVER_PORT || 5000;
 app.listen(PORT, () => {

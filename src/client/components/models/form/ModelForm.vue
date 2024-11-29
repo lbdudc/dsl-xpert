@@ -3,6 +3,7 @@ import { useRouter, useRoute } from "vue-router";
 import ModelFormOpenAiVue from "./openai/ModelForm.vue";
 import ModelFormWebLlmVue from "./web-llm/ModelForm.vue";
 import ModelFormHuggingFaceVue from "./huggingface/ModelForm.vue";
+import ModelFormCurlVue from "./curl/ModelForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "./openai/modelService.js";
 import { initialValues } from "./consts.js";
@@ -43,6 +44,7 @@ const modelDeveloperItems = [
     { code: "openai", name: "OpenAI" },
     { code: "webllm", name: "WebLLM" },
     { code: "huggingface", name: "Hugging Face" },
+    { code: "curl", name: "Curl Custom Model" },
 ];
 
 const errors = ref({});
@@ -230,6 +232,48 @@ const changeModelDeveloper = (type) => {
                                                     d="m79.755 65.227h-69.511c-1.762 0-3.194-1.433-3.194-3.194v-48.564c0-1.762 1.433-3.195 3.194-3.195h69.511c1.762 0 3.195 1.433 3.195 3.195v48.565c0 1.76-1.433 3.193-3.195 3.193zm-69.511-51.986c-0.121 0-0.227 0.107-0.227 0.228v48.565c0 0.121 0.106 0.227 0.227 0.227h69.511c0.122 0 0.228-0.106 0.228-0.227v-48.565c0-0.121-0.106-0.228-0.228-0.228h-69.511z" />
                                             </g>
                                         </svg>
+                                        <svg v-else-if="slotProps.value == 'curl'" xmlns="http://www.w3.org/2000/svg"
+                                            xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 343.059 102.926"
+                                            height="20" width="20">
+                                            <defs>
+                                                <symbol style="overflow:visible" id="a" overflow="visible">
+                                                    <path
+                                                        d="M15.031-26.813c0 7.094 1.328 10.579 6.86 15.141l8.53 7.11C35.829-.125 38.595 0 45.329 0H63.61c3.844 0 7.938-.844 7.938-5.766 0-5.062-4.563-5.78-7.938-5.78H43.297c-2.297 0-4.578-1.204-6.625-2.892l-6.969-5.89c-1.812-1.438-3.125-2.64-3.125-4.922v-14.313c0-2.28 1.313-3.484 3.125-4.937l6.969-5.89c2.047-1.672 4.328-2.876 6.625-2.876h20.312c3.375 0 7.938-.734 7.938-5.78 0-4.923-4.094-5.767-7.938-5.767H45.33c-6.735 0-9.5.126-14.907 4.563l-8.531 7.094c-5.532 4.578-6.86 8.062-6.86 15.156Zm0 0"
+                                                        style="stroke:none" />
+                                                </symbol>
+                                                <symbol style="overflow:visible" id="b" overflow="visible">
+                                                    <path
+                                                        d="M71.547-56.875c0-3.969-.844-7.938-5.766-7.938-4.937 0-5.781 3.97-5.781 7.938v33.547L43.047-12.625c-1.078.719-2.281 1.078-3.61 1.078h-3.843c-2.766 0-5.766-.719-6.735-2.406-.968-1.672-1.078-4.813-1.203-7.453l-1.203-35.469c-.125-3.734-.719-7.938-5.656-7.938-5.281 0-5.89 4.454-5.766 8.657l1.203 36.312c.235 6.25.125 11.188 5.297 15.64C25.375-.968 28.984 0 32.234 0h8.532c3.125 0 6.25-1.438 9.984-3.844l9.375-6.14v1.921c0 3.97.844 8.063 5.766 8.063 6.14 0 5.656-5.89 5.656-8.531zm0 0"
+                                                        style="stroke:none" />
+                                                </symbol>
+                                                <symbol style="overflow:visible" id="c" overflow="visible">
+                                                    <path
+                                                        d="M15.031-7.938c0 3.97.844 7.938 5.766 7.938 4.937 0 5.781-3.969 5.781-7.938v-29.218L42.688-50.5c2.046-1.688 3.609-2.766 5.765-2.766h3.375c2.766 0 5.531 0 6.969 2.047C60-49.547 60-48.094 60-46.172c0 3.719 1.688 7.094 5.89 7.094 4.938 0 5.657-4.094 5.657-8.063 0-5.28-1.328-9.25-5.172-13.109-3.125-3.125-6.844-4.563-11.297-4.563h-9.266c-3.609 0-6.968 2.282-10.218 4.922l-9.016 7.47v-4.704c0-3.844-1.203-7.688-5.781-7.688-5.281 0-5.766 4.329-5.766 8.532zm0 0"
+                                                        style="stroke:none" />
+                                                </symbol>
+                                                <symbol style="overflow:visible" id="d" overflow="visible">
+                                                    <path
+                                                        d="M49.297-80.563c0-6.859-1.922-8.062-8.531-8.062H28.625c-3.86 0-7.938.844-7.938 5.766 0 5.062 4.563 5.78 7.938 5.78h9.14v65.532h-9.14c-3.86 0-7.938.844-7.938 5.781C20.688-.719 25.25 0 28.625 0h29.328c3.375 0 7.938-.719 7.938-5.766 0-4.937-4.079-5.78-7.938-5.78h-8.656zm0 0"
+                                                        style="stroke:none" />
+                                                </symbol>
+                                            </defs>
+                                            <path style="fill:#0c544c;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                                                d="M333.977 14.043a4.96 4.96 0 0 1-4.961-4.961 4.958 4.958 0 0 1 4.96-4.96 4.96 4.96 0 1 1 0 9.921m-49.269 84.762a4.96 4.96 0 0 1-4.96-4.961 4.958 4.958 0 0 1 4.96-4.961 4.957 4.957 0 0 1 4.957 4.96 4.96 4.96 0 0 1-4.957 4.962M333.977 0a9.082 9.082 0 0 0-9.082 9.082c0 1.07.27 2.066.609 3.02l-42.606 73.023c-4.117.863-7.273 4.344-7.273 8.719a9.082 9.082 0 0 0 9.082 9.082c5.012 0 9.078-4.067 9.078-9.082 0-1.008-.27-1.93-.57-2.836l42.82-73.262c3.992-.957 7.024-4.379 7.024-8.664A9.082 9.082 0 0 0 333.977 0" />
+                                            <path style="fill:#073551;fill-opacity:1;fill-rule:nonzero;stroke:none"
+                                                d="M296.816 14.043a4.96 4.96 0 0 1-4.96-4.961 4.958 4.958 0 0 1 4.96-4.96 4.957 4.957 0 0 1 4.957 4.96 4.96 4.96 0 0 1-4.957 4.961m-49.273 84.762a4.96 4.96 0 1 1 0-9.922 4.958 4.958 0 0 1 4.96 4.96 4.96 4.96 0 0 1-4.96 4.962M296.816 0a9.08 9.08 0 0 0-9.082 9.082c0 1.07.27 2.066.61 3.02l-42.606 73.023c-4.12.863-7.277 4.344-7.277 8.719a9.082 9.082 0 0 0 18.164 0c0-1.008-.27-1.93-.57-2.836l42.82-73.262c3.992-.957 7.023-4.379 7.023-8.664 0-5.016-4.07-9.082-9.082-9.082M228.957 29.227a4.963 4.963 0 0 1 4.961 4.96 4.96 4.96 0 1 1-4.96-4.96m-.001 14.043a9.082 9.082 0 0 0 9.082-9.082c0-1.004-.273-1.93-.574-2.836-1.203-3.606-4.5-6.247-8.508-6.247-.64 0-1.203.239-1.809.368-4.117.859-7.273 4.34-7.273 8.715a9.082 9.082 0 0 0 9.082 9.082M223.996 65.922a4.96 4.96 0 1 1 9.922 0 4.96 4.96 0 0 1-4.961 4.957 4.96 4.96 0 0 1-4.96-4.957m14.042 0c0-1.008-.273-1.93-.574-2.836-1.203-3.606-4.496-6.246-8.508-6.246-.64 0-1.203.238-1.809.363-4.117.863-7.273 4.344-7.273 8.719 0 5.012 4.066 9.082 9.082 9.082 5.016 0 9.082-4.07 9.082-9.082" />
+                                            <use transform="translate(-86.211 -184.055)" height="100%" width="100%"
+                                                y="286.977" x="71.18" xlink:href="#a"
+                                                style="fill:#073551;fill-opacity:1" />
+                                            <use transform="translate(-86.211 -184.055)" height="100%" width="100%"
+                                                y="286.977" x="133.711" xlink:href="#b"
+                                                style="fill:#073551;fill-opacity:1" />
+                                            <use transform="translate(-86.211 -184.055)" height="100%" width="100%"
+                                                y="286.977" x="196.242" xlink:href="#c"
+                                                style="fill:#073551;fill-opacity:1" />
+                                            <use transform="translate(-86.211 -184.055)" height="100%" width="100%"
+                                                y="286.977" x="239.653" xlink:href="#d"
+                                                style="fill:#073551;fill-opacity:1" />
+                                        </svg>
                                         <svg v-else-if="slotProps.value == 'openai'" class="model-icon"
                                             viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd"
                                             width="20" height="20" clip-rule="evenodd" stroke-linejoin="round"
@@ -297,6 +341,7 @@ const changeModelDeveloper = (type) => {
                         <model-form-open-ai-vue v-if="model.developer === 'openai'" :model="model" />
                         <model-form-web-llm-vue v-else-if="model.developer === 'webllm'" :model="model" />
                         <model-form-hugging-face-vue v-else-if="model.developer === 'huggingface'" :model="model" />
+                        <model-form-curl-vue v-else-if="model.developer === 'curl'" :model="model" />
                     </section>
                 </TabPanel>
                 <TabPanel value="2" class="mt-4 px-10 max-h-[81vh] overflow-auto">
@@ -304,7 +349,7 @@ const changeModelDeveloper = (type) => {
                 </TabPanel>
             </TabPanels>
             <Button type=" submit" :loading="loading" severity="success" icon="pi pi-check"
-                :label="model.id ? 'Update' : 'Create' + ' Model'" class="p-4" />
+                :label="model.id ? 'Update' : 'Create' + ' Model'" class="p-4 bg-green-500" />
         </Tabs>
     </Form>
 
