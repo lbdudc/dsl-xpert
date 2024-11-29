@@ -155,7 +155,7 @@ const changeModelDeveloper = (type) => {
             <TabList class="flex justify-center">
                 <Tab value="0" class="flex-1 flex items-center justify-center gap-4">
                     <span class="text-sm" :class="errorTabs && errorTabs[0] != null ? 'text-red-700' : ''">
-                        DSL Model Definition
+                        Model Info
                     </span>
                     <i v-if="errorTabs && errorTabs[0] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>

@@ -81,9 +81,10 @@ onMounted(async () => {
 
 </script>
 <template>
-    <section class="text-surface-500 dark:text-surface-400 mb-4 hover:cursor-pointer" @click="hfModelDialog = true">
-        <label class="text-lg font-semibold ">Model Selected:</label>
-        <span v-if="model.modelType" class="ml-4">
+    <section class="text-surface-500 dark:text-surface-400 mb-4 hover:cursor-pointer  p-2"
+        @click="hfModelDialog = true">
+        <label class="text-lg font-semibold text-green-500 ">Model Selected:</label>
+        <span v-if="model.modelType" class="ml-4 ">
             {{ model.modelType }}
         </span>
         <span v-else>
