@@ -7,7 +7,7 @@ import ModelFormCurlVue from "./curl/ModelForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "./openai/modelService.js";
 import { initialValues } from "./consts.js";
-import { onMounted, ref, reactive } from "vue";
+import { onMounted, ref, reactive, watch } from "vue";
 
 const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"}`;
 
@@ -104,12 +104,12 @@ const resolver = async (values) => {
         errorTabs.value[2] = true;
     }
 
-    if (!model.modelType) {
+    if (!model.modelType || model.modelType == "") {
         errors.value.modelType = [{ type: 'required', message: 'Model Type is required.' }];
         errorTabs.value[1] = true;
     }
 
-    if (!model.apiKey || model.apiKey == "") {
+    if (model.developer == "openai" && (!model.apiKey || model.apiKey == "")) {
         errors.value.apiKey = [{ message: 'API Key is required' }];
         errorTabs.value[1] = true;
     }
@@ -148,6 +148,11 @@ const changeModelDeveloper = (type) => {
     model.developer = type.value;
     model.modelType = null;
 }
+
+// watch the model and execute the validation
+watch(model, (newVal) => {
+    resolver(newVal);
+}, { deep: true });
 
 </script>
 <template>
