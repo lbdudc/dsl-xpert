@@ -23,18 +23,6 @@ const removeStopSequence = (stopSequenceIndex) => {
 
 <template>
   <div class="flex flex-col gap-4">
-    <FloatLabel class="flex flex-col gap-4" variant="in">
-      <InputText name="modelName" id="modelName" v-model="model.name" label="Model name" fluid>
-      </InputText>
-      <label for="modelName">Model Name</label>
-    </FloatLabel>
-
-    <FloatLabel class="flex flex-col gap-4" variant="in">
-      <Textarea name="description" v-model="model.description" label="Model Description">
-        </Textarea>
-      <label for="description">Model Description</label>
-    </FloatLabel>
-
     <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
       <Select name="modelType" v-model="model.modelType" :options="modelTypeItems" label="Model type"
         placeholder="Select a model type">

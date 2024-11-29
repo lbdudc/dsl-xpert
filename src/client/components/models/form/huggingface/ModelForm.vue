@@ -23,7 +23,6 @@ const hfModelAuthor = ref("");
 const hfToken = ref("");
 const hfModelFilter = ref("");
 const hfModelSort = ref("");
-const hfModeDirection = ref(-1);
 
 
 const fetchModels = async () => {
@@ -38,7 +37,6 @@ const fetchModels = async () => {
     }
     if (hfModelSort.value != "") {
         queryParamsObj.sort = hfModelSort.value;
-        queryParamsObj.direction = hfModeDirection.value;
     }
 
     const response = await fetch(`${HUGGINGFACE_API_URL}/models?${new URLSearchParams(queryParamsObj).toString()}`, {
@@ -97,33 +95,31 @@ onMounted(async () => {
 
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="modelName" id="modelName" v-model="hfModelName" label="Search Model Name" fluid>
+            <InputText name="hfModelName" id="hfModelName" v-model="hfModelName" label="Search Model Name" fluid>
             </InputText>
-            <label for="modelName">Model Name</label>
+            <label for="hfModelName">Model Name</label>
         </FloatLabel>
 
         <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="modelAuthor" id="modelAuthor" v-model="hfModelAuthor" label="Search Model Author" fluid>
+            <InputText name="hfModelAuthor" id="hfModelAuthor" v-model="hfModelAuthor" label="Search Model Author"
+                fluid>
             </InputText>
-            <label for="modelAuthor">Model Author</label>
+            <label for="hfModelAuthor">Model Author</label>
         </FloatLabel>
 
         <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="modelFilter" id="modelFilter" v-model="hfModelFilter" label="Search Model Filter" fluid>
+            <InputText name="hfModelFilter" id="hfModelFilter" v-model="hfModelFilter" label="Search Model Filter"
+                fluid>
             </InputText>
-            <label for="modelFilter">Model Filter</label>
+            <label for="hfModelFilter">Model Filter</label>
         </FloatLabel>
 
         <div class="flex flex-row items-center justify-between">
             <FloatLabel class=" flex flex-col gap-4 flex-1" variant="in">
-                <InputText name="modelSort" id="modelSort" v-model="hfModelSort" label="Search Model Sort" fluid>
+                <InputText name="hfModelSort" id="hfModelSort" v-model="hfModelSort" label="Search Model Sort" fluid>
                 </InputText>
-                <label for="modelSort">Model Sort</label>
+                <label for="hfModelSort">Model Sort</label>
             </FloatLabel>
-            <Button @click="hfModeDirection = hfModeDirection === 1 ? -1 : 1"
-                class="p-button-rounded p-button-text p-button-sm"
-                :icon="hfModeDirection === 1 ? 'pi pi-sort-up' : 'pi pi-sort-down'">
-            </Button>
         </div>
 
         <FloatLabel class="flex flex-col gap-4" variant="in">
@@ -139,7 +135,7 @@ onMounted(async () => {
     <Divider />
 
     <section>
-        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" itemSize="10"
+        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" itemSize=10
             class="flex flex-col items-center justify-center" style="height: 500px">
             <template v-slot:item="{ item, options }">
                 <!-- All the rows have to be the same height -->

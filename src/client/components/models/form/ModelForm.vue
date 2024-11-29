@@ -46,6 +46,7 @@ const modelDeveloperItems = [
 ];
 
 const errors = ref({});
+const errorTabs = ref({});
 
 onMounted(async () => {
     if (route.params.id) {
@@ -84,25 +85,31 @@ onMounted(async () => {
 
 const resolver = async (values) => {
     errors.value = {};
+    errorTabs.value = {};
 
     if (!model.name || model.name == "") {
         errors.value.modelName = [{ message: 'ModelName is required.' }];
+        errorTabs.value[0] = true;
     }
 
     if (!model.description || model.description == "") {
         errors.value.description = [{ message: 'Description is required.' }];
+        errorTabs.value[0] = true;
     }
 
     if (!model.definition || model.definition == "") {
         errors.value.definition = [{ message: 'Model grammar definition is required.' }];
+        errorTabs.value[2] = true;
     }
 
     if (!model.modelType) {
         errors.value.modelType = [{ type: 'required', message: 'Model Type is required.' }];
+        errorTabs.value[1] = true;
     }
 
     if (!model.apiKey || model.apiKey == "") {
         errors.value.apiKey = [{ message: 'API Key is required' }];
+        errorTabs.value[1] = true;
     }
 
     return {
@@ -144,13 +151,44 @@ const changeModelDeveloper = (type) => {
 <template>
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
         class="flex flex-col gap-4 h-full">
-        <Tabs value="0" class="flex-1">
+        <Tabs value="0" class="flex-1" scrollable>
             <TabList class="flex justify-center">
-                <Tab value="0" class="flex-1 text-center">Model Setup</Tab>
-                <Tab value="1" class="flex-1 text-center">Grammar Setup</Tab>
+                <Tab value="0" class="flex-1 flex items-center justify-center gap-4">
+                    <span class="text-sm" :class="errorTabs && errorTabs[0] != null ? 'text-red-700' : ''">
+                        DSL Model Definition
+                    </span>
+                    <i v-if="errorTabs && errorTabs[0] != null" class="pi pi-exclamation-triangle text-red-700"></i>
+                </Tab>
+                <Tab value="1" class="flex-1 flex items-center justify-center gap-4">
+                    <span class="text-sm" :class="errorTabs && errorTabs[1] != null ? 'text-red-700' : ''">
+                        Model Setup
+                    </span>
+                    <i v-if="errorTabs && errorTabs[1] != null" class="pi pi-exclamation-triangle text-red-700"></i>
+                </Tab>
+                <Tab value="2" class="flex-1 flex items-center justify-center gap-4">
+                    <span class="text-sm" :class="errorTabs && errorTabs[2] != null ? 'text-red-700' : ''">
+                        Grammar Setup
+                    </span>
+                    <i v-if="errorTabs && errorTabs[2] != null" class="pi pi-exclamation-triangle text-red-700"></i>
+                </Tab>
             </TabList>
             <TabPanels class="flex-1">
                 <TabPanel value="0">
+                    <section class="flex flex-col gap-4 mt-4">
+                        <FloatLabel class="flex flex-col gap-4" variant="in">
+                            <InputText name="modelName" id="modelName" v-model="model.name" label="Model name" fluid>
+                            </InputText>
+                            <label for="modelName">Model Name</label>
+                        </FloatLabel>
+
+                        <FloatLabel class="flex flex-col gap-4" variant="in">
+                            <Textarea name="description" v-model="model.description" label="Model Description">
+                            </Textarea>
+                            <label for="description">Model Description</label>
+                        </FloatLabel>
+                    </section>
+                </TabPanel>
+                <TabPanel value="1">
                     <section class="mt-4">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
@@ -261,7 +299,7 @@ const changeModelDeveloper = (type) => {
                         <model-form-hugging-face-vue v-else-if="model.developer === 'huggingface'" :model="model" />
                     </section>
                 </TabPanel>
-                <TabPanel value="1" class="mt-4">
+                <TabPanel value="2" class="mt-4">
                     <model-form-validator :model="model" :errors="errors" />
                 </TabPanel>
             </TabPanels>
