@@ -2,6 +2,7 @@
 import { ProgressSpinner } from "primevue";
 import { onMounted, ref, reactive } from "vue";
 import { useRoute } from "vue-router";
+import { fetchModel, tokenCounter, createChat } from "./chatService.js";
 
 const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
   }`;
@@ -22,20 +23,11 @@ onMounted(() => {
   }
 });
 
-// Counts the approximate number of tokens in the input while adding the total number for the whole conversation
-async function tokenCounter(text) {
-  const words = text.split(/\s+/);
-  const nWords = words.length;
-  const tokenCount = nWords * 2 + nTokensConversation; // The number of words is doubled to take into account the possible response as well
-
-  return tokenCount;
-}
-
 const getModelOutput = async () => {
   if (loadingResponse.value) return;
 
   try {
-    const userMessage = message.value;
+    let userMessage = message.value;
 
     // Add the new message to the chat messages array
     if (userMessage != "") {
@@ -48,12 +40,18 @@ const getModelOutput = async () => {
     }
 
     // Check that the amount of tokens does not exceed the maximum number of 4096 (as the counting is approximate we use 4000 instead)
-    if (tokenCounter(userMessage) > 4000) {
+    if (tokenCounter(userMessage, nTokensConversation) > 4000) {
       console.log(
         'The amount of tokens in the conversation will exceed the maximum limit for the specified model. You need to start a new conversation. To do so, just write "Reset".'
       );
       process.exit(1);
     }
+
+    // Format userMessage and apply grammar definition and usage examples as context
+    const res = await fetchModel(SERVER_URL, route.params.id)
+    const definition = res.definition;
+    const definitionExamples = res.definitionExamples;
+    userMessage = await createChat(userMessage, definition, definitionExamples);
 
     // Send petition with the user input
     loadingResponse.value = true;
