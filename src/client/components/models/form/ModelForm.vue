@@ -172,8 +172,8 @@ const changeModelDeveloper = (type) => {
                     <i v-if="errorTabs && errorTabs[2] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>
             </TabList>
-            <TabPanels class="flex-1">
-                <TabPanel value="0">
+            <TabPanels class="flex-1 m-0 p-0">
+                <TabPanel value="0" class="pt-4 px-10">
                     <section class="flex flex-col gap-4 mt-4">
                         <FloatLabel class="flex flex-col gap-4" variant="in">
                             <InputText name="modelName" id="modelName" v-model="model.name" label="Model name" fluid>
@@ -188,7 +188,7 @@ const changeModelDeveloper = (type) => {
                         </FloatLabel>
                     </section>
                 </TabPanel>
-                <TabPanel value="1">
+                <TabPanel value="1" class="pt-4 px-10 max-h-[81vh] overflow-auto">
                     <section class="mt-4">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
@@ -299,7 +299,7 @@ const changeModelDeveloper = (type) => {
                         <model-form-hugging-face-vue v-else-if="model.developer === 'huggingface'" :model="model" />
                     </section>
                 </TabPanel>
-                <TabPanel value="2" class="mt-4">
+                <TabPanel value="2" class="mt-4 px-10 max-h-[81vh] overflow-auto">
                     <model-form-validator :model="model" :errors="errors" />
                 </TabPanel>
             </TabPanels>

@@ -135,9 +135,9 @@ onMounted(async () => {
 
     <Divider />
 
-    <section>
+    <section class="max-h-[370px] overflow-hidden">
         <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" itemSize=10
-            class="flex flex-col items-center justify-center" style="height: 500px">
+            class="flex flex-col items-center justify-center" style="height: 370px">
             <template v-slot:item="{ item, options }">
                 <!-- All the rows have to be the same height -->
                 <div class="grid grid-cols-4 gap-2 w-full hover:bg-gray-100 hover:cursor-pointer hover:text-slate-950"
