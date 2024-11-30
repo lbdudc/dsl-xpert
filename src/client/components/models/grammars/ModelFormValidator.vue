@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, ref } from "vue";
 import { grammarTypeItems } from "@consts/grammar";
 import ModelGrammarValidator from "./ModelGrammarValidator.vue";
 
@@ -15,7 +15,7 @@ const props = defineProps({
 });
 
 const model = reactive(props.model);
-
+const exampleActiveTab = ref(0);
 
 const handleContentUpdate = (content) => {
     model.definition = content;
@@ -24,18 +24,18 @@ const handleContentUpdate = (content) => {
 const addCard = () => {
     model.definitionExamples.push({ userInstruction: "", modelAnswer: "" });
     if (model.definitionExamples.length > 1) {
-        model.activeTab = model.definitionExamples.length - 1;
+        exampleActiveTab.value = model.definitionExamples.length - 1;
     } else {
-        model.activeTab = 0;
+        exampleActiveTab.value = 0;
     }
 };
 
 const removeCard = (cardIndex) => {
     model.definitionExamples.splice(cardIndex, 1);
     if (model.definitionExamples.length > 1) {
-        model.activeTab = model.definitionExamples.length - 1;
+        exampleActiveTab.value = model.definitionExamples.length - 1;
     } else {
-        model.activeTab = 0;
+        exampleActiveTab.value = 0;
     }
 };
 </script>
@@ -59,7 +59,7 @@ const removeCard = (cardIndex) => {
         </Message>
 
 
-        <Tabs :value="model.activeTab" scrollable>
+        <Tabs :value="exampleActiveTab" scrollable>
             <TabList>
                 <Tab v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
                     Example {{ cardIndex + 1 }}
