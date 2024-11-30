@@ -1,6 +1,5 @@
 <script setup>
-import { ref } from "vue";
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute } from "vue-router";
 import NotFoundVue from "../404.vue";
 import ChatVue from "./components/Chat.vue";

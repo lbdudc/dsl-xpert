@@ -152,7 +152,7 @@ watch(model, (newVal) => {
                         </FloatLabel>
                     </section>
                 </TabPanel>
-                <TabPanel value="1" class="pt-4 px-10 max-h-[81vh] overflow-auto">
+                <TabPanel value="1" class="pt-4 px-10 max-h-[75vh] overflow-auto">
                     <section class="mt-4">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
@@ -306,7 +306,7 @@ watch(model, (newVal) => {
                         <model-form-curl-vue v-else-if="model.developer === 'curl'" :model="model" />
                     </section>
                 </TabPanel>
-                <TabPanel value="2" class="mt-4 px-10 max-h-[81vh] overflow-auto">
+                <TabPanel value="2" class="mt-4 px-10 max-h-[70vh] overflow-auto">
                     <model-form-validator :model="model" :errors="errors" />
                 </TabPanel>
             </TabPanels>

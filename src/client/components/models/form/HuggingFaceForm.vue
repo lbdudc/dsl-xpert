@@ -81,37 +81,38 @@ onMounted(async () => {
     <Divider />
 
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="hfModelName" id="hfModelName" v-model="hfModelName" label="Search Model Name" fluid>
+        <FloatLabel class="flex flex-col gap-4" variant="on">
+            <InputText size="small" name="hfModelName" id="hfModelName" v-model="hfModelName" label="Search Model Name">
             </InputText>
             <label for="hfModelName">Model Name</label>
         </FloatLabel>
 
-        <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="hfModelAuthor" id="hfModelAuthor" v-model="hfModelAuthor" label="Search Model Author"
-                fluid>
+        <FloatLabel class="flex flex-col gap-4" variant="on">
+            <InputText size="small" name=" hfModelAuthor" id="hfModelAuthor" v-model="hfModelAuthor"
+                label="Search Model Author">
             </InputText>
             <label for="hfModelAuthor">Model Author</label>
         </FloatLabel>
 
-        <FloatLabel class="flex flex-col gap-4" variant="in">
-            <InputText name="hfModelFilter" id="hfModelFilter" v-model="hfModelFilter" label="Search Model Filter"
-                fluid>
+        <FloatLabel class="flex flex-col gap-4" variant="on">
+            <InputText size="small" name="hfModelFilter" id="hfModelFilter" v-model="hfModelFilter"
+                label="Search Model Filter">
             </InputText>
             <label for="hfModelFilter">Model Filter</label>
         </FloatLabel>
 
         <div class="flex flex-row items-center justify-between">
-            <FloatLabel class=" flex flex-col gap-4 flex-1" variant="in">
-                <InputText name="hfModelSort" id="hfModelSort" v-model="hfModelSort" label="Search Model Sort" fluid>
+            <FloatLabel class=" flex flex-col gap-4 flex-1" variant="on">
+                <InputText size="small" name="hfModelSort" id="hfModelSort" v-model="hfModelSort"
+                    label="Search Model Sort">
                 </InputText>
                 <label for="hfModelSort">Model Sort</label>
             </FloatLabel>
         </div>
 
-        <FloatLabel class="flex flex-col gap-4" variant="in">
-            <Password fluid v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder="" autocomplete="off"
-                :feedback="false" toggleMask>
+        <FloatLabel class="flex flex-col gap-4" variant="on">
+            <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder=""
+                autocomplete="off" :feedback="false" fluid toggleMask>
             </Password>
             <label for="hfToken">HuggingFace Token</label>
         </FloatLabel>
