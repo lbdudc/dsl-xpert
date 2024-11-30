@@ -12,3 +12,4 @@ export const grammarTypeItems = [
         code: "langium",
     }
 ];
+

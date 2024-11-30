@@ -2,11 +2,9 @@
 import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
 import { useRouter } from "vue-router";
+import { fetchModels } from "@services/modelService";
 
 const router = useRouter();
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
 
 // computed models based on search
 const search = ref("");
@@ -30,21 +28,11 @@ const modelCreateItems = [
 ];
 
 
-onMounted(() => {
-  fetchModels();
+onMounted(async () => {
+  fetchModels().then((data) => {
+    models.value = data;
+  });
 });
-
-const fetchModels = async () => {
-  const res = await fetch(`${SERVER_URL}/api/models`);
-
-  if (!res.ok) {
-    console.error("Failed to fetch models");
-    return;
-  }
-
-  const data = await res.json();
-  models.value = data;
-};
 </script>
 <template>
   <div class="flex flex-col w-screen p-4 gap-8 px-10">

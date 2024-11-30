@@ -1,6 +1,6 @@
 <script setup>
 import { reactive, ref } from "vue";
-import { testCurl } from "./modelService.js";
+import { testCurl } from "@services/curlService.js";
 
 
 const props = defineProps({
@@ -9,14 +9,13 @@ const props = defineProps({
         required: true
     }
 });
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"}`;
 
 const model = reactive(props.model);
 const result = ref(null);
 
 
 const submitCurl = async () => {
-    testCurl(SERVER_URL, model.modelType)
+    testCurl(model.modelType)
         .then((response) => {
             result.value = response;
         })

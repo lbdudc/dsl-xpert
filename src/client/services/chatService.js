@@ -1,16 +1,32 @@
-export const fetchModel = async (SERVER_URL, id) => {
-	const res = await fetch(`${SERVER_URL}/api/models/${id}`);
-	const data = await res.json();
+import { SERVER_URL } from "@consts/server";
+
+export const chat = async (id, userMessage) => {
+	const response = await fetch(`${SERVER_URL}/api/models/${id}/chat`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			message: userMessage,
+		}),
+	});
+	if (!response.ok) {
+		const error = await response.text();
+		throw new Error(JSON.stringify(JSON.parse(error), null, 4));
+	}
+	const data = await response.json();
 	return data;
 };
 
+
+
 // Counts the approximate number of tokens in the input while adding the total number for the whole conversation
 export const tokenCounter = async (text, nTokensConversation) => {
-  const words = text.split(/\s+/);
-  const nWords = words.length;
-  const tokenCount = nWords * 2 + nTokensConversation; // The number of words is doubled to take into account the possible response as well
+	const words = text.split(/\s+/);
+	const nWords = words.length;
+	const tokenCount = nWords * 2 + nTokensConversation; // The number of words is doubled to take into account the possible response as well
 
-  return tokenCount;
+	return tokenCount;
 }
 
 export const createChat = async (userMessage, definition, definitionExamples) => {

@@ -1,10 +1,19 @@
-export const fetchModel = async (SERVER_URL, id) => {
+import { SERVER_URL } from "@consts/server";
+
+export const fetchModel = async (id) => {
     const res = await fetch(`${SERVER_URL}/api/models/${id}`);
+    const data = await res.json();
+    const { _id } = data;
+    return { ...data, id: _id };
+};
+
+export const fetchModels = async () => {
+    const res = await fetch(`${SERVER_URL}/api/models`);
     const data = await res.json();
     return data;
 };
 
-export const createModel = async (SERVER_URL, modelData) => {
+export const createModel = async (modelData) => {
     const res = await fetch(`${SERVER_URL}/api/models`, {
         method: "POST",
         headers: {
@@ -17,13 +26,22 @@ export const createModel = async (SERVER_URL, modelData) => {
     return json;
 };
 
-export const updateModel = async (SERVER_URL, id, modelData) => {
+export const updateModel = async (id, modelData) => {
     const res = await fetch(`${SERVER_URL}/api/models/${id}`, {
         method: "PUT",
         headers: {
             "Content-Type": "application/json",
         },
         body: JSON.stringify(modelData),
+    });
+
+    const json = await res.json();
+    return json;
+};
+
+export const deleteModel = async (id) => {
+    const res = await fetch(`${SERVER_URL}/api/models/${id}`, {
+        method: "DELETE",
     });
 
     const json = await res.json();

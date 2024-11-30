@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from "vue";
-import { modelTypeItems } from './modelConstants.js';
+import { modelTypeItems } from '@consts/openai';
 
 const props = defineProps({
   model: {

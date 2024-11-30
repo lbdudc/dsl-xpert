@@ -1,5 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
+import { fetchModels, fetchModelDetails } from "@services/huggingFaceService";
+
 const props = defineProps({
     model: {
         type: Object,
@@ -9,10 +11,6 @@ const props = defineProps({
 
 const loadingModels = ref(false);
 const model = reactive(props.model);
-
-
-// HuggingFace API
-const HUGGINGFACE_API_URL = "https://huggingface.co/api"
 
 const hfModelSelected = ref(null);
 const hfModels = ref(null);
@@ -24,7 +22,7 @@ const hfModelFilter = ref("");
 const hfModelSort = ref("");
 
 
-const fetchModels = async () => {
+const fetchModelsClient = async () => {
     loadingModels.value = true;
     const queryParamsObj = {};
 
@@ -38,29 +36,18 @@ const fetchModels = async () => {
         queryParamsObj.sort = hfModelSort.value;
     }
 
-    const response = await fetch(`${HUGGINGFACE_API_URL}/models?${new URLSearchParams(queryParamsObj).toString()}`, {
-        headers: {
-            Authorization: `Bearer ${hfToken}`
-        }
-    });
-    const data = await response.json();
+    const data = await fetchModels(queryParamsObj, hfToken.value);
     hfModels.value = data;
     loadingModels.value = false;
 };
 
-const fetchModelDetail = async (modelId) => {
-    const response = await fetch(`${HUGGINGFACE_API_URL}/models/${modelId}`, {
-        headers: {
-            Authorization: `Bearer ${hfToken}`
-        }
-    });
-    const data = await response.json();
-    hfModelSelected.value = data;
+const fetchModelDetailClient = async (modelId) => {
+    const res = await fetchModelDetails(modelId, hfToken.value);
+    hfModelSelected.value = res;
 };
 
-
 const openModelDialog = (item) => {
-    fetchModelDetail(item.id);
+    fetchModelDetailClient(item.id);
     hfModelDialog.value = true;
 };
 
@@ -74,7 +61,7 @@ const selectHfModel = () => {
 };
 
 onMounted(async () => {
-    fetchModels();
+    fetchModelsClient();
 });
 
 

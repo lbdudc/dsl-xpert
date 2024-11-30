@@ -5,11 +5,9 @@ import ModelFormWebLlmVue from "./web-llm/ModelForm.vue";
 import ModelFormHuggingFaceVue from "./huggingface/ModelForm.vue";
 import ModelFormCurlVue from "./curl/ModelForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
-import { fetchModel, createModel, updateModel } from "./openai/modelService.js";
-import { initialValues } from "./consts.js";
+import { fetchModel, createModel, updateModel } from "@services/modelService.js";
+import { initialValues } from "@consts/model";
 import { onMounted, ref, reactive, watch } from "vue";
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"}`;
 
 const route = useRoute();
 const router = useRouter();
@@ -17,28 +15,8 @@ const router = useRouter();
 const loading = ref(false);
 
 const model = reactive({
-    id: null,
-    developer: null,
-    modelType: null,
-    apiKey: "",
-    showApiKey: false,
-    name: null,
-    temperature: 0.2,
-    maximumLength: 4095,
-    topP: 1,
-    repetitionPenalty: 0,
-    stopSequences: [";", "###"],
-    seed: 6,
-    grammarType: { name: "Langium", code: "langium" },
-    description: null,
-    definition: null,
-    definitionExamples: [
-        { "userInstruction": "", "modelAnswer": "" }
-    ],
-    activeTab: 0,
-    singleStopSequence: ""
+    ...initialValues
 });
-
 
 const modelDeveloperItems = [
     { code: "openai", name: "OpenAI" },
@@ -53,23 +31,9 @@ const errorTabs = ref({});
 onMounted(async () => {
     if (route.params.id) {
         loading.value = true;
-        await fetchModel(SERVER_URL, route.params.id).then((res) => {
-            model.developer = res.developer;
-            model.modelType = res.modelType;
-            model.name = res.name;
-            model.apiKey = res.apiKey;
-            model.temperature = res.temperature;
-            model.maximumLength = res.maximumLength;
-            model.topP = res.topP;
-            model.repetitionPenalty = res.repetitionPenalty;
-            model.stopSequences = res.stopSequences;
-            model.seed = res.seed;
-            model.description = res.description;
-            model.definition = res.definition;
-            model.definitionExamples = res.definitionExamples;
-        }).finally(() => {
-            loading.value = false;
-        });
+        const res = await fetchModel(route.params.id);
+        Object.assign(model, res);
+        loading.value = false;
         return;
     }
 
@@ -129,9 +93,9 @@ const onFormSubmit = async (valid) => {
     loading.value = true;
 
     if (model.id) {
-        res = await updateModel(SERVER_URL, model.id, model);
+        res = await updateModel(model.id, model);
     } else {
-        res = await createModel(SERVER_URL, model);
+        res = await createModel(model);
     }
 
     if (res.errors) {
@@ -156,6 +120,7 @@ watch(model, (newVal) => {
 
 </script>
 <template>
+    {{ model }}
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
         class="flex flex-col gap-4 h-full">
         <Tabs value="0" class="flex-1" scrollable>

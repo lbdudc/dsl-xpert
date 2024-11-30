@@ -1,6 +1,6 @@
 <script setup>
 import { reactive } from "vue";
-import { grammarTypeItems } from "./consts.js";
+import { grammarTypeItems } from "@consts/grammar";
 import ModelGrammarValidator from "./ModelGrammarValidator.vue";
 
 const props = defineProps({

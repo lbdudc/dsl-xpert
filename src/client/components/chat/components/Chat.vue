@@ -2,10 +2,8 @@
 import { ProgressSpinner } from "primevue";
 import { onMounted, ref, reactive } from "vue";
 import { useRoute } from "vue-router";
-import { fetchModel, tokenCounter, createChat } from "./chatService.js";
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
+import { tokenCounter, createChat, chat } from "@services/chatService.js";
+import { fetchModel } from "@services/modelService.js";
 
 let message = ref("");
 let conversation = reactive([]);
@@ -13,12 +11,11 @@ let nTokensConversation = 0;
 const loadingResponse = ref(false);
 const route = useRoute();
 const id = ref(null);
+
 onMounted(() => {
   if (route.params.id) {
-    fetch(`${SERVER_URL}/api/models/${route.params.id}`).then((res) => {
-      res.json().then((res) => {
-        id.value = res._id;
-      });
+    fetchModel(route.params.id).then((res) => {
+      id.value = res._id;
     });
   }
 });
@@ -48,30 +45,17 @@ const getModelOutput = async () => {
     }
 
     // Format userMessage and apply grammar definition and usage examples as context
-    const res = await fetchModel(SERVER_URL, route.params.id)
+    const res = await fetchModel(route.params.id);
+
     const definition = res.definition;
     const definitionExamples = res.definitionExamples;
     userMessage = await createChat(userMessage, definition, definitionExamples);
 
     // Send petition with the user input
     loadingResponse.value = true;
-    const response = await fetch(`${SERVER_URL}/api/models/${id.value}/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: userMessage,
-      }),
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      loadingResponse.value = false;
-      throw new Error(JSON.stringify(JSON.parse(error), null, 4));
-    }
-
     // Get response and update conversation and number of tokens
-    const openAIData = await response.json();
+    const openAIData = await chat(id.value, userMessage);
+
     const lastMessage = openAIData.messagesHistory.slice(-1)[0];
     if (lastMessage) {
       conversation.push({
@@ -151,7 +135,7 @@ const formatText = (text) => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-                }}</span>
+              }}</span>
             </div>
           </div>
         </div>

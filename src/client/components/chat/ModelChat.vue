@@ -1,42 +1,27 @@
 <script setup>
-import { computed, ref } from "vue";
+import { ref } from "vue";
 import { onMounted } from "vue";
 import { useRoute } from "vue-router";
 import NotFoundVue from "../404.vue";
 import ChatVue from "./components/Chat.vue";
 import ModelDetailVue from "./components/ModelDetail.vue";
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
+import { fetchModel } from "@services/modelService";
 
 const route = useRoute();
-
-const id = route.params.id;
-
 const show404 = ref(false);
+
 const model = ref(null);
 const isSmallScreen = ref(window.innerWidth < 768);
 const visibleSidebar = ref(false);
 
-onMounted(() => {
-  fetchModel();
+onMounted(async () => {
+  const res = await fetchModel(route.params.id);
+  model.value = res;
 
   window.addEventListener("resize", () => {
     isSmallScreen.value = window.innerWidth < 768;
   });
 });
-
-const fetchModel = async () => {
-  const res = await fetch(`${SERVER_URL}/api/models/${id}`);
-
-  if (!res.ok) {
-    show404.value = true;
-    return;
-  }
-
-  const data = await res.json();
-  model.value = data;
-};
 
 </script>
 
