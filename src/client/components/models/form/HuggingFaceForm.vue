@@ -122,7 +122,7 @@ onMounted(async () => {
     <Divider />
 
     <section class="max-h-[370px] overflow-hidden">
-        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" itemSize=10
+        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" :itemSize="5"
             class="flex flex-col items-center justify-center" style="height: 370px">
             <template v-slot:item="{ item, options }">
                 <!-- All the rows have to be the same height -->

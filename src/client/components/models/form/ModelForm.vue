@@ -1,12 +1,12 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import ModelFormOpenAiVue from "./openai/ModelForm.vue";
-import ModelFormWebLlmVue from "./web-llm/ModelForm.vue";
-import ModelFormHuggingFaceVue from "./huggingface/ModelForm.vue";
-import ModelFormCurlVue from "./curl/ModelForm.vue";
+import ModelFormOpenAiVue from "./OpenAIForm.vue";
+import ModelFormWebLlmVue from "./WebLLMForm.vue";
+import ModelFormHuggingFaceVue from "./HuggingFaceForm.vue";
+import ModelFormCurlVue from "./CurlForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "@services/modelService.js";
-import { initialValues } from "@consts/model";
+import { initialValues, modelDeveloperItems } from "@consts/model";
 import { onMounted, ref, reactive, watch } from "vue";
 
 const route = useRoute();
@@ -17,13 +17,6 @@ const loading = ref(false);
 const model = reactive({
     ...initialValues
 });
-
-const modelDeveloperItems = [
-    { code: "openai", name: "OpenAI" },
-    { code: "webllm", name: "WebLLM" },
-    { code: "huggingface", name: "Hugging Face" },
-    { code: "curl", name: "Curl Custom Model" },
-];
 
 const errors = ref({});
 const errorTabs = ref({});
@@ -120,7 +113,6 @@ watch(model, (newVal) => {
 
 </script>
 <template>
-    {{ model }}
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
         class="flex flex-col gap-4 h-full">
         <Tabs value="0" class="flex-1" scrollable>

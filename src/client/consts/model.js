@@ -20,3 +20,10 @@ export const initialValues = {
     grammarType: grammarTypeItems[2],
     singleStopSequence: ""
 };
+
+export const modelDeveloperItems = [
+    { code: "openai", name: "OpenAI" },
+    { code: "webllm", name: "WebLLM" },
+    { code: "huggingface", name: "Hugging Face" },
+    { code: "curl", name: "Curl Custom Model" },
+];
