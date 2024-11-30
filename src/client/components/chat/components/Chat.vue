@@ -2,23 +2,38 @@
 import { ProgressSpinner } from "primevue";
 import { onMounted, ref, reactive } from "vue";
 import { useRoute } from "vue-router";
-import { tokenCounter, createChat, chat } from "@services/chatService.js";
+import { ServerSelectorService } from "@services/chat/chatService.js";
+import { tokenCounter, createChat, } from "@services/chat/contextUtils.js";
 import { fetchModel } from "@services/modelService.js";
+import { copyToClipboard, formatText } from "../utils/chatUtils.js";
+import { useToast } from "primevue/usetoast";
+
+const toast = useToast();
+const route = useRoute();
 
 let message = ref("");
 let conversation = reactive([]);
 let nTokensConversation = 0;
 const loadingResponse = ref(false);
-const route = useRoute();
-const id = ref(null);
+
+const model = reactive({});
 
 onMounted(() => {
-  if (route.params.id) {
-    fetchModel(route.params.id).then((res) => {
-      id.value = res._id;
-    });
-  }
+  const routeId = route.params.id;
+  if (!routeId) return;
+
+  fetchModel(routeId).then((res) => {
+    Object.assign(model, res);
+    model.id = res.id;
+  });
 });
+
+const copyAndShowMessage = async (message) => {
+  const res = await copyToClipboard(navigator, message);
+  if (res) toast.add({
+    severity: 'success', summary: 'Success', detail: 'Copied to clipboard', life: 2500
+  });
+};
 
 const getModelOutput = async () => {
   if (loadingResponse.value) return;
@@ -41,20 +56,25 @@ const getModelOutput = async () => {
       console.log(
         'The amount of tokens in the conversation will exceed the maximum limit for the specified model. You need to start a new conversation. To do so, just write "Reset".'
       );
-      process.exit(1);
+      return;
     }
 
     // Format userMessage and apply grammar definition and usage examples as context
-    const res = await fetchModel(route.params.id);
-
-    const definition = res.definition;
-    const definitionExamples = res.definitionExamples;
-    userMessage = await createChat(userMessage, definition, definitionExamples);
+    userMessage = await createChat(userMessage, model.definition, model.definitionExamples);
 
     // Send petition with the user input
     loadingResponse.value = true;
+
     // Get response and update conversation and number of tokens
-    const openAIData = await chat(id.value, userMessage);
+    const chatReasoner = new ServerSelectorService();
+
+    // TODO: de momento va a pelo con openai, esta funcion ya funciona
+    // para recibir como primer parametro el nombre del servidor, y devolver 
+    // el chat correspondiente
+    const openAIData = await chatReasoner.sendMessage('openai', {
+      id: model.id,
+      userMessage
+    });
 
     const lastMessage = openAIData.messagesHistory.slice(-1)[0];
     if (lastMessage) {
@@ -82,23 +102,6 @@ const getModelOutput = async () => {
     loadingResponse.value = false;
   }
 };
-
-// Copy to clipboard the model output
-const copyToClipboard = (text) => {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      console.log("Text copied to clipboard:", text);
-    })
-    .catch((error) => {
-      console.error("Error copying text to clipboard:", error);
-    });
-};
-
-// Replace newline characters with <br> and tab characters with spaces
-const formatText = (text) => {
-  return text.replace(/\n/g, "<br>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-};
 </script>
 
 <template>
@@ -123,7 +126,7 @@ const formatText = (text) => {
                 <!-- Use v-html to render formatted text -->
                 <p class="text-sm" v-html="formatText(message.text)"></p>
                 <!-- Add copy to clipboard button -->
-                <button v-if="!message.isUser" @click="copyToClipboard(message.text)"
+                <button v-if="!message.isUser" @click="copyAndShowMessage(message.text)"
                   class="absolute top-1/2 transform -translate-y-1/2 left-full mt-0 ml-0 text-gray-500 hover:text-gray-700 focus:outline-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -135,7 +138,7 @@ const formatText = (text) => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-              }}</span>
+                }}</span>
             </div>
           </div>
         </div>
@@ -150,7 +153,6 @@ const formatText = (text) => {
           </TextArea>
         </div>
       </div>
-      <!-- Component End  -->
     </div>
   </div>
 </template>

@@ -2,10 +2,13 @@
 // This starter template is using Vue 3 <script setup> SFCs
 // Check out https://vuejs.org/api/sfc-script-setup.html#script-setup
 import NavBar from "@/components/NavBar.vue";
+import { useToast } from "primevue/usetoast";
+const toast = useToast();
 </script>
 
 <template>
   <div class="main-container">
+    <Toast position="bottom-left" />
     <NavBar />
     <router-view />
   </div>

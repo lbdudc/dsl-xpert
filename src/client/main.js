@@ -10,6 +10,7 @@ import 'primeicons/primeicons.css'
 import { Tooltip } from "primevue";
 import { definePreset } from "@primevue/themes";
 import customTheme from "./plugins/primevue.js"
+import ToastService from 'primevue/toastservice';
 
 const Noir = definePreset(Aura, customTheme);
 
@@ -28,6 +29,8 @@ createApp(App)
                 }
             },
         }
+    ).use(
+        ToastService
     ).directive(
         'tooltip',
         Tooltip
