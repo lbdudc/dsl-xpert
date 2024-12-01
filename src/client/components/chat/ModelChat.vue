@@ -12,6 +12,8 @@ const model = reactive({});
 const isSmallScreen = ref(window.innerWidth < 768);
 const visibleSidebar = ref(false);
 
+const loading = ref(true);
+
 onMounted(async () => {
   if (!route.params.id) {
     router.push({ name: "NotFound" });
@@ -25,6 +27,8 @@ onMounted(async () => {
     router.push({ name: "NotFound" });
     return;
   }
+
+  loading.value = false;
 
   window.addEventListener("resize", () => {
     isSmallScreen.value = window.innerWidth < 768;
@@ -42,7 +46,7 @@ const visible = ref(false);
     <ModelDetailVue :model="model" />
   </Sidebar>
 
-  <div v-if="model" class="w-screen h-[calc(100vh-44px)] flex flex-row">
+  <div v-if="!loading" class="w-screen h-[calc(100vh-44px)] flex flex-row">
     <div v-if="!isSmallScreen" class="model-container w-1/3 h-full">
       <ModelDetailVue :model="model" />
     </div>
@@ -51,7 +55,6 @@ const visible = ref(false);
       <Button @click="visibleSidebar = true" rounded severity="secondary" icon="pi pi-arrow-right"
         class="fixed top-1/2 left-1 transform -translate-y-1/2" />
     </div>
-
     <ChatVue :model="model" class="flex flex-grow w-2/3" />
   </div>
   <div v-else class="flex items-center justify-center h-full">

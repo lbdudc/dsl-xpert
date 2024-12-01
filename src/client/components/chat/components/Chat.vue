@@ -1,6 +1,6 @@
 <script setup>
 import { ProgressSpinner } from "primevue";
-import { ref, reactive } from "vue";
+import { ref, reactive, onMounted } from "vue";
 import { ServerSelectorService } from "@services/chat/chatService.js";
 import { tokenCounter, createChat, } from "@services/chat/contextUtils.js";
 import { copyToClipboard, formatText } from "../utils/chatUtils.js";
@@ -13,6 +13,7 @@ const message = ref("");
 const conversation = reactive([]);
 const nTokensConversation = ref(0);
 const loadingResponse = ref(false);
+const settingUpModel = ref(false);
 
 const props = defineProps({
   model: {
@@ -20,7 +21,6 @@ const props = defineProps({
     required: true,
   },
 });
-
 
 const copyAndShowMessage = async (message) => {
   const res = await copyToClipboard(navigator, message);
@@ -58,10 +58,12 @@ const getModelOutput = async () => {
 
     // Send message to the chat service
     const chatReasoner = new ServerSelectorService();
-    const serverResponse = await chatReasoner.sendMessage('openai', {
+    const serverResponse = await chatReasoner.sendMessage(props.model.developer, {
       id: props.model.id,
       userMessage
-    });
+    },
+      engine
+    );
 
     // Add the response to the conversation
     const lastMessage = serverResponse.messagesHistory.slice(-1)[0];
@@ -77,10 +79,39 @@ const getModelOutput = async () => {
     loadingResponse.value = false;
   }
 };
+
+// Model loading progress
+const chatReasoner = new ServerSelectorService();
+const progress = ref(0);
+const progressText = ref("");
+let engine = null;
+
+// Callback function to update model loading progress
+const initProgressCallback = (initProgress) => {
+  progress.value = Math.round(initProgress.progress * 100);
+  progressText.value = initProgress.text;
+}
+
+onMounted(async () => {
+  settingUpModel.value = true;
+
+  // Load the engine model
+  engine = await chatReasoner.loadModel(props.model, initProgressCallback);
+
+  settingUpModel.value = false;
+});
 </script>
 
 <template>
-  <div class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
+  <section v-if="settingUpModel"
+    class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center mx-16 gap-8">
+    <ProgressBar :value="progress" class="w-full"></ProgressBar>
+    <span class="text-sm text-gray-500">
+      {{ progressText }}
+    </span>
+  </section>
+
+  <div v-else class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
     <div class="flex flex-col items-center justify-center w-full h-full">
       <!-- Component Start -->
       <div class="flex flex-col flex-grow w-full bg-slate-200 shadow-xl rounded-lg overflow-hidden">
@@ -113,7 +144,7 @@ const getModelOutput = async () => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-              }}</span>
+                }}</span>
             </div>
           </div>
         </div>

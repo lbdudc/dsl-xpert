@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import { CreateMLCEngine, prebuiltAppConfig } from "@mlc-ai/web-llm";
+import { prebuiltAppConfig } from "@mlc-ai/web-llm";
 
 const props = defineProps({
     model: {
@@ -12,23 +12,12 @@ const props = defineProps({
 const model = reactive(props.model);
 
 // WEB LLM
-const engine = ref(null);
 const wllmSelectedModel = ref(null);
 const modelSelectorItems = ref([]);
 
 onMounted(async () => {
-    // engine.value = await CreateMLCEngine(
-    //     selectedModel,
-    //     { initProgressCallback: initProgressCallback }, // engineConfig
-    // );
     modelSelectorItems.value = prebuiltAppConfig.model_list.map(model => model.model_id);
 });
-
-// Callback function to update model loading progress
-const initProgressCallback = (initProgress) => {
-    progress.value = initProgress;
-    console.log(initProgress);
-}
 
 const selectModel = (selectedModel) => {
     wllmSelectedModel.value = prebuiltAppConfig.model_list.find(model => model.model_id === selectedModel.value);
