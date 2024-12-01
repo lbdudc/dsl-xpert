@@ -1,32 +1,26 @@
 <script setup>
 import { ProgressSpinner } from "primevue";
-import { onMounted, ref, reactive } from "vue";
-import { useRoute } from "vue-router";
+import { ref, reactive } from "vue";
 import { ServerSelectorService } from "@services/chat/chatService.js";
 import { tokenCounter, createChat, } from "@services/chat/contextUtils.js";
-import { fetchModel } from "@services/modelService.js";
 import { copyToClipboard, formatText } from "../utils/chatUtils.js";
 import { useToast } from "primevue/usetoast";
 
 const toast = useToast();
-const route = useRoute();
+const MAX_TOKENS = 4000;
 
-let message = ref("");
-let conversation = reactive([]);
-let nTokensConversation = 0;
+const message = ref("");
+const conversation = reactive([]);
+const nTokensConversation = ref(0);
 const loadingResponse = ref(false);
 
-const model = reactive({});
-
-onMounted(() => {
-  const routeId = route.params.id;
-  if (!routeId) return;
-
-  fetchModel(routeId).then((res) => {
-    Object.assign(model, res);
-    model.id = res.id;
-  });
+const props = defineProps({
+  model: {
+    type: Object,
+    required: true,
+  },
 });
+
 
 const copyAndShowMessage = async (message) => {
   const res = await copyToClipboard(navigator, message);
@@ -35,77 +29,58 @@ const copyAndShowMessage = async (message) => {
   });
 };
 
+const addMessageToConversation = (text, isUser) => {
+  conversation.push({
+    text,
+    timestamp: new Date().toLocaleTimeString(),
+    isUser,
+  });
+};
+
 const getModelOutput = async () => {
+
   if (loadingResponse.value) return;
+  if (message.value == "") return;
+
+  let userMessage = message.value;
+
+  addMessageToConversation(userMessage, true);
+  message.value = "";
+
+  if (tokenCounter(userMessage, nTokensConversation.value) > MAX_TOKENS) {
+    addMessageToConversation("You have reached the maximum token limit", false);
+    return;
+  }
 
   try {
-    let userMessage = message.value;
-
-    // Add the new message to the chat messages array
-    if (userMessage != "") {
-      conversation.push({
-        text: userMessage,
-        timestamp: new Date().toLocaleTimeString(),
-        isUser: true,
-      });
-      message.value = "";
-    }
-
-    // Check that the amount of tokens does not exceed the maximum number of 4096 (as the counting is approximate we use 4000 instead)
-    if (tokenCounter(userMessage, nTokensConversation) > 4000) {
-      console.log(
-        'The amount of tokens in the conversation will exceed the maximum limit for the specified model. You need to start a new conversation. To do so, just write "Reset".'
-      );
-      return;
-    }
-
-    // Format userMessage and apply grammar definition and usage examples as context
-    userMessage = await createChat(userMessage, model.definition, model.definitionExamples);
-
-    // Send petition with the user input
     loadingResponse.value = true;
+    userMessage = createChat(userMessage, props.model.definition, props.model.definitionExamples);
 
-    // Get response and update conversation and number of tokens
+    // Send message to the chat service
     const chatReasoner = new ServerSelectorService();
-
-    // TODO: de momento va a pelo con openai, esta funcion ya funciona
-    // para recibir como primer parametro el nombre del servidor, y devolver 
-    // el chat correspondiente
-    const openAIData = await chatReasoner.sendMessage('openai', {
-      id: model.id,
+    const serverResponse = await chatReasoner.sendMessage('openai', {
+      id: props.model.id,
       userMessage
     });
 
-    const lastMessage = openAIData.messagesHistory.slice(-1)[0];
-    if (lastMessage) {
-      conversation.push({
-        text: lastMessage.content,
-        timestamp: new Date().toLocaleTimeString(),
-        isUser: false,
-      });
-    }
-    nTokensConversation = openAIData.nTokens;
-    loadingResponse.value = false;
+    // Add the response to the conversation
+    const lastMessage = serverResponse.messagesHistory.slice(-1)[0];
+    if (!lastMessage) return;
+
+    addMessageToConversation(lastMessage.content, false);
+    nTokensConversation.value = serverResponse.nTokens;
+
   } catch (error) {
-    let errorMessage = error.message;
-    try {
-      const parsedError = JSON.parse(errorMessage);
-      errorMessage = parsedError.error || "An unexpected error occurred";
-    } catch (parseError) {
-      errorMessage = error.message;
-    }
-    conversation.push({
-      text: errorMessage,
-      timestamp: new Date().toLocaleTimeString(),
-      isUser: false,
-    });
+    const errorMessage = JSON.parse(error.message).error || "An unexpected error occurred";
+    addMessageToConversation(errorMessage, false);
+  } finally {
     loadingResponse.value = false;
   }
 };
 </script>
 
 <template>
-  <div class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center pb-2">
+  <div class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
     <div class="flex flex-col items-center justify-center w-full h-full">
       <!-- Component Start -->
       <div class="flex flex-col flex-grow w-full bg-slate-200 shadow-xl rounded-lg overflow-hidden">
@@ -138,7 +113,7 @@ const getModelOutput = async () => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-                }}</span>
+              }}</span>
             </div>
           </div>
         </div>

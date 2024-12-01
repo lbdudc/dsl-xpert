@@ -6,7 +6,7 @@
  * @param {Number} nTokensConversation - The number of tokens in the conversation
  * @returns {Number} - The total number of tokens in the conversation 
  */
-export const tokenCounter = async (text, nTokensConversation) => {
+export const tokenCounter = (text, nTokensConversation) => {
     const words = text.split(/\s+/);
     const nWords = words.length;
 
@@ -22,7 +22,7 @@ export const tokenCounter = async (text, nTokensConversation) => {
  * @param {Array} definitionExamples - The grammar examples to be included in the conversation
  * @returns {Array} - The conversation context for the model inference
  */
-export const createChat = async (userMessage, definition, definitionExamples) => {
+export const createChat = (userMessage, definition, definitionExamples) => {
     // Format definition examples
     let formattedDefinitionExamples = "";
     let defExample = "";

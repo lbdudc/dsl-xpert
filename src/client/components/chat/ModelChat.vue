@@ -1,26 +1,36 @@
 <script setup>
-import { ref, onMounted } from "vue";
-import { useRoute } from "vue-router";
-import NotFoundVue from "../404.vue";
+import { ref, reactive, onMounted } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import ChatVue from "./components/Chat.vue";
 import ModelDetailVue from "./components/ModelDetail.vue";
 import { fetchModel } from "@services/modelService";
 
 const route = useRoute();
-const show404 = ref(false);
+const router = useRouter();
 
-const model = ref(null);
+const model = reactive({});
 const isSmallScreen = ref(window.innerWidth < 768);
 const visibleSidebar = ref(false);
 
 onMounted(async () => {
-  const res = await fetchModel(route.params.id);
-  model.value = res;
+  if (!route.params.id) {
+    router.push({ name: "NotFound" });
+    return;
+  }
+
+  try {
+    const res = await fetchModel(route.params.id);
+    Object.assign(model, res);
+  } catch (err) {
+    router.push({ name: "NotFound" });
+    return;
+  }
 
   window.addEventListener("resize", () => {
     isSmallScreen.value = window.innerWidth < 768;
   });
 });
+const visible = ref(false);
 
 </script>
 
@@ -41,13 +51,11 @@ onMounted(async () => {
       <Button @click="visibleSidebar = true" rounded severity="secondary" icon="pi pi-arrow-right"
         class="fixed top-1/2 left-1 transform -translate-y-1/2" />
     </div>
+
     <ChatVue :model="model" class="flex flex-grow w-2/3" />
   </div>
-  <div v-else>
-    <div v-if="show404">
-      <NotFoundVue />
-    </div>
-    <div v-else>Loading...</div>
+  <div v-else class="flex items-center justify-center h-full">
+    <ProgressSpinner />
   </div>
 </template>
 

@@ -18,7 +18,7 @@ const deleteModelCall = async () => {
   const { _id } = props.model;
 
   deleteModel(_id).then(() => {
-    router.push("/");
+    router.push({ name: "ModelList" });
   }).catch((err) => {
     console.error(err);
   });
