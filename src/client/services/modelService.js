@@ -27,6 +27,10 @@ export const createModel = async (modelData) => {
         body: JSON.stringify(modelData),
     });
 
+    if (!res.ok) {
+        throw new Error("Model not found");
+    };
+
     const json = await res.json();
     return json;
 };
@@ -40,6 +44,10 @@ export const updateModel = async (id, modelData) => {
         body: JSON.stringify(modelData),
     });
 
+    if (!res.ok) {
+        throw new Error("Model not found");
+    };
+
     const json = await res.json();
     return json;
 };
@@ -48,6 +56,10 @@ export const deleteModel = async (id) => {
     const res = await fetch(`${SERVER_URL}/api/models/${id}`, {
         method: "DELETE",
     });
+
+    if (!res.ok) {
+        throw new Error("Model not found");
+    };
 
     const json = await res.json();
     return json;
