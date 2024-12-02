@@ -146,4 +146,33 @@ const callHuggingFaceInferenceChat = async (messageObject) => {
 	}
 }
 
+const callHuggingFaceCustomChat = async (messageObject) => {
+	const { userMessage, modelName, modelTag, temperature, maxLength, repetitionPenalty, topP, seed, stopSequences, apiKey } = messageObject;
+
+	const response = await fetch(`${HUGGINGFACE_SERVER_URL}/api/chat`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${apiKey}`,
+		},
+		body: JSON.stringify({
+			prompt: userMessage,
+			model_name: modelName,
+			model_tag: modelTag,
+			temperature: temperature,
+			max_length: maxLength,
+			repetition_penalty: repetitionPenalty,
+			top_P: topP,
+			seed: seed,
+			stop_sequences: stopSequences
+		}),
+	});
+	if (!response.ok) {
+		const error = await response.text();
+		throw new Error(JSON.stringify(JSON.parse(error), null, 4));
+	}
+	const data = await response.json();
+	return data;
+};
+
 
