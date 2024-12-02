@@ -21,17 +21,10 @@ export const initialValues = {
     singleStopSequence: ""
 };
 
-// Create an enum for model types
-export const modelTypeItems = [
-    "openai",
-    "webllm",
-    "huggingface",
-    "curl"
-];
-
 export const modelDeveloperItems = [
     { code: "openai", name: "OpenAI" },
     { code: "webllm", name: "WebLLM" },
-    { code: "huggingface", name: "Hugging Face" },
+    { code: "huggingface-inference", name: "Hugging Face Inference" },
+    { code: "huggingface-custom", name: "Hugging Face Custom Model" },
     { code: "curl", name: "Curl Custom Model" },
 ];

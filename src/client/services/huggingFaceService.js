@@ -20,3 +20,19 @@ export const fetchModelDetails = async (modelId, token) => {
     });
     return await response.json();
 }
+
+export const fetchInferenceModels = async (params, token) => {
+
+    const queryParams = {
+        ...params,
+        inference: 'warm',
+        pippeline_tag: 'text-generation',
+    }
+
+    const response = await fetch(`${HUGGINGFACE_API_URL}/models?${new URLSearchParams(queryParams).toString()}`, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    });
+    return await response.json();
+}

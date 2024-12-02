@@ -5,7 +5,6 @@ export default class ModelController {
   static async create(req, res) {
     try {
       const model = new ModelSchema(req.body);
-      model.encryptApiKey(req.body.apiKey);
       await model.save();
       res.send(model);
     } catch (error) {
@@ -37,7 +36,6 @@ export default class ModelController {
           .status(404)
           .send({ message: `Model with name ${name} not found` });
       }
-      model.apiKey = model.decryptApiKey();
       res.send(model);
     } catch (error) {
       console.error(error);
@@ -53,10 +51,6 @@ export default class ModelController {
         return res
           .status(404)
           .send({ message: `Model with id ${id} not found` });
-      }
-      if (req.body.apiKey) {
-        model.encryptApiKey(req.body.apiKey);
-        delete req.body.apiKey;
       }
       Object.assign(model, req.body);
       await model.save();
@@ -94,6 +88,7 @@ export default class ModelController {
         res.status(404).send({ message: `Model with id ${id} not found` });
       }
       const {
+        apiKey,
         modelType,
         temperature,
         maximumLength,
@@ -103,8 +98,6 @@ export default class ModelController {
         seed,
       } = model;
 
-      // Decrypt OpenAI API key
-      const apiKey = model.decryptApiKey();
       const openai = new OpenAI({
         apiKey: apiKey,
       });

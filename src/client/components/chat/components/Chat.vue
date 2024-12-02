@@ -57,13 +57,16 @@ const getModelOutput = async () => {
     userMessage = createChat(userMessage, props.model.definition, props.model.definitionExamples);
 
     // Send message to the chat service
-    const chatReasoner = new ServerSelectorService();
     const serverResponse = await chatReasoner.sendMessage(props.model.developer, {
       id: props.model.id,
+      modelType: props.model.modelType,
+      apiKey: props.model.apiKey,
       userMessage
     },
       engine
     );
+
+    console.log("Server response", serverResponse);
 
     // Add the response to the conversation
     const lastMessage = serverResponse.messagesHistory.slice(-1)[0];

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
-import { fetchModels, fetchModelDetails } from "@services/huggingFaceService";
+import { fetchInferenceModels, fetchModelDetails } from "@services/huggingFaceService";
 
 const props = defineProps({
     model: {
@@ -17,13 +17,13 @@ const hfModels = ref(null);
 const hfModelDialog = ref(false);
 const hfModelName = ref("");
 const hfModelAuthor = ref("");
-const hfToken = ref("");
 const hfModelFilter = ref("");
 const hfModelSort = ref("");
 
 
 const fetchModelsClient = async () => {
     loadingModels.value = true;
+
     const queryParamsObj = {};
 
     if (hfModelName.value != "") {
@@ -36,13 +36,14 @@ const fetchModelsClient = async () => {
         queryParamsObj.sort = hfModelSort.value;
     }
 
-    const data = await fetchModels(queryParamsObj, hfToken.value);
+    const data = await fetchInferenceModels(queryParamsObj, model.apiKey);
+
     hfModels.value = data;
     loadingModels.value = false;
 };
 
 const fetchModelDetailClient = async (modelId) => {
-    const res = await fetchModelDetails(modelId, hfToken.value);
+    const res = await fetchModelDetails(modelId, model.apiKey);
     hfModelSelected.value = res;
 };
 
@@ -69,7 +70,8 @@ onMounted(async () => {
 <template>
     <section class="text-surface-500 dark:text-surface-400 mb-4 hover:cursor-pointer  p-2"
         @click="hfModelDialog = true">
-        <label class="text-lg font-semibold text-green-500 ">Model Selected:</label>
+        <label class="text-lg font-semibold" :class="!model.modelType ? 'text-red-500' : 'text-green-500'">Model
+            Selected:</label>
         <span v-if="model.modelType" class="ml-4 ">
             {{ model.modelType }}
         </span>
@@ -111,13 +113,12 @@ onMounted(async () => {
         </div>
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder=""
-                autocomplete="off" :feedback="false" fluid toggleMask>
+            <Password fluid v-model="model.apiKey" name="apiKey" label="HuggingFace API key"
+                placeholder="Enter HuggingFace API key" autocomplete="off" :feedback="false" toggleMask>
             </Password>
-            <label for="hfToken">HuggingFace Token</label>
         </FloatLabel>
 
-        <Button @click="fetchModels">Search</Button>
+        <Button @click="fetchModelsClient">Search</Button>
     </section>
 
     <Divider />

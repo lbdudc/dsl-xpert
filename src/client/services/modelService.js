@@ -2,6 +2,11 @@ import { SERVER_URL } from "@consts/server";
 
 export const fetchModel = async (id) => {
     const res = await fetch(`${SERVER_URL}/api/models/${id}`);
+
+    if (!res.ok) {
+        throw new Error("Model not found");
+    };
+
     const data = await res.json();
     const { _id } = data;
     return { ...data, id: _id };

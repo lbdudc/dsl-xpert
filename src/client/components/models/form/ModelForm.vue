@@ -2,7 +2,8 @@
 import { useRouter, useRoute } from "vue-router";
 import ModelFormOpenAiVue from "./OpenAIForm.vue";
 import ModelFormWebLlmVue from "./WebLLMForm.vue";
-import ModelFormHuggingFaceVue from "./HuggingFaceForm.vue";
+import ModelFormHuggingFaceCustomVue from "./HuggingFaceCustomForm.vue";
+import ModelFormHuggingFaceInferenceVue from "./HuggingFaceInferenceForm.vue";
 import ModelFormCurlVue from "./CurlForm.vue";
 import ModelFormValidator from "../grammars/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "@services/modelService.js";
@@ -66,7 +67,10 @@ const resolver = async (values) => {
         errorTabs.value[1] = true;
     }
 
-    if (model.developer == "openai" && (!model.apiKey || model.apiKey == "")) {
+    if (
+        (model.developer == "openai" || model.developer == "huggingface-inference") &&
+        (!model.apiKey || model.apiKey == "")
+    ) {
         errors.value.apiKey = [{ message: 'API Key is required' }];
         errorTabs.value[1] = true;
     }
@@ -302,7 +306,10 @@ watch(model, (newVal) => {
                     <section>
                         <model-form-open-ai-vue v-if="model.developer === 'openai'" :model="model" />
                         <model-form-web-llm-vue v-else-if="model.developer === 'webllm'" :model="model" />
-                        <model-form-hugging-face-vue v-else-if="model.developer === 'huggingface'" :model="model" />
+                        <model-form-hugging-face-custom-vue v-else-if="model.developer === 'huggingface-custom'"
+                            :model="model" />
+                        <model-form-hugging-face-inference-vue v-else-if="model.developer === 'huggingface-inference'"
+                            :model="model" />
                         <model-form-curl-vue v-else-if="model.developer === 'curl'" :model="model" />
                     </section>
                 </TabPanel>

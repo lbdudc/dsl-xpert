@@ -22,7 +22,8 @@ const models = ref([]);
 const modelCreateItems = [
   // add to query params ?m=template
   { label: "OpenAI", command: () => router.push({ name: "ModelCreate", query: { m: "openai" } }) },
-  { label: "Hugging Face", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface" } }) },
+  { label: "Hugging Face Inference", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface-inference" } }) },
+  { label: "Hugging Face Custom Model", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface-custom" } }) },
   { label: "Web Llm", command: () => router.push({ name: "ModelCreate", query: { m: "webllm" } }) },
   { label: "Curl Custom", command: () => router.push({ name: "ModelCreate", query: { m: "curl" } }) },
 ];

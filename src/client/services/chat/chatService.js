@@ -1,5 +1,5 @@
-import { SERVER_URL } from "@consts/server";
-import { modelTypeItems } from "@consts/model";
+import { SERVER_URL, HUGGINGFACE_INFERENCES_API_URL } from "@consts/server";
+import { modelDeveloperItems } from "@consts/model";
 import { CreateMLCEngine, prebuiltAppConfig } from "@mlc-ai/web-llm";
 
 /**
@@ -12,8 +12,8 @@ export class ServerSelectorService {
 
 	async loadModel(model, callbackFunct) {
 		const { developer } = model;
-		if (!modelTypeItems.includes(developer)) {
-			return new Error("Model not valid, use one of the following: " + modelTypeItems.concat(", "));
+		if (!modelDeveloperItems.find(model => model.code === developer)) {
+			return new Error("Model not valid, use one of the following: " + modelDeveloperItems.concat(", "));
 		}
 
 		let res;
@@ -48,8 +48,8 @@ export class ServerSelectorService {
 	 */
 	async sendMessage(model, messageObject = {}, customEngine) {
 		// model has to be one of the modelTypeItems, else return an error
-		if (!modelTypeItems.includes(model)) {
-			return new Error("Model not valid, use one of the following: " + modelTypeItems.concat(", "));
+		if (!modelDeveloperItems.find(model => model === model)) {
+			return new Error("Model not valid, use one of the following: " + modelDeveloperItems.map(model.code).concat(", "));
 		}
 
 		let res;
@@ -60,8 +60,11 @@ export class ServerSelectorService {
 			case "webllm":
 				res = await callWebLLMChat(messageObject, customEngine);
 				break;
-			case "huggingface":
-				res = await this.callHubbingFaceChat(model);
+			case "huggingface-inference":
+				res = await callHuggingFaceInferenceChat(messageObject);
+				break;
+			case "huggingface-custom":
+				res = await callHuggingFaceCustomChat(messageObject);
 				break;
 			case "curl":
 				res = await this.callCurlChat(model);
@@ -111,5 +114,36 @@ const callWebLLMChat = async (messageObject, customEngine) => {
 	}
 }
 
+const callHuggingFaceInferenceChat = async (messageObject) => {
+	const { userMessage, modelType, apiKey } = messageObject;
+
+	// TODO: cambiar Chat.vue, para que el createChat devuelva todo en un string
+
+	const response = await fetch(`${HUGGINGFACE_INFERENCES_API_URL}/models/${modelType}`, {
+		method: "POST",
+		headers: {
+			"Content-Type": "application/json",
+			"Authorization": `Bearer ${apiKey}`,
+		},
+		body: JSON.stringify({
+			inputs: userMessage.map(message => message.content).join(". ")
+		})
+	});
+
+	if (!response.ok) {
+		const error = await response.text();
+		throw new Error(JSON.stringify(JSON.parse(error), null, 4));
+	}
+
+	const data = await response.json();
+	userMessage.push({
+		content: data[0].generated_text,
+		role: "assistant",
+	});
+
+	return {
+		messagesHistory: userMessage,
+	}
+}
 
 
