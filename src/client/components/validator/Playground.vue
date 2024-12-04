@@ -1,9 +1,9 @@
 <script setup>
 import { onMounted, ref, watch } from 'vue';
-import { addMonacoStyles, setupPlayground, share, overlay, getPlaygroundState, MonacoEditorLanguageClientWrapper } from "../../libs/worker/common.js";
+import { addMonacoStyles, setupPlayground, overlay, getPlaygroundState } from "../../libs/worker/common.js";
 import { buildWorkerDefinition } from "../../libs/monaco-editor-workers/index.js";
 
-onMounted(async () => {
+onMounted(() => {
 
     addMonacoStyles('monaco-styles-helper');
 
@@ -12,29 +12,29 @@ onMounted(async () => {
         new URL("", window.location.href).href,
         false
     );
-    // on doc load
-    addEventListener('load', async function () {
 
-        // get a handle to our various interactive buttons
-        const grammarRoot = document.getElementById('grammar-root');
-        const contentRoot = document.getElementById('content-root');
+    init();
+});
 
-        const res = await setupPlayground(
-            grammarRoot,
-            contentRoot,
-            overlay
-        );
 
+const init = () => {
+    // get a handle to our various interactive buttons
+    const grammarRoot = document.getElementById('grammar-root');
+    const contentRoot = document.getElementById('content-root');
+
+    setupPlayground(
+        grammarRoot,
+        contentRoot,
+        overlay
+    ).then((res) => {
         console.log(res);
         const langiumEditor = res.langiumWrapper.editorApp.editor;
         const dslEditor = res.dslWrapper.editorApp.editor;
-
         // AQUI SETEAMOS LA GRAMATICA INICIAL
         // dslEditor.getModel().setValue("dasñlkdañlskd");
         // langiumEditor.getModel().setValue("asotro");
-
     });
-});
+}
 
 
 const emitContent = () => {
@@ -48,7 +48,7 @@ const emitContent = () => {
 <template>
     <div x-data="{ isOpen: false }" class="relative bg-white flex flex-col h-full dark:bg-gray-900">
         <div class="relative bg-white flex flex-col h-full dark:bg-gray-900">
-            <div class="dark:bg-gray-900 flex-grow" ref="monaco" id="monaco-editor-root" @focusout="emitContent" >
+            <div class="dark:bg-gray-900 flex-grow" ref="monaco" id="monaco-editor-root" @focusout="emitContent">
                 <div id="grid" class="without-tree">
                     <div id="grammar-header" class="border-solid border flex items-center p-2 text-white font-mono">
                         Grammar
@@ -57,7 +57,7 @@ const emitContent = () => {
                         class="border-solid border flex items-center p-2 text-white font-mono relative">
                         <span>Content</span>
                     </div>
-                    <div id="grammar-body" class="border-solid border relative" >
+                    <div id="grammar-body" class="border-solid border relative">
                         <div id="grammar-root" class="h-full absolute top-0 left-0 w-full"></div>
                     </div>
                     <div id="content-body" class="border-solid border relative">

@@ -1,6 +1,7 @@
 <script setup>
 import { editor } from "monaco-editor";
 import { onMounted, ref, watch } from "vue";
+import Playground from "@/components/validator/Playground.vue";
 
 const props = defineProps({
   grammarType: {
@@ -18,22 +19,22 @@ const monaco = ref(null);
 
 const loadClient = async (grammarType) => {
 
-  try {
-    const module = await import(`./${grammarType.code}/wrapperLangium.js`);
-    const startClient = module.startLangiumClientClassic;
+  // try {
+  //   const module = await import(`./${grammarType.code}/wrapperLangium.js`);
+  //   const startClient = module.startLangiumClientClassic;
 
-    if (startClient) {
-      const client = await startClient(monaco.value);
-      const editor = client.editorApp.editor;
-      editor.trigger("keyboard",
-        "type",
-        { text: props.model.definition }
-      )
-    }
-  } catch (error) {
-    console.error(`Error loading module for ${grammarType.code}:`, error);
-    return null;
-  }
+  //   if (startClient) {
+  //     const client = await startClient(monaco.value);
+  //     const editor = client.editorApp.editor;
+  //     editor.trigger("keyboard",
+  //       "type",
+  //       { text: props.model.definition }
+  //     )
+  //   }
+  // } catch (error) {
+  //   console.error(`Error loading module for ${grammarType.code}:`, error);
+  //   return null;
+  // }
 };
 
 
@@ -46,19 +47,20 @@ const emitContent = () => {
   emit("updateContent", filteredContent);
 };
 
-watch(
-  () => props.grammarType,
-  (newValue) => {
-    loadClient(newValue);
-  },
-  { immediate: true }
-);
+// watch(
+//   () => props.grammarType,
+//   (newValue) => {
+//     loadClient(newValue);
+//   },
+//   { immediate: true }
+// );
 </script>
 
 <template>
   <div>
     <h1>Model grammar definition</h1>
-    <div ref="monaco" id="monaco-editor-root" @focusout="emitContent"></div>
+    <Playground />
+    <!-- <div ref="monaco" id="monaco-editor-root" @focusout="emitContent"></div> -->
   </div>
 </template>
 

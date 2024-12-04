@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
+import ModelFormVue from "@/components/models/form/ModelForm.vue"
 
 // has to be imported here to avoid problems when loading the workers
 import Playground from "@/components/validator/Playground.vue";
@@ -14,7 +15,7 @@ const routes = [
   {
     path: `${base}models/new`,
     name: "ModelCreate",
-    component: () => import("@/components/models/form/ModelForm.vue"),
+    component: ModelFormVue,
   },
   {
     path: `${base}models/:id/chat`,
@@ -24,7 +25,7 @@ const routes = [
   {
     path: `${base}models/:id/edit`,
     name: "ModelForm",
-    component: () => import("@/components/models/form/ModelForm.vue"),
+    component: ModelFormVue,
   },
   {
     path: `${base}playground`,

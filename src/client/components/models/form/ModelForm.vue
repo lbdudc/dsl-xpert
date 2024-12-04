@@ -5,7 +5,7 @@ import ModelFormWebLlmVue from "./WebLLMForm.vue";
 import ModelFormHuggingFaceCustomVue from "./HuggingFaceCustomForm.vue";
 import ModelFormHuggingFaceInferenceVue from "./HuggingFaceInferenceForm.vue";
 import ModelFormCurlVue from "./CurlForm.vue";
-import ModelFormValidator from "../grammars/ModelFormValidator.vue";
+import ModelFormValidator from "@components/validator/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "@services/modelService.js";
 import { initialValues, modelDeveloperItems } from "@consts/model";
 import { onMounted, ref, reactive, watch } from "vue";
