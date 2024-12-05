@@ -1,12 +1,8 @@
 import mongoose from "mongoose";
-import crypto from "crypto";
 import dotenv from "dotenv";
 
 dotenv.config(); // Asegúrate de llamar a dotenv.config()
 const Schema = mongoose.Schema;
-
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY;
-const ALGORITHM = process.env.ALGORITHM;
 
 const ModelSchema = new Schema({
   name: {
@@ -58,6 +54,10 @@ const ModelSchema = new Schema({
   },
   definition: {
     type: String,
+    required: true,
+  },
+  grammarType: {
+    type: Object,
     required: true,
   },
   definitionExamples: {

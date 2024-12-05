@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import ModelFormVue from "@/components/models/form/ModelForm.vue"
 
 // has to be imported here to avoid problems when loading the workers
-import Playground from "@/components/validator/Playground.vue";
+// import Playground from "@/components/validator/Playground.vue";
 
 const base = import.meta.env.BASE_URL;
 
@@ -27,11 +27,11 @@ const routes = [
     name: "ModelForm",
     component: ModelFormVue,
   },
-  {
-    path: `${base}playground`,
-    name: "Playground",
-    component: Playground
-  },
+  // {
+  //   path: `${base}playground`,
+  //   name: "Playground",
+  //   component: Playground
+  // },
   {
     path: `${base}404`,
     name: "NotFound",

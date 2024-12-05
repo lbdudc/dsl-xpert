@@ -1,7 +1,21 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { onMounted, ref, reactive } from 'vue';
 import { addMonacoStyles, setupPlayground, overlay, getPlaygroundState } from "../../libs/worker/common.js";
 import { buildWorkerDefinition } from "../../libs/monaco-editor-workers/index.js";
+import ExampleTabs from './ExampleTabs.vue';
+
+
+const props = defineProps({
+    model: {
+        type: Object,
+        required: true
+    },
+    errors: {
+        type: Object,
+        required: true
+    }
+});
+
 
 onMounted(() => {
 
@@ -42,43 +56,52 @@ const emitContent = () => {
     console.log(getPlaygroundState());
 };
 
+
+const model = reactive(props.model);
+const errors = reactive(props.errors);
+
 </script>
 
 
 <template>
-    <div x-data="{ isOpen: false }" class="relative bg-white flex flex-col h-full dark:bg-gray-900">
-        <div class="relative bg-white flex flex-col h-full dark:bg-gray-900">
-            <div class="dark:bg-gray-900 flex-grow" ref="monaco" id="monaco-editor-root" @focusout="emitContent">
-                <div id="grid" class="without-tree">
-                    <div id="grammar-header" class="border-solid border flex items-center p-2 text-white font-mono">
-                        Grammar
-                    </div>
-                    <div id="content-header"
-                        class="border-solid border flex items-center p-2 text-white font-mono relative">
-                        <span>Content</span>
-                    </div>
-                    <div id="grammar-body" class="border-solid border relative">
-                        <div id="grammar-root" class="h-full absolute top-0 left-0 w-full"></div>
-                    </div>
-                    <div id="content-body" class="border-solid border relative">
-                        <div id="overlay" class="h-full absolute top-0 left-0 w-full bg-black" style="z-index: 100000">
-                            <div class="block absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
-                                <div class="hint text-xs text-center w-48 font-mono"
-                                    style="color: rgba(212, 212, 212, 1)">
-                                    Loading...
+    <section v-if="props.model">
+        <div x-data="{ isOpen: false }" class="relative bg-white flex flex-col h-full dark:bg-gray-900">
+            <div class="relative bg-white flex flex-col h-full dark:bg-gray-900">
+                <div class="dark:bg-gray-900 flex-grow" ref="monaco" id="monaco-editor-root" @focusout="emitContent">
+                    <div id="grid" class="without-tree">
+                        <div id="grammar-header" class="border-solid border flex items-center p-2 text-white font-mono">
+                            Grammar
+                        </div>
+                        <div id="content-header"
+                            class="border-solid border flex items-center p-2 text-white font-mono relative">
+                            <span>Content</span>
+                        </div>
+                        <div id="grammar-body" class="border-solid border relative">
+                            <div id="grammar-root" class="h-full absolute top-0 left-0 w-full"></div>
+                        </div>
+                        <div id="content-body" class="border-solid border relative">
+                            <div id="overlay" class="h-full absolute top-0 left-0 w-full bg-black"
+                                style="z-index: 100000">
+                                <div class="block absolute"
+                                    style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
+                                    <div class="hint text-xs text-center w-48 font-mono"
+                                        style="color: rgba(212, 212, 212, 1)">
+                                        Loading...
+                                    </div>
                                 </div>
                             </div>
+                            <div id="content-root" class="h-full absolute top-0 left-0 w-full"></div>
                         </div>
-                        <div id="content-root" class="h-full absolute top-0 left-0 w-full"></div>
+                        <div id="ast-header">
+                            Syntax tree
+                        </div>
+                        <div id="ast-body"></div>
                     </div>
-                    <div id="ast-header">
-                        Syntax tree
-                    </div>
-                    <div id="ast-body"></div>
                 </div>
             </div>
         </div>
-    </div>
+        <ExampleTabs v-if="props.model" :model="model" :errors="errors" />
+    </section>
 </template>
 
 <style scoped>

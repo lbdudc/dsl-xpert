@@ -1,7 +1,8 @@
 <script setup>
 import { editor } from "monaco-editor";
 import { onMounted, ref, watch } from "vue";
-import Playground from "@/components/validator/Playground.vue";
+import LangiumGrammarValidator from "@components/validator/LangiumGrammarValidator.vue";
+import NoGrammarValidator from "@components/validator/NoGrammarValidator.vue";
 
 const props = defineProps({
   grammarType: {
@@ -11,7 +12,11 @@ const props = defineProps({
   model: {
     type: Object,
     required: true,
-  }
+  },
+  errors: {
+    type: Object,
+    required: true,
+  },
 });
 
 const emit = defineEmits(["updateContent"]);
@@ -57,11 +62,12 @@ const emitContent = () => {
 </script>
 
 <template>
-  <div>
-    <h1>Model grammar definition</h1>
-    <Playground />
-    <!-- <div ref="monaco" id="monaco-editor-root" @focusout="emitContent"></div> -->
-  </div>
+  <section v-if="props.model" class="mt-0 pt-0">
+    <NoGrammarValidator v-if="props.grammarType.code == 'no-grammar-validator'" :model="props.model"
+      :errors="props.errors" />
+    <LangiumGrammarValidator v-else-if="props.grammarType.code == 'langium'" :model="props.model"
+      :errors="props.errors" />
+  </section>
 </template>
 
 <style scoped>

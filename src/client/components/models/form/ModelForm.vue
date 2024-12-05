@@ -325,7 +325,4 @@ watch(model, (newVal) => {
     <div v-else class="flex justify-center items-center h-full">
         <ProgressSpinner />
     </div>
-    <!-- <div v-else>
-        <not-found-vue />
-    </div> -->
 </template>
