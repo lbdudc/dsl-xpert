@@ -12,6 +12,9 @@ const props = defineProps({
     }
 });
 
+// define emits events
+const emit = defineEmits(["update:activeTab", "focusout"]);
+
 const model = reactive(props.model);
 
 // Examples code
@@ -24,21 +27,35 @@ const addCard = () => {
     } else {
         exampleActiveTab.value = 0;
     }
+    updateActiveTab(exampleActiveTab.value);
+    emitFocusOut();
 };
 
-const removeCard = (cardIndex) => {
+const removeCard = () => {
+    const cardIndex = exampleActiveTab.value;
     model.definitionExamples.splice(cardIndex, 1);
     if (model.definitionExamples.length > 1) {
         exampleActiveTab.value = model.definitionExamples.length - 1;
     } else {
         exampleActiveTab.value = 0;
     }
+    updateActiveTab(exampleActiveTab.value);
+    emitFocusOut();
+};
+
+const updateActiveTab = (value) => {
+    exampleActiveTab.value = value;
+    emit("update:activeTab", value);
+};
+
+const emitFocusOut = () => {
+    emit("focusout");
 };
 
 </script>
 
 <template>
-    <Tabs v-if="model" :value="exampleActiveTab" scrollable>
+    <Tabs v-if="model" :value="exampleActiveTab" @update:value="updateActiveTab">
         <TabList>
             <Tab v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
                 Example {{ cardIndex + 1 }}
@@ -49,26 +66,31 @@ const removeCard = (cardIndex) => {
         </TabList>
 
         <TabPanel v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
-            <Card>
-                <template #content>
-                    <div class="grid grid-cols-1 gap-4 md:grid-cols-2 min-h-[200px]">
-                        <Textarea v-model="card.userInstruction" label="User instruction"
-                            placeholder="Enter an instruction for the model" rows="2" auto-grow>
-                            </Textarea>
-                        <Textarea v-model="card.modelAnswer" label="Model answer"
-                            placeholder="Enter the desired result for that instruction" rows="2" auto-grow>
-                            </Textarea>
-                    </div>
-                </template>
-
-                <template #footer>
-                    <Button @click="removeCard(cardIndex)" label="Remove" icon="pi pi-times" severity="danger"
-                        variant="text">
-                    </Button>
-                </template>
-            </Card>
+            <Textarea v-model="card.userInstruction" label="User instruction"
+                placeholder="Enter an instruction for the model" rows="2" auto-grow class="w-full">
+                >
+            </Textarea>
         </TabPanel>
     </Tabs>
+    <!-- CHECK IF HAS GRAMMAR VALIDATION OR NOT -->
+    <div v-if="model.grammarType.code == 'langium'" id="content-body" @focusout="emitFocusOut"
+        class=" relative border border-gray-300">
+        <div id="overlay" class="h-full absolute top-0 left-0 w-full bg-black" style="z-index: 100000">
+            <div class="block absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
+                <div class="hint text-xs text-center w-48 font-mono" style="color: rgba(212, 212, 212, 1)">
+                    Loading...
+                </div>
+            </div>
+        </div>
+        <div id="content-root" class="h-full absolute top-0 left-0 w-full"></div>
+    </div>
+    <Button @click="removeCard()" label="Remove" icon="pi pi-times" severity="danger" variant="text">
+    </Button>
 </template>
 
-<style></style>
+<style>
+#grammar-body,
+#content-body {
+    min-height: 30vh;
+}
+</style>

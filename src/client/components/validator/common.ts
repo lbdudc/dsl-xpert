@@ -102,7 +102,7 @@ export function getPlaygroundState(): PlaygroundParameters {
 export async function setupPlayground(
   leftEditor: HTMLElement,
   rightEditor: HTMLElement,
-): Promise<{ langiumWrapper: MonacoEditorLanguageClientWrapper; dslWrapper: MonacoEditorLanguageClientWrapper; }> {
+): Promise<{ langiumWrapper: MonacoEditorLanguageClientWrapper; dslWrapper: MonacoEditorLanguageClientWrapper; setupDSLWrapper: () => Promise<void>; overlay: (show: boolean, error: boolean) => void; }> {
   // setup initial contents for the grammar & dsl (Hello World)
   currentGrammarContent = HelloWorldGrammar;
   currentDSLContent = DSLInitialContent;
@@ -202,7 +202,9 @@ export async function setupPlayground(
   return {
     langiumWrapper,
     dslWrapper,
-  }
+    setupDSLWrapper: setupDSLWrapper,
+    overlay
+  };
 }
 
 
@@ -260,75 +262,74 @@ async function getFreshLangiumWrapper(htmlElement: HTMLElement): Promise<MonacoE
   await langiumWrapper.start(createUserConfig({
     languageId: "langium",
     code: currentGrammarContent,
-      worker: "../../libs/worker/langiumServerWorker.js",
-      textmateGrammar: LangiumTextMateContent
-    }), htmlElement);
-    return langiumWrapper;
+    worker: "../../libs/worker/langiumServerWorker.js",
+    textmateGrammar: LangiumTextMateContent
+  }), htmlElement);
+  return langiumWrapper;
+}
+
+
+/**
+ * Document change listener for modified DSL programs
+ */
+let dslDocumentChangeListener: Disposable;
+
+/**
+ * Helper for registering to receive new ASTs from parsed DSL programs
+ */
+function registerForDocumentChanges(dslClient: any | undefined) {
+  // dispose of any existing listener
+  if (dslDocumentChangeListener) {
+    dslDocumentChangeListener.dispose();
   }
-  
-  
-  /**
-   * Document change listener for modified DSL programs
-   */
-  let dslDocumentChangeListener: Disposable;
-  
-  /**
-   * Helper for registering to receive new ASTs from parsed DSL programs
-   */
-  function registerForDocumentChanges(dslClient: any | undefined) {
-    // dispose of any existing listener
-    if (dslDocumentChangeListener) {
-      dslDocumentChangeListener.dispose();
-    }
-  
-    // register to receive new ASTs from parsed DSL programs
-    dslDocumentChangeListener = dslClient!.onNotification('browser/DocumentChange', (resp: DocumentChangeResponse) => {
-  
-      // retrieve existing code from the model
-      currentDSLContent = dslWrapper?.getModel()?.getValue() as string;
-  
-      // delay changes by 200ms, to avoid getting too many intermediate states
-      throttle(2, languageUpdateDelay, () => {
-  
-        // show errors if any
-        if (resp.diagnostics.filter(d => d.severity === 1).length) {
-          currentDSLErrors = resp.diagnostics;
-          return;
-        }
-  
-        // no errors
-        currentDSLErrors = [];
-      });
+
+  // register to receive new ASTs from parsed DSL programs
+  dslDocumentChangeListener = dslClient!.onNotification('browser/DocumentChange', (resp: DocumentChangeResponse) => {
+
+    // retrieve existing code from the model
+    currentDSLContent = dslWrapper?.getModel()?.getValue() as string;
+
+    // delay changes by 200ms, to avoid getting too many intermediate states
+    throttle(2, languageUpdateDelay, () => {
+
+      // show errors if any
+      if (resp.diagnostics.filter(d => d.severity === 1).length) {
+        currentDSLErrors = resp.diagnostics;
+        return;
+      }
+
+      // no errors
+      currentDSLErrors = [];
     });
-  }
-  
-  
-  /**
-   * Produce a new LS worker for a given grammar, which returns a Promise once it's finished starting
-   * 
-   * @param grammar To setup LS for
-   * @returns Configured LS worker
-   */
-  async function getLSWorkerForGrammar(grammar: string): Promise<Worker> {
-    return new Promise((resolve, reject) => {
-      // create & notify the worker to setup w/ this grammar
-      const worker = new Worker("../../libs/worker/userServerWorker.js");
-      worker.postMessage({
-        type: "startWithGrammar",
-        grammar
-      });
-  
-      // wait for the worker to finish starting
-      worker.onmessage = (event) => {
-        if (event.data.type === "lsStartedWithGrammar") {
-          resolve(worker);
-        }
-      };
-  
-      worker.onerror = (event) => {
-        reject(event);
-      };
-  
+  });
+}
+
+
+/**
+ * Produce a new LS worker for a given grammar, which returns a Promise once it's finished starting
+ * 
+ * @param grammar To setup LS for
+ * @returns Configured LS worker
+ */
+async function getLSWorkerForGrammar(grammar: string): Promise<Worker> {
+  return new Promise((resolve, reject) => {
+    // create & notify the worker to setup w/ this grammar
+    const worker = new Worker("../../libs/worker/userServerWorker.js");
+    worker.postMessage({
+      type: "startWithGrammar",
+      grammar
     });
-  }
-  
+
+    // wait for the worker to finish starting
+    worker.onmessage = (event) => {
+      if (event.data.type === "lsStartedWithGrammar") {
+        resolve(worker);
+      }
+    };
+
+    worker.onerror = (event) => {
+      reject(event);
+    };
+
+  });
+}
