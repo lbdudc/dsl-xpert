@@ -66,15 +66,19 @@ const emitFocusOut = () => {
         </TabList>
 
         <TabPanel v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
-            <Textarea v-model="card.userInstruction" label="User instruction"
-                placeholder="Enter an instruction for the model" rows="2" auto-grow class="w-full">
-                >
-            </Textarea>
+            <div class="flex flex-col gap-2 mt-2">
+                <Textarea v-model="card.userInstruction" label="User instruction"
+                    placeholder="Enter an instruction for the model" rows="2" auto-grow class="w-full">>
+                </Textarea>
+                <Textarea v-if="model.grammarType.code == 'no-grammar-validator'" v-model="card.modelAnswer"
+                    label="Model answer" placeholder="Enter the model answer" rows="5" auto-grow class="w-full">
+                </Textarea>
+            </div>
         </TabPanel>
     </Tabs>
     <!-- CHECK IF HAS GRAMMAR VALIDATION OR NOT -->
     <div v-if="model.grammarType.code == 'langium'" id="content-body" @focusout="emitFocusOut"
-        class=" relative border border-gray-300">
+        class=" relative border border-gray-300 mt-2">
         <div id="overlay" class="h-full absolute top-0 left-0 w-full bg-black" style="z-index: 100000">
             <div class="block absolute" style="top: 50%; left: 50%; transform: translate(-50%, -50%)">
                 <div class="hint text-xs text-center w-48 font-mono" style="color: rgba(212, 212, 212, 1)">

@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted, ref, reactive } from 'vue';
-import { addMonacoStyles, setupPlayground, overlay, getPlaygroundState } from "../../libs/worker/common.js";
+import { addMonacoStyles, setupPlayground, overlay, getPlaygroundState, getDSLWrapper } from "../../libs/worker/common.js";
 import { buildWorkerDefinition } from "../../libs/monaco-editor-workers/index.js";
 import ExampleTabs from './ExampleTabs.vue';
 
@@ -27,8 +27,6 @@ onMounted(() => {
     init();
 });
 
-let dslWrapper = null;
-
 const init = () => {
     // get a handle to our various interactive buttons
     const grammarRoot = document.getElementById('grammar-root');
@@ -39,20 +37,30 @@ const init = () => {
         contentRoot,
         overlay
     ).then((res) => {
-        dslWrapper = res.dslWrapper.editorApp.editor;
+        console.log(res);
+        // langiumWrapper = res.langiumWrapper.editorApp.editor;
+
         const langiumEditor = res.langiumWrapper.editorApp.editor;
-        // const dslEditor = res.dslWrapper.editorApp.editor;
-        // const setupDSLWrapper = res.setupDSLWrapper;
+        const dslEditor = res.dslWrapper.editorApp.editor;
+
+        // // set the initial text for the editors;
+
+        // set the listeners for the editors
+        langiumEditor.onDidChangeModelContent(() => {
+            const { grammar, grammarErrors } = getPlaygroundState();
+            model.definition = grammar;
+            model.grammarErrors = grammarErrors;
+        });
 
         if (model.definition != null && model.definition != "") {
             langiumEditor.getModel().setValue(model.definition);
         }
 
-        if (model.definitionExamples.length > 0
-            && model.definitionExamples[0].modelAnswer != null
-            && model.definitionExamples[0].modelAnswer != ""
-        ) {
-            dslWrapper.getModel().setValue(model.definitionExamples[0].modelAnswer);
+        refreshListener();
+
+        // set the initial text for the editors;
+        if (model.definitionExamples.length > 0) {
+            refreshDSLDefinition(0);
         }
 
         loading.value = false;
@@ -64,14 +72,23 @@ const activeTab = ref(0);
 const refreshDSLDefinition = (exampleIndex) => {
     if (exampleIndex == null) return;
     const exampleContent = model.definitionExamples[exampleIndex].modelAnswer;
-    dslWrapper.getModel().setValue(exampleContent);
+    getDSLWrapper().getModel().setValue(exampleContent);
     activeTab.value = exampleIndex;
 };
 
+const refreshListener = () => {
+    const wrapper = getDSLWrapper();
+    wrapper.editorApp.editor.onDidChangeModelContent(() => {
+        const { content, dslErrors } = getPlaygroundState();
+        if (activeTab.value == null) return;
+        if (model.definitionExamples[activeTab.value] == null) return;
+        model.definitionExamples[activeTab.value].modelAnswer = content;
+        model.definitionErrors = dslErrors;
+    });
+};
+
 const emitContent = () => {
-    const content = dslWrapper.getModel().getValue();
-    model.definitionExamples[activeTab.value].modelAnswer = content;
-    // TODO: checkear el contenido de los 
+    refreshListener();
 };
 
 const model = reactive(props.model);

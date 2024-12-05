@@ -119,7 +119,7 @@ watch(model, (newVal) => {
 <template>
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
         class="flex flex-col gap-4 h-full">
-        <Tabs value="0" class="flex-1" scrollable>
+        <Tabs value="0" class="flex-1" scrollable lazy>
             <TabList class="flex justify-center">
                 <Tab value="0" class="flex-1 flex items-center justify-center gap-4">
                     <span class="text-sm" :class="errorTabs && errorTabs[0] != null ? 'text-red-700' : ''">

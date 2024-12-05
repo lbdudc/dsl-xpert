@@ -91,6 +91,10 @@ export function getPlaygroundState(): PlaygroundParameters {
 }
 
 
+export function getDSLWrapper() {
+  return dslWrapper;
+}
+
 /**
  * Starts the playground
  * 
@@ -202,7 +206,6 @@ export async function setupPlayground(
   return {
     langiumWrapper,
     dslWrapper,
-    setupDSLWrapper: setupDSLWrapper,
     overlay
   };
 }
