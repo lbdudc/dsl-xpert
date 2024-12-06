@@ -33,7 +33,8 @@ const showDialog = () => {
                 {{ props.message.text }}
             </span>
         </div>
-        <div v-else class="flex items-center justify-between bg-blue-600 text-white p-3 rounded-lg relative">
+        <div v-else
+            class="flex items-center justify-between bg-blue-600 text-white p-3 rounded-lg relative hover:cursor-pointer">
             <!-- Pulse animation ball in the top right corner of the message -->
             <div v-if="props.message.loading"
                 class="absolute top-[-8px] right-[-4px] w-4 h-4 bg-blue-400 rounded-full animate-ping">
@@ -46,7 +47,7 @@ const showDialog = () => {
             </div>
 
             <p class="text-sm" v-html="formatText(props.message.text)"></p>
-            <button v-if="!props.message.isUser" @click="copyAndShowMessage(props.message.text)"
+            <button v-if="!props.message.isUser" @click.stop="copyAndShowMessage(props.message.text)"
                 class="absolute top-1/2 transform -translate-y-1/2 left-full mt-0 ml-0 text-gray-500 hover:text-gray-700 focus:outline-none">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -62,18 +63,22 @@ const showDialog = () => {
         </span>
     </div>
 
-    <Dialog v-model:visible="visible" header="Errors" :style="{ width: '40vw' }">
-        <div v-if="props.message.error">
-            <p class="text-sm">{{ props.message.error }}</p>
-        </div>
-        <!-- ForEach grammarErrors -->
-        <div v-if="props.message.grammarErrors">
-            <p class="text-sm">Grammar Errors:</p>
-            <ul>
-                <li v-for="error in props.message.grammarErrors" :key="error">
-                    <p class="text-sm">{{ error }}</p>
-                </li>
-            </ul>
+    <Dialog v-model:visible="visible" header="Grammar Errors" position="bottomright" :style="{ width: '40vw' }">
+        <div v-if="props.message.grammarErrors" class="flex flex-col gap-4">
+            <div v-for="(error, index) in props.message.grammarErrors" :key="index"
+                class="border rounded-lg bg-gray-50 p-2">
+                <h2 class="text-sm font-semibold text-gray-700">
+                    Severity: <span class="text-red-500">{{ error.severity }}</span>
+                </h2>
+                <p class="text-sm text-gray-600">
+                    <strong>Range Start:</strong> Line {{ error.range.start.line }}, Character {{
+                        error.range.start.character }}<br>
+                    <strong>Range End:</strong> Line {{ error.range.end.line }}, Character {{ error.range.end.character
+                    }}<br>
+                    <strong>Message:</strong> {{ error.message }}<br>
+                    <strong>Code:</strong> {{ error.data.code }}<br>
+                </p>
+            </div>
         </div>
     </Dialog>
 </template>

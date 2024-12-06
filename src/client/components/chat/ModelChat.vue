@@ -97,7 +97,7 @@ const forceRefresh = (res) => {
     <ModelDetailVue :model="model" />
   </Sidebar>
 
-  <div v-if="!loading && !loadingValidator" class="w-screen h-[calc(100vh-44px)] flex flex-row">
+  <div v-if="!loading && !loadingValidator" class="w-screen h-screen overflow-hidden flex flex-row">
     <div v-if="!isSmallScreen" class="model-container w-1/3 h-full">
       <ModelDetailVue :model="model" />
     </div>
@@ -114,7 +114,6 @@ const forceRefresh = (res) => {
   <!-- Hidden moel validator -->
   <HiddenValidator v-show="false" :model="model" @validate="outputValidation" @loaded="validatorLoaded"
     :refSignal="refDSL" @refresh="forceRefresh" />
-  />
 </template>
 
 <style scoped>
