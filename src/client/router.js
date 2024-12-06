@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from "vue-router";
-import ModelFormVue from "@/components/models/form/ModelForm.vue"
+import ModelFormVue from "@/components/models/ModelForm.vue"
 
 // has to be imported here to avoid problems when loading the workers
 // import Playground from "@/components/validator/Playground.vue";

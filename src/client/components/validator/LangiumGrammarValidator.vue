@@ -12,6 +12,10 @@ const props = defineProps({
     errors: {
         type: Object,
         required: true
+    },
+    exampleErrorTabs: {
+        type: Object,
+        required: true
     }
 });
 
@@ -43,17 +47,28 @@ const init = () => {
         const langiumEditor = res.langiumWrapper.editorApp.editor;
         const dslEditor = res.dslWrapper.editorApp.editor;
 
-        // // set the initial text for the editors;
+        // set the listeners for the langium editor
+        res.langiumWrapper.getLanguageClient().onNotification("browser/DocumentChange", (params) => {
+            const { content, diagnostics } = params;
+            model.definition = content;
 
-        // set the listeners for the editors
-        langiumEditor.onDidChangeModelContent(() => {
-            const { grammar, grammarErrors } = getPlaygroundState();
-            model.definition = grammar;
-            model.grammarErrors = grammarErrors;
+            if (diagnostics.filter(d => d.severity === 1).length) {
+                // error in the grammar, report an error & stop here
+                overlay(true, true);
+                model.grammarErrors = diagnostics;
+                return;
+            }
+            // no errors
+            overlay(false, false);
+            model.grammarErrors = [];
         });
+
 
         if (model.definition != null && model.definition != "") {
             langiumEditor.getModel().setValue(model.definition);
+        } else {
+            // send a fake change event to trigger the initial validation
+            langiumEditor.getModel().setValue(getPlaygroundState().grammar);
         }
 
         refreshListener();
@@ -78,12 +93,22 @@ const refreshDSLDefinition = (exampleIndex) => {
 
 const refreshListener = () => {
     const wrapper = getDSLWrapper();
-    wrapper.editorApp.editor.onDidChangeModelContent(() => {
-        const { content, dslErrors } = getPlaygroundState();
+    wrapper.getLanguageClient().onNotification("browser/DocumentChange", (params) => {
+        const { diagnostics } = params;
+        const currentDSLContent = wrapper?.getModel()?.getValue()
+        // console.log(content, diagnostics);
+
         if (activeTab.value == null) return;
         if (model.definitionExamples[activeTab.value] == null) return;
-        model.definitionExamples[activeTab.value].modelAnswer = content;
-        model.definitionErrors = dslErrors;
+        model.definitionExamples[activeTab.value].modelAnswer = currentDSLContent;
+
+        if (diagnostics.filter(d => d.severity === 1).length) {
+            // error in the grammar, report an error & stop here
+            model.definitionExamples[activeTab.value].errors = diagnostics;
+            return;
+        }
+        // no errors
+        model.definitionExamples[activeTab.value].errors = [];
     });
 };
 
@@ -105,8 +130,8 @@ const errors = reactive(props.errors);
                 </div>
             </div>
         </div>
-        <ExampleTabs v-if="props.model" :model="model" :errors="errors" @update:activeTab="refreshDSLDefinition"
-            @focusout="emitContent" />
+        <ExampleTabs v-if="props.model" :exampleErrorTabs="props.exampleErrorTabs" :model="model" :errors="errors"
+            @update:activeTab="refreshDSLDefinition" @focusout="emitContent" />
     </section>
     <ProgressSpinner v-if="loading" class="flex justify-center items-center h-96 overflow-hidden" />
 </template>

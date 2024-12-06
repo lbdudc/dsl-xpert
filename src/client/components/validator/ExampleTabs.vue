@@ -9,7 +9,11 @@ const props = defineProps({
     errors: {
         type: Object,
         required: true
-    }
+    },
+    exampleErrorTabs: {
+        type: Object,
+        required: true
+    },
 });
 
 // define emits events
@@ -58,7 +62,12 @@ const emitFocusOut = () => {
     <Tabs v-if="model" :value="exampleActiveTab" @update:value="updateActiveTab">
         <TabList>
             <Tab v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
-                Example {{ cardIndex + 1 }}
+                <span :class="props.exampleErrorTabs && props.exampleErrorTabs[cardIndex] != null ? '' : ''">
+                    Example {{ cardIndex + 1 }}
+                </span>
+                <i v-if="props.exampleErrorTabs && props.exampleErrorTabs[cardIndex] != null"
+                    class="pi pi-exclamation-triangle text-red-700 ml-2"></i>
+
             </Tab>
             <Tab @click="addCard">
                 <Button label="Add Example" icon="pi pi-plus" severity="success" variant="text" />
@@ -67,12 +76,19 @@ const emitFocusOut = () => {
 
         <TabPanel v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
             <div class="flex flex-col gap-2 mt-2">
-                <Textarea v-model="card.userInstruction" label="User instruction"
-                    placeholder="Enter an instruction for the model" rows="2" auto-grow class="w-full">>
+                <FloatLabel class="flex flex-col gap-4" variant="in">
+                    <Textarea :name="'exampleInstruction-' + cardIndex" :id="'exampleInstruction-' + cardIndex"
+                        v-model="card.userInstruction" label="User instruction" rows="2" auto-grow class="w-full">>
                 </Textarea>
-                <Textarea v-if="model.grammarType.code == 'no-grammar-validator'" v-model="card.modelAnswer"
-                    label="Model answer" placeholder="Enter the model answer" rows="5" auto-grow class="w-full">
+                    <label :for="'exampleInstruction-' + cardIndex">Example Instruction</label>
+                </FloatLabel>
+                <FloatLabel v-if="model.grammarType.code == 'no-grammar-validator'" class="flex flex-col gap-4"
+                    variant="in">
+                    <Textarea :name="'exampleAnswer-' + cardIndex" :id="'exampleAnswer-' + cardIndex"
+                        v-model="card.modelAnswer" label="Model answer" rows="5" auto-grow class="w-full">
                 </Textarea>
+                    <label :for="'exampleAnswer-' + cardIndex">Example model answer</label>
+                </FloatLabel>
             </div>
         </TabPanel>
     </Tabs>

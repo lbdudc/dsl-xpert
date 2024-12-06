@@ -17,7 +17,7 @@ export const initialValues = {
     definitionExamples: [
         { "userInstruction": "", "modelAnswer": "" }
     ],
-    grammarType: grammarTypeItems[2],
+    grammarType: grammarTypeItems[0],
     singleStopSequence: ""
 };
 

@@ -10,6 +10,10 @@ const props = defineProps({
     errors: {
         type: Object,
         required: true
+    },
+    exampleErrorTabs: {
+        type: Object,
+        required: true
     }
 });
 
@@ -35,7 +39,7 @@ const errors = reactive(props.errors);
             errors.definition.error?.message }}
         </Message>
 
-        <ExampleTabs v-if="props.model" :model="model" :errors="errors" />
+        <ExampleTabs v-if="props.model" :exampleErrorTabs="props.exampleErrorTabs" :model="model" :errors="errors" />
     </section>
 </template>
 

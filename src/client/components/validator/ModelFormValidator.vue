@@ -11,6 +11,10 @@ const props = defineProps({
     errors: {
         type: Object,
         required: true
+    },
+    exampleErrorTabs: {
+        type: Object,
+        required: true
     }
 });
 
@@ -31,7 +35,7 @@ const forceRender = async () => {
 </script>
 
 <template>
-    <div class="flex flex-col gap-4">
+    <div class="flex flex-col">
         <div class="flex gap-4">
             <Select name="grammarType" v-model="model.grammarType" optionLabel="name" :options="grammarTypeItems"
                 class="grow" label="Grammar type" placeholder="Select a grammar type">
@@ -41,7 +45,8 @@ const forceRender = async () => {
                 icon="pi pi-refresh" @click="forceRender"></Button>
         </div>
         <ModelGrammarValidator v-if="model.grammarType && render" :model="model" :errors="props.errors"
-            :key="model.grammarType" :grammarType="model.grammarType" @updateContent="handleContentUpdate">
+            :exampleErrorTabs="props.exampleErrorTabs" :key="model.grammarType" :grammarType="model.grammarType"
+            @updateContent="handleContentUpdate">
         </ModelGrammarValidator>
     </div>
 </template>

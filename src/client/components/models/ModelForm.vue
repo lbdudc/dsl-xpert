@@ -1,10 +1,10 @@
 <script setup>
 import { useRouter, useRoute } from "vue-router";
-import ModelFormOpenAiVue from "./OpenAIForm.vue";
-import ModelFormWebLlmVue from "./WebLLMForm.vue";
-import ModelFormHuggingFaceCustomVue from "./HuggingFaceCustomForm.vue";
-import ModelFormHuggingFaceInferenceVue from "./HuggingFaceInferenceForm.vue";
-import ModelFormCurlVue from "./CurlForm.vue";
+import ModelFormOpenAiVue from "./form/OpenAIForm.vue";
+import ModelFormWebLlmVue from "./form/WebLLMForm.vue";
+import ModelFormHuggingFaceCustomVue from "./form/HuggingFaceCustomForm.vue";
+import ModelFormHuggingFaceInferenceVue from "./form/HuggingFaceInferenceForm.vue";
+import ModelFormCurlVue from "./form/CurlForm.vue";
 import ModelFormValidator from "@components/validator/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "@services/modelService.js";
 import { initialValues, modelDeveloperItems } from "@consts/model";
@@ -21,6 +21,7 @@ const model = reactive({
 
 const errors = ref({});
 const errorTabs = ref({});
+const exampleErrorTabs = ref({});
 
 onMounted(async () => {
     if (route.params.id) {
@@ -46,6 +47,7 @@ onMounted(async () => {
 const resolver = async (values) => {
     errors.value = {};
     errorTabs.value = {};
+    exampleErrorTabs.value = {};
 
     if (!model.name || model.name == "") {
         errors.value.modelName = [{ message: 'ModelName is required.' }];
@@ -73,6 +75,37 @@ const resolver = async (values) => {
     ) {
         errors.value.apiKey = [{ message: 'API Key is required' }];
         errorTabs.value[1] = true;
+    }
+
+    // if has grammar validation
+    if (model.grammarType.code == "langium") {
+        if (model.grammarErrors?.length > 0) {
+            errors.value.grammarErrors = [{ message: 'Grammar has errors' }];
+            errorTabs.value[2] = true;
+        }
+    }
+
+    // examples validation
+    if (model.definitionExamples?.length > 0) {
+        model.definitionExamples.forEach((example, index) => {
+            if (example.userInstruction == "") {
+                errors.value[`exampleInstruction-${index}`] = [{ message: 'Example instructions are empty' }];
+                errorTabs.value[2] = true;
+                exampleErrorTabs.value[index] = true;
+            }
+
+            if (example.modelAnswer == "") {
+                errors.value[`exampleAnswer-${index}`] = [{ message: 'Example answers are empty' }];
+                errorTabs.value[2] = true;
+                exampleErrorTabs.value[index] = true;
+            }
+
+            if (model.grammarType.code == "langium" && example.errors?.length > 0) {
+                errors.value[`exampleAnswer-${index}`] = [{ message: 'Example has errors' }];
+                errorTabs.value[2] = true;
+                exampleErrorTabs.value[index] = true;
+            }
+        });
     }
 
     return {
@@ -119,22 +152,22 @@ watch(model, (newVal) => {
 <template>
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
         class="flex flex-col gap-4 h-full">
-        <Tabs value="0" class="flex-1" scrollable lazy>
+        <Tabs value="0" class="flex-1" scrollable>
             <TabList class="flex justify-center">
                 <Tab value="0" class="flex-1 flex items-center justify-center gap-4">
-                    <span class="text-sm" :class="errorTabs && errorTabs[0] != null ? 'text-red-700' : ''">
+                    <span class="text-sm" :class="errorTabs && errorTabs[0] != null ? '' : ''">
                         Model Info
                     </span>
                     <i v-if="errorTabs && errorTabs[0] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>
                 <Tab value="1" class="flex-1 flex items-center justify-center gap-4">
-                    <span class="text-sm" :class="errorTabs && errorTabs[1] != null ? 'text-red-700' : ''">
+                    <span class="text-sm" :class="errorTabs && errorTabs[1] != null ? '' : ''">
                         Model Setup
                     </span>
                     <i v-if="errorTabs && errorTabs[1] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>
                 <Tab value="2" class="flex-1 flex items-center justify-center gap-4">
-                    <span class="text-sm" :class="errorTabs && errorTabs[2] != null ? 'text-red-700' : ''">
+                    <span class="text-sm" :class="errorTabs && errorTabs[2] != null ? '' : ''">
                         Grammar Setup
                     </span>
                     <i v-if="errorTabs && errorTabs[2] != null" class="pi pi-exclamation-triangle text-red-700"></i>
@@ -314,7 +347,7 @@ watch(model, (newVal) => {
                     </section>
                 </TabPanel>
                 <TabPanel value="2" class="mt-4 px-10 max-h-[70vh] overflow-auto">
-                    <model-form-validator :model="model" :errors="errors" />
+                    <model-form-validator :model="model" :errors="errors" :exampleErrorTabs="exampleErrorTabs" />
                 </TabPanel>
             </TabPanels>
             <Button type=" submit" :loading="loading" severity="success" icon="pi pi-check"

@@ -17,6 +17,10 @@ const props = defineProps({
     type: Object,
     required: true,
   },
+  exampleErrorTabs: {
+    type: Object,
+    required: true,
+  },
 });
 
 const emit = defineEmits(["updateContent"]);
@@ -64,9 +68,9 @@ const emitContent = () => {
 <template>
   <section v-if="props.model" class="mt-0 pt-0">
     <NoGrammarValidator v-if="props.grammarType.code == 'no-grammar-validator'" :model="props.model"
-      :errors="props.errors" />
+      :exampleErrorTabs="props.exampleErrorTabs" :errors="props.errors" />
     <LangiumGrammarValidator v-else-if="props.grammarType.code == 'langium'" :model="props.model"
-      :errors="props.errors" />
+      :exampleErrorTabs="props.exampleErrorTabs" :errors="props.errors" />
   </section>
 </template>
 
