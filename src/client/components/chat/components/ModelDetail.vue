@@ -1,11 +1,9 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import { deleteModel } from "@services/modelService.js";
 
 const router = useRouter();
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
 
 const props = defineProps({
   model: {
@@ -16,19 +14,14 @@ const props = defineProps({
 
 const activeTab = ref(0);
 
-const deleteModel = async () => {
+const deleteModelCall = async () => {
   const { _id } = props.model;
 
-  const res = await fetch(`${SERVER_URL}/api/models/${_id}`, {
-    method: "DELETE",
+  deleteModel(_id).then(() => {
+    router.push({ name: "home" });
+  }).catch((err) => {
+    console.error(err);
   });
-
-  if (!res.ok) {
-    console.error("Error deleting model");
-    return;
-  }
-
-  router.push("/");
 };
 
 const goToForm = () => {
@@ -121,7 +114,7 @@ const goToForm = () => {
       <div class="flex gap-2 md:flex-row md:justify-center">
         <Button @click="goToForm" icon="pi pi-pencil" class="w-full md:w-auto" variant="text" severity="warn"
           label="Edit" />
-        <Button @click="deleteModel" icon="pi pi-trash" class="w-full md:w-auto" variant="text" severity="danger"
+        <Button @click="deleteModelCall" icon="pi pi-trash" class="w-full md:w-auto" variant="text" severity="danger"
           label="Delete" />
       </div>
     </template>

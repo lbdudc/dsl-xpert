@@ -1,126 +1,128 @@
 <script setup>
 import { ProgressSpinner } from "primevue";
-import { onMounted, ref, reactive } from "vue";
-import { useRoute } from "vue-router";
+import { ref, reactive, onMounted } from "vue";
+import { ServerSelectorService } from "@services/chat/chatService.js";
+import { tokenCounter, createChat, } from "@services/chat/contextUtils.js";
+import { copyToClipboard, formatText } from "../utils/chatUtils.js";
+import { useToast } from "primevue/usetoast";
 
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
+const toast = useToast();
+const MAX_TOKENS = 4000;
 
-let message = ref("");
-let conversation = reactive([]);
-let nTokensConversation = 0;
+const message = ref("");
+const conversation = reactive([]);
+const nTokensConversation = ref(0);
 const loadingResponse = ref(false);
-const route = useRoute();
-const id = ref(null);
-onMounted(() => {
-  if (route.params.id) {
-    fetch(`${SERVER_URL}/api/models/${route.params.id}`).then((res) => {
-      res.json().then((res) => {
-        id.value = res._id;
-      });
-    });
-  }
+const settingUpModel = ref(false);
+
+const props = defineProps({
+  model: {
+    type: Object,
+    required: true,
+  },
 });
 
-// Counts the approximate number of tokens in the input while adding the total number for the whole conversation
-async function tokenCounter(text) {
-  const words = text.split(/\s+/);
-  const nWords = words.length;
-  const tokenCount = nWords * 2 + nTokensConversation; // The number of words is doubled to take into account the possible response as well
+const copyAndShowMessage = async (message) => {
+  const res = await copyToClipboard(navigator, message);
+  if (res) toast.add({
+    severity: 'success', summary: 'Success', detail: 'Copied to clipboard', life: 2500
+  });
+};
 
-  return tokenCount;
-}
+const addMessageToConversation = (text, isUser) => {
+  conversation.push({
+    text,
+    timestamp: new Date().toLocaleTimeString(),
+    isUser,
+  });
+};
 
 const getModelOutput = async () => {
+
   if (loadingResponse.value) return;
+  if (message.value == "") return;
+
+  let userMessage = message.value;
+
+  addMessageToConversation(userMessage, true);
+  message.value = "";
+
+  if (tokenCounter(userMessage, nTokensConversation.value) > MAX_TOKENS) {
+    addMessageToConversation("You have reached the maximum token limit", false);
+    return;
+  }
 
   try {
-    const userMessage = message.value;
-
-    // Add the new message to the chat messages array
-    if (userMessage != "") {
-      conversation.push({
-        text: userMessage,
-        timestamp: new Date().toLocaleTimeString(),
-        isUser: true,
-      });
-      message.value = "";
-    }
-
-    // Check that the amount of tokens does not exceed the maximum number of 4096 (as the counting is approximate we use 4000 instead)
-    if (tokenCounter(userMessage) > 4000) {
-      console.log(
-        'The amount of tokens in the conversation will exceed the maximum limit for the specified model. You need to start a new conversation. To do so, just write "Reset".'
-      );
-      process.exit(1);
-    }
-
-    // Send petition with the user input
     loadingResponse.value = true;
-    const response = await fetch(`${SERVER_URL}/api/models/${id.value}/chat`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        message: userMessage,
-      }),
-    });
-    if (!response.ok) {
-      const error = await response.text();
-      loadingResponse.value = false;
-      throw new Error(JSON.stringify(JSON.parse(error), null, 4));
-    }
+    userMessage = createChat(userMessage, props.model.definition, props.model.definitionExamples);
 
-    // Get response and update conversation and number of tokens
-    const openAIData = await response.json();
-    const lastMessage = openAIData.messagesHistory.slice(-1)[0];
-    if (lastMessage) {
-      conversation.push({
-        text: lastMessage.content,
-        timestamp: new Date().toLocaleTimeString(),
-        isUser: false,
-      });
-    }
-    nTokensConversation = openAIData.nTokens;
-    loadingResponse.value = false;
+    // Send message to the chat service
+    const serverResponse = await chatReasoner.sendMessage(props.model.developer, {
+      id: props.model.id,
+      modelType: props.model.modelType,
+      apiKey: props.model.apiKey,
+      modelName: "distilgpt2", // Needs to be set to huggingFaceModelName
+      modelTag: "text-generation", // Needs to be set to huggingFaceModelTag
+      temperature: props.model.temperature,
+      max_tokens: props.model.maximumLength,
+      repetition_penalty: props.model.repetitionPenalty,
+      top_P: props.model.topP,
+      stopSequences: props.model.stopSequences,
+      seed: props.model.seed,
+      userMessage
+    },
+      engine
+    );
+
+    console.log("Server response", serverResponse);
+
+    // Add the response to the conversation
+    const lastMessage = serverResponse.messagesHistory.slice(-1)[0];
+    if (!lastMessage) return;
+
+    addMessageToConversation(lastMessage.content, false);
+    nTokensConversation.value = serverResponse.nTokens;
+
   } catch (error) {
-    let errorMessage = error.message;
-    try {
-      const parsedError = JSON.parse(errorMessage);
-      errorMessage = parsedError.error || "An unexpected error occurred";
-    } catch (parseError) {
-      errorMessage = error.message;
-    }
-    conversation.push({
-      text: errorMessage,
-      timestamp: new Date().toLocaleTimeString(),
-      isUser: false,
-    });
+    const errorMessage = JSON.parse(error.message).error || "An unexpected error occurred";
+    addMessageToConversation(errorMessage, false);
+  } finally {
     loadingResponse.value = false;
   }
 };
 
-// Copy to clipboard the model output
-const copyToClipboard = (text) => {
-  navigator.clipboard
-    .writeText(text)
-    .then(() => {
-      console.log("Text copied to clipboard:", text);
-    })
-    .catch((error) => {
-      console.error("Error copying text to clipboard:", error);
-    });
-};
+// Model loading progress
+const chatReasoner = new ServerSelectorService();
+const progress = ref(0);
+const progressText = ref("");
+let engine = null;
 
-// Replace newline characters with <br> and tab characters with spaces
-const formatText = (text) => {
-  return text.replace(/\n/g, "<br>").replace(/\t/g, "&nbsp;&nbsp;&nbsp;&nbsp;");
-};
+// Callback function to update model loading progress
+const initProgressCallback = (initProgress) => {
+  progress.value = Math.round(initProgress.progress * 100);
+  progressText.value = initProgress.text;
+}
+
+onMounted(async () => {
+  settingUpModel.value = true;
+
+  // Load the engine model
+  engine = await chatReasoner.loadModel(props.model, initProgressCallback);
+
+  settingUpModel.value = false;
+});
 </script>
 
 <template>
-  <div class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center pb-2">
+  <section v-if="settingUpModel"
+    class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center mx-16 gap-8">
+    <ProgressBar :value="progress" class="w-full"></ProgressBar>
+    <span class="text-sm text-gray-500">
+      {{ progressText }}
+    </span>
+  </section>
+
+  <div v-else class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
     <div class="flex flex-col items-center justify-center w-full h-full">
       <!-- Component Start -->
       <div class="flex flex-col flex-grow w-full bg-slate-200 shadow-xl rounded-lg overflow-hidden">
@@ -141,7 +143,7 @@ const formatText = (text) => {
                 <!-- Use v-html to render formatted text -->
                 <p class="text-sm" v-html="formatText(message.text)"></p>
                 <!-- Add copy to clipboard button -->
-                <button v-if="!message.isUser" @click="copyToClipboard(message.text)"
+                <button v-if="!message.isUser" @click="copyAndShowMessage(message.text)"
                   class="absolute top-1/2 transform -translate-y-1/2 left-full mt-0 ml-0 text-gray-500 hover:text-gray-700 focus:outline-none">
                   <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 fill-current" viewBox="0 0 20 20">
                     <path fill-rule="evenodd"
@@ -153,7 +155,7 @@ const formatText = (text) => {
               </div>
               <span class="text-xs text-gray-500 leading-none">{{
                 message.timestamp
-              }}</span>
+                }}</span>
             </div>
           </div>
         </div>
@@ -168,7 +170,6 @@ const formatText = (text) => {
           </TextArea>
         </div>
       </div>
-      <!-- Component End  -->
     </div>
   </div>
 </template>

@@ -5,7 +5,6 @@ export default class ModelController {
   static async create(req, res) {
     try {
       const model = new ModelSchema(req.body);
-      model.encryptApiKey(req.body.apiKey);
       await model.save();
       res.send(model);
     } catch (error) {
@@ -37,7 +36,6 @@ export default class ModelController {
           .status(404)
           .send({ message: `Model with name ${name} not found` });
       }
-      model.apiKey = model.decryptApiKey();
       res.send(model);
     } catch (error) {
       console.error(error);
@@ -53,10 +51,6 @@ export default class ModelController {
         return res
           .status(404)
           .send({ message: `Model with id ${id} not found` });
-      }
-      if (req.body.apiKey) {
-        model.encryptApiKey(req.body.apiKey);
-        delete req.body.apiKey;
       }
       Object.assign(model, req.body);
       await model.save();
@@ -94,6 +88,7 @@ export default class ModelController {
         res.status(404).send({ message: `Model with id ${id} not found` });
       }
       const {
+        apiKey,
         modelType,
         temperature,
         maximumLength,
@@ -101,59 +96,15 @@ export default class ModelController {
         repetitionPenalty,
         stopSequences,
         seed,
-        definition,
-        definitionExamples,
       } = model;
-      // Format definition examples
-      let formattedDefinitionExamples = "";
-      let defExample = "";
-      definitionExamples.forEach((item) => {
-        defExample =
-          "\n<s>[INST] " +
-          item.userInstruction +
-          " [/INST]\n" +
-          item.modelAnswer +
-          " <s>\n";
-        formattedDefinitionExamples += defExample;
-      });
 
-      // Initialize the variables and the context for correct model inference
-      const apiKey = model.decryptApiKey();
       const openai = new OpenAI({
         apiKey: apiKey,
       });
-      let nTokens = 0;
-      const initialContext = [
-        {
-          role: "system",
-          content:
-            "You are a helpful assistant that will provide answers converting our instructions using the grammar vocabulary and the examples that we will give you in the next two inputs.",
-        },
-        {
-          role: "user",
-          content:
-            "I need you to use this grammar for a set of instructions that I will be giving you:\n\n" +
-            definition +
-            '\n\nCould you acknowledge that you understand what I want you to do in my following prompts?\nJust say "yes" or "no". I do not want you to do any additional work by now.',
-        },
-        { role: "assistant", content: "Yes." },
-        {
-          role: "user",
-          content:
-            "In addition to prior grammar, these are some examples of what I expect you to do, separated by <s> and [INST] to highlight the instruction:" +
-            formattedDefinitionExamples +
-            'Could you acknowledge that you understand what I want you to do in my following prompts?\nJust say "yes" or "no". I do not want you to do any additional work by now.',
-        },
-        { role: "assistant", content: "Yes." },
-      ];
-      let messagesHistory = initialContext;
-
-      // Format user input and add to the conversation
-      const userInput = { role: "user", content: req.body.message };
-      messagesHistory.push(userInput);
 
       // Connect with OpenAI API
       let modelResponse = "";
+      let messagesHistory = req.body.message
       const doPetition = async () => {
         try {
           const stream = await openai.chat.completions.create({
@@ -169,7 +120,7 @@ export default class ModelController {
           });
 
           modelResponse = stream.choices[0].message.content;
-          nTokens = stream.usage.total_tokens;
+          const nTokens = stream.usage.total_tokens;
 
           const modelOutput = { role: "assistant", content: modelResponse };
           messagesHistory.push(modelOutput);

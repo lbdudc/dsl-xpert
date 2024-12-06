@@ -2,11 +2,9 @@
 import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
 import { useRouter } from "vue-router";
+import { fetchModels } from "@services/modelService";
 
 const router = useRouter();
-
-const SERVER_URL = `${import.meta.env.VITE_SERVER_URL || "http://localhost:5000"
-  }`;
 
 // computed models based on search
 const search = ref("");
@@ -21,21 +19,21 @@ const modelsSearch = computed(() => {
 
 const models = ref([]);
 
-onMounted(() => {
-  fetchModels();
+const modelCreateItems = [
+  // add to query params ?m=template
+  { label: "OpenAI", command: () => router.push({ name: "ModelCreate", query: { m: "openai" } }) },
+  { label: "Hugging Face Inference", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface-inference" } }) },
+  { label: "Hugging Face Custom Model", command: () => router.push({ name: "ModelCreate", query: { m: "huggingface-custom" } }) },
+  { label: "Web Llm", command: () => router.push({ name: "ModelCreate", query: { m: "webllm" } }) },
+  { label: "Curl Custom", command: () => router.push({ name: "ModelCreate", query: { m: "curl" } }) },
+];
+
+
+onMounted(async () => {
+  fetchModels().then((data) => {
+    models.value = data;
+  });
 });
-
-const fetchModels = async () => {
-  const res = await fetch(`${SERVER_URL}/api/models`);
-
-  if (!res.ok) {
-    console.error("Failed to fetch models");
-    return;
-  }
-
-  const data = await res.json();
-  models.value = data;
-};
 </script>
 <template>
   <div class="flex flex-col w-screen p-4 gap-8 px-10">
@@ -47,8 +45,9 @@ const fetchModels = async () => {
         Create a new model or manage existing ones.
       </p>
       <div class="flex gap-2 md:flex-row md:justify-center">
-        <Button @click="router.push({ name: 'ModelCreate' })" severity="success" icon="pi pi-plus"
-          class="w-full md:w-auto" label="New Model" />
+
+        <SplitButton label="New Model" @click="router.push({ name: 'ModelCreate', query: { m: 'openai' } })"
+          :model="modelCreateItems" class="w-full md:w-auto" severity="success" icon="pi pi-plus" />
 
         <IconField>
           <InputIcon class="pi pi-search" />
