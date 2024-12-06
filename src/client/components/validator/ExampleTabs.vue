@@ -75,7 +75,7 @@ const emitFocusOut = () => {
         </TabList>
 
         <TabPanel v-for="(card, cardIndex) in model.definitionExamples" :key="cardIndex" :value="cardIndex">
-            <div class="flex flex-col gap-2 mt-2">
+            <div class="flex flex-col gap-2 mt-4">
                 <FloatLabel class="flex flex-col gap-4" variant="in">
                     <Textarea :name="'exampleInstruction-' + cardIndex" :id="'exampleInstruction-' + cardIndex"
                         v-model="card.userInstruction" label="User instruction" rows="2" auto-grow class="w-full">>
@@ -104,7 +104,7 @@ const emitFocusOut = () => {
         </div>
         <div id="content-root" class="h-full absolute top-0 left-0 w-full"></div>
     </div>
-    <Button @click="removeCard()" label="Remove" icon="pi pi-times" severity="danger" variant="text">
+    <Button @click="removeCard()" class="my-4" label="Remove" icon="pi pi-times" severity="danger" variant="text">
     </Button>
 </template>
 

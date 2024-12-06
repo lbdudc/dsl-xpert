@@ -346,7 +346,7 @@ watch(model, (newVal) => {
                         <model-form-curl-vue v-else-if="model.developer === 'curl'" :model="model" />
                     </section>
                 </TabPanel>
-                <TabPanel value="2" class="mt-4 px-10 max-h-[70vh] overflow-auto">
+                <TabPanel value="2" class="mt-4 px-10 max-h-screen overflow-auto">
                     <model-form-validator :model="model" :errors="errors" :exampleErrorTabs="exampleErrorTabs" />
                 </TabPanel>
             </TabPanels>
