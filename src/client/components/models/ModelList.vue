@@ -2,9 +2,11 @@
 import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
 import { useRouter } from "vue-router";
-import { fetchModels } from "@services/modelService";
+import { fetchModels, deleteModel } from "@services/modelService";
+import { useToast } from "primevue/usetoast";
 
 const router = useRouter();
+const toast = useToast();
 
 // computed models based on search
 const search = ref("");
@@ -28,12 +30,33 @@ const modelCreateItems = [
   { label: "Curl Custom", command: () => router.push({ name: "ModelCreate", query: { m: "curl" } }) },
 ];
 
+const visible = ref(false);
+const modelForDeletion = ref(null);
 
 onMounted(async () => {
   fetchModels().then((data) => {
     models.value = data;
   });
 });
+
+const openDialog = (model) => {
+  modelForDeletion.value = model;
+  visible.value = true;
+};
+
+const deleteModelReq = async () => {
+  try {
+    await deleteModel(modelForDeletion.value._id)
+  } catch (error) {
+    console.error(error);
+    toast.add({ severity: 'error', summary: 'Error', detail: 'Could not delete model', life: 5000 });
+    return;
+  }
+  models.value = models.value.filter((model) => model._id !== modelForDeletion.value._id);
+  visible.value = false;
+  toast.add({ severity: 'success', summary: 'Success', detail: 'Model deleted', life: 5000 });
+};
+
 </script>
 <template>
   <section class="flex flex-col gap-4 mt-0 py-4 items-center overflow-x-hidden">
@@ -58,8 +81,20 @@ onMounted(async () => {
 
     <!-- CARDS -->
     <section class="grid grid-cols-1  gap-4 w-full pt-8 px-8 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
-      <ModelCardVue v-for="model in modelsSearch" :key="model.id" :model="model" />
+      <ModelCardVue v-for="model in modelsSearch" :key="model.id" :model="model" @delete="openDialog" />
     </section>
+
+    <Dialog v-model:visible="visible" header="Delete Model" :style="{ width: '40vw' }">
+      <div class="flex flex-col gap-4 mb-4">
+        <p>
+          Are you sure you want to delete the model <strong>{{ modelForDeletion.name }}</strong>?
+        </p>
+      </div>
+      <div class="flex justify-end gap-2">
+        <Button type="button" label="Cancel" severity="secondary" @click="visible = false"></Button>
+        <Button type="button" label="Delete" @click="deleteModelReq"></Button>
+      </div>
+    </Dialog>
   </section>
 </template>
 
