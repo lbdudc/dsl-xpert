@@ -59,9 +59,6 @@ const selectModel = (selectedModel) => {
             </template>
         </Card>
     </section>
-    <div v-if="progress">
-        {{ progress }}
-    </div>
 </template>
 
 

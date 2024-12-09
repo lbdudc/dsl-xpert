@@ -5,6 +5,7 @@ import ModelFormWebLlmVue from "./form/WebLLMForm.vue";
 import ModelFormHuggingFaceCustomVue from "./form/HuggingFaceCustomForm.vue";
 import ModelFormHuggingFaceInferenceVue from "./form/HuggingFaceInferenceForm.vue";
 import ModelFormCurlVue from "./form/CurlForm.vue";
+import HyperParameters from "./form/HyperParameters.vue";
 import ModelFormValidator from "@components/validator/ModelFormValidator.vue";
 import { fetchModel, createModel, updateModel } from "@services/modelService.js";
 import { initialValues, modelDeveloperItems } from "@consts/model";
@@ -61,7 +62,7 @@ const resolver = async (values) => {
 
     if (!model.definition || model.definition == "") {
         errors.value.definition = [{ message: 'Model grammar definition is required.' }];
-        errorTabs.value[2] = true;
+        errorTabs.value[3] = true;
     }
 
     if (!model.modelType || model.modelType == "") {
@@ -81,7 +82,7 @@ const resolver = async (values) => {
     if (model.grammarType.code == "langium") {
         if (model.grammarErrors?.length > 0) {
             errors.value.grammarErrors = [{ message: 'Grammar has errors' }];
-            errorTabs.value[2] = true;
+            errorTabs.value[3] = true;
         }
     }
 
@@ -90,19 +91,19 @@ const resolver = async (values) => {
         model.definitionExamples.forEach((example, index) => {
             if (example.userInstruction == "") {
                 errors.value[`exampleInstruction-${index}`] = [{ message: 'Example instructions are empty' }];
-                errorTabs.value[2] = true;
+                errorTabs.value[3] = true;
                 exampleErrorTabs.value[index] = true;
             }
 
             if (example.modelAnswer == "") {
                 errors.value[`exampleAnswer-${index}`] = [{ message: 'Example answers are empty' }];
-                errorTabs.value[2] = true;
+                errorTabs.value[3] = true;
                 exampleErrorTabs.value[index] = true;
             }
 
             if (model.grammarType.code == "langium" && example.errors?.length > 0) {
                 errors.value[`exampleAnswer-${index}`] = [{ message: 'Example has errors' }];
-                errorTabs.value[2] = true;
+                errorTabs.value[3] = true;
                 exampleErrorTabs.value[index] = true;
             }
         });
@@ -167,15 +168,27 @@ watch(model, (newVal) => {
                     <i v-if="errorTabs && errorTabs[1] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>
                 <Tab value="2" class="flex-1 flex items-center justify-center gap-4">
-                    <span class="text-sm" :class="errorTabs && errorTabs[2] != null ? '' : ''">
-                        Grammar Setup
+                    <span class="text-sm" :class="errorTabs && errorTabs[1] != null ? '' : ''">
+                        Model Hyper Parameters
                     </span>
                     <i v-if="errorTabs && errorTabs[2] != null" class="pi pi-exclamation-triangle text-red-700"></i>
                 </Tab>
+                <Tab value="3" class="flex-1 flex items-center justify-center gap-4">
+                    <span class="text-sm" :class="errorTabs && errorTabs[2] != null ? '' : ''">
+                        Grammar Setup
+                    </span>
+                    <i v-if="errorTabs && errorTabs[3] != null" class="pi pi-exclamation-triangle text-red-700"></i>
+                </Tab>
             </TabList>
             <TabPanels class="flex-1 m-0 p-0">
-                <TabPanel value="0" class="pt-4 px-10">
-                    <section class="flex flex-col gap-4 mt-4">
+                <TabPanel value="0" class="pt-0 px-10">
+                    <section class="flex flex-col gap-4 mt-0">
+                        <section class="mb-4">
+                            <h3 class="text-lg font-semibold">Model Information</h3>
+                            <p class="text-sm text-gray-500">
+                                Provide basic information about the model
+                            </p>
+                        </section>
                         <FloatLabel class="flex flex-col gap-4" variant="in">
                             <InputText name="modelName" id="modelName" v-model="model.name" label="Model name" fluid>
                             </InputText>
@@ -190,7 +203,13 @@ watch(model, (newVal) => {
                     </section>
                 </TabPanel>
                 <TabPanel value="1" class="pt-4 px-10">
-                    <section class="mt-4">
+                    <section class="pt-0 mt-0">
+                        <h3 class="text-lg font-semibold">Model Setup</h3>
+                        <p class="text-sm text-gray-500">
+                            Provide the necessary information to set up the model, including API keys and model type
+                        </p>
+                    </section>
+                    <section class="mt-8">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
                                 @change="changeModelDeveloper" :options="modelDeveloperItems" label="Model type"
@@ -347,11 +366,14 @@ watch(model, (newVal) => {
                     </section>
                 </TabPanel>
                 <TabPanel value="2" class="mt-4 px-10">
+                    <hyper-parameters :model="model" />
+                </TabPanel>
+                <TabPanel value="3" class="mt-4 px-10">
                     <model-form-validator :model="model" :errors="errors" :exampleErrorTabs="exampleErrorTabs" />
                 </TabPanel>
             </TabPanels>
             <Button type=" submit" :loading="loading" severity="success" icon="pi pi-check"
-                :label="model.id ? 'Update' : 'Create' + ' Model'" class="p-4 bg-green-500" />
+                :label="model.id ? 'Update' : 'Create' + ' Model'" class="p-4 t-10 bg-green-500" />
         </Tabs>
     </Form>
 
