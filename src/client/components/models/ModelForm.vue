@@ -151,7 +151,7 @@ watch(model, (newVal) => {
 </script>
 <template>
     <Form v-if="model.developer" v-slot="$form" :initialValues :resolver @submit="onFormSubmit"
-        class="flex flex-col gap-4 h-full">
+        class="flex flex-col gap-4">
         <Tabs value="0" class="flex-1" scrollable>
             <TabList class="flex justify-center">
                 <Tab value="0" class="flex-1 flex items-center justify-center gap-4">
@@ -189,7 +189,7 @@ watch(model, (newVal) => {
                         </FloatLabel>
                     </section>
                 </TabPanel>
-                <TabPanel value="1" class="pt-4 px-10 max-h-[75vh] overflow-auto">
+                <TabPanel value="1" class="pt-4 px-10">
                     <section class="mt-4">
                         <FloatLabel variant=" in">
                             <Select class="w-full" name="modelDeveloper" v-model="model.developer"
@@ -346,7 +346,7 @@ watch(model, (newVal) => {
                         <model-form-curl-vue v-else-if="model.developer === 'curl'" :model="model" />
                     </section>
                 </TabPanel>
-                <TabPanel value="2" class="mt-4 px-10 max-h-[70vh] overflow-auto">
+                <TabPanel value="2" class="mt-4 px-10">
                     <model-form-validator :model="model" :errors="errors" :exampleErrorTabs="exampleErrorTabs" />
                 </TabPanel>
             </TabPanels>

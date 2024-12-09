@@ -111,11 +111,9 @@ const goToForm = () => {
     </template>
 
     <template #footer>
-      <div class="flex gap-2 md:flex-row md:justify-center">
-        <Button @click="goToForm" icon="pi pi-pencil" class="w-full md:w-auto" variant="text" severity="warn"
-          label="Edit" />
-        <Button @click="deleteModelCall" icon="pi pi-trash" class="w-full md:w-auto" variant="text" severity="danger"
-          label="Delete" />
+      <div class="flex gap-2 flex-wrap justify-center">
+        <Button @click="goToForm" icon="pi pi-pencil" class="w-full" severity="warn" label="Edit" />
+        <Button @click="deleteModelCall" icon="pi pi-trash" class="w-full" severity="danger" label="Delete" />
       </div>
     </template>
 
