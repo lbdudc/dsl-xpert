@@ -34,6 +34,10 @@ onMounted(async () => {
 
   loading.value = false;
 
+  if (model.grammarType.code == "no-grammar-validator") {
+    loadingValidator.value = false;
+  }
+
   window.addEventListener("resize", () => {
     isSmallScreen.value = window.innerWidth < 768;
   });
@@ -51,7 +55,9 @@ const addMessage = (res) => {
   textIndex.value = index;
 
   // validate the message
-  refreshDSL();
+  if (model.grammarType.code == "langium") {
+    refreshDSL();
+  }
 };
 
 const outputValidation = (res) => {
@@ -90,30 +96,34 @@ const forceRefresh = (res) => {
 </script>
 
 <template>
-  <Sidebar v-model:visible="visibleSidebar" @hide="visible = false" class="w-full">
-    <template #header>
-      <h2 class="text-xl font-bold">Model Details</h2>
-    </template>
-    <ModelDetailVue :model="model" />
-  </Sidebar>
-
-  <div v-if="!loading && !loadingValidator" class="w-screen h-screen overflow-hidden flex flex-row">
-    <div v-if="!isSmallScreen" class="model-container w-1/3 h-full">
+  <div class="flex flex-col h-full">
+    <Sidebar v-model:visible="visibleSidebar" @hide="visible = false" class="w-full">
+      <template #header>
+        <h2 class="text-xl font-bold">Model Details</h2>
+      </template>
       <ModelDetailVue :model="model" />
+    </Sidebar>
+
+    <div v-if="!loading && !loadingValidator" class="w-screen h-screen overflow-hidden flex flex-row">
+      <div v-if="!isSmallScreen" class="model-container w-1/3 h-full">
+        <ModelDetailVue :model="model" />
+      </div>
+      <div v-else>
+        <!-- Absolute position at the left middle screen -->
+        <Button @click="visibleSidebar = true" rounded severity="secondary" icon="pi pi-arrow-right"
+          class="fixed top-1/2 left-1 transform -translate-y-1/2" />
+      </div>
+      <ChatVue :model="model" class="flex flex-grow w-2/3" @add:message="addMessage" :chatMessage="chatMessage" />
     </div>
-    <div v-else>
-      <!-- Absolute position at the left middle screen -->
-      <Button @click="visibleSidebar = true" rounded severity="secondary" icon="pi pi-arrow-right"
-        class="fixed top-1/2 left-1 transform -translate-y-1/2" />
+    <div v-else class="flex items-center justify-center h-full">
+      <ProgressSpinner />
     </div>
-    <ChatVue :model="model" class="flex flex-grow w-2/3" @add:message="addMessage" :chatMessage="chatMessage" />
+    <!-- Hidden model validator -->
+    <div v-if="model?.grammarType?.code == 'langium'">
+      <HiddenValidator v-show="false" :model="model" @validate="outputValidation" @loaded="validatorLoaded"
+        :refSignal="refDSL" @refresh="forceRefresh" />
+    </div>
   </div>
-  <div v-else class="flex items-center justify-center h-full">
-    <ProgressSpinner />
-  </div>
-  <!-- Hidden moel validator -->
-  <HiddenValidator v-show="false" :model="model" @validate="outputValidation" @loaded="validatorLoaded"
-    :refSignal="refDSL" @refresh="forceRefresh" />
 </template>
 
 <style scoped>

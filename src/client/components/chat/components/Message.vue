@@ -9,6 +9,11 @@ const props = defineProps({
         type: Object,
         required: true
     },
+    hasValidator: {
+        type: Boolean,
+        required: false,
+        default: false
+    }
 })
 
 const copyAndShowMessage = async (message) => {
@@ -36,13 +41,13 @@ const showDialog = () => {
         <div v-else
             class="flex items-center justify-between bg-blue-600 text-white p-3 rounded-lg relative hover:cursor-pointer">
             <!-- Pulse animation ball in the top right corner of the message -->
-            <div v-if="props.message.loading"
+            <div v-if="props.message.loading && props.hasValidator"
                 class="absolute top-[-8px] right-[-4px] w-4 h-4 bg-blue-400 rounded-full animate-ping">
             </div>
-            <div v-else-if="!props.message.error"
+            <div v-else-if="!props.message.error && props.hasValidator"
                 class="absolute top-[-10px] right-[-8px] w-6 h-6 bg-green-600 rounded-full">
             </div>
-            <div v-else-if="props.message.error"
+            <div v-else-if="props.message.error && props.hasValidator"
                 class="absolute top-[-10px] right-[-8px] w-6 h-6 bg-red-600 rounded-full">
             </div>
 
@@ -63,7 +68,8 @@ const showDialog = () => {
         </span>
     </div>
 
-    <Dialog v-model:visible="visible" header="Grammar Errors" position="bottomright" :style="{ width: '40vw' }">
+    <Dialog v-if="props.hasValidator" v-model:visible="visible" header="Grammar Errors" position="bottomright"
+        :style="{ width: '40vw' }">
         <div v-if="props.message.grammarErrors" class="flex flex-col gap-4">
             <div v-for="(error, index) in props.message.grammarErrors" :key="index"
                 class="border rounded-lg bg-gray-50 p-2">

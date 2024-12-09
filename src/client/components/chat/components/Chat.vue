@@ -148,7 +148,7 @@ watch(() => props.chatMessage, (newVal) => {
           <!-- Render chat messages dynamically -->
           <div v-for="(message, index) in conversation" :key="index" :class="{ 'ml-auto justify-end': message.isUser }"
             class="flex w-full mt-2 space-x-3 max-w-xs mr-4">
-            <MessageVue :message="message" />
+            <MessageVue :message="message" :hasValidator="props.model.grammarType.code == 'langium'" />
           </div>
         </div>
 
