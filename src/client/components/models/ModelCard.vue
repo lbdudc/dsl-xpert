@@ -8,6 +8,8 @@ const props = defineProps({
   },
 });
 
+const emit = defineEmits(["delete"]);
+
 const router = useRouter();
 
 const goToDetail = () => {
@@ -17,44 +19,64 @@ const goToDetail = () => {
 const goToForm = () => {
   router.push({ name: "ModelForm", params: { id: props.model.name }, query: { m: "openai" } });
 };
+
+const sendDelete = () => {
+  emit("delete", props.model);
+};
+
 </script>
 <template>
-
-  <!-- Card when user hover rise te card a little -->
-  <Card @click="goToDetail()"
-    class="flex flex-col justify-between h-full max-h-[40vh] overflow-auto hover:cursor-pointer">
+  <Card @click="goToDetail()" class="flex flex-col hover:cursor-pointer 
+  justify-between
+  min-h-[300px] bg-gradient-to-tr from-zinc-900" :class="{
+    '!to-green-700': props.model.developer === 'openai',
+    '!to-yellow-700': props.model.developer === ('huggingface-inference' || 'huggingface-vustom'),
+    '!to-indigo-700': props.model.developer === 'webllm',
+    '!to-red-700': props.model.developer === 'curl',
+  }" :pt="{
+    body: {
+      class: [
+        'h-full',
+      ]
+    },
+    content: {
+      class: [
+        'flex-1',
+      ]
+    }
+  }">
     <template #title>
-      <h2 class="text-lg font-bold">
+      <h2 class=" text-lg font-bold text-white">
         {{ props.model.name }}
       </h2>
     </template>
 
     <template #subtitle>
-      <div class="flex gap-2">
+      <div class="flex flex-wrap gap-2">
         <Chip :label="props.model.developer" icon="pi pi-user" class="text-xs" />
-        <Chip :label="props.model.modelType" icon="pi pi-desktop" class="text-xs text-nowrap" />
+        <Chip :label="props.model.modelType" icon="pi pi-desktop" class="text-xs text-ellipsis overflow-hidden ..." />
+        <Chip :label="props.model.grammarType.code" icon="pi pi-book"
+          class="text-xs text-ellipsis overflow-hidden ..." />
       </div>
     </template>
 
     <template #content>
       <!-- Max 3 lines of text -->
-      <span class="text-sm text-gray-500 line-clamp-3">
+      <span class="text-sm  line-clamp-3  h-full">
         {{ props.model.description }}
       </span>
     </template>
 
-    <template #footer class="h-full">
-      <div class="flex gap-4 mt-1 h-full">
-        <Button @click.stop="goToForm()" label="Edit" severity="secondary" variant="text" class="w-full" />
+    <!-- always at the bottom -->
+    <template #footer class="flex justify-between items-center flex-1">
+      <div class="flex gap-4">
+        <ConfirmPopup></ConfirmPopup>
         <Button label="Chat" class="w-full" @click.stop="goToDetail()" icon="pi pi-comments" />
+        <Button @click.stop="goToForm()" rounded variant="text" severity="warn" icon="pi pi-pencil" />
+        <Button @click.stop="sendDelete()" rounded variant="text" severity="danger" icon="pi pi-trash" />
       </div>
-
     </template>
   </Card>
 </template>
 
-<style scoped>
-.p-card-body {
-  height: 100% !important;
-}
-</style>
+<style scoped></style>

@@ -1,6 +1,9 @@
 <script setup>
 import { Menubar } from "primevue";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const baseURL = import.meta.env.BASE_URL;
 
@@ -9,7 +12,7 @@ const items = ref([]);
 
 <template>
   <Menubar :model="items">
-    <template #start>
+    <template #start @click="router.push({ name: 'Home' })">
       <router-link class="flex items-center" :to="baseURL">
         <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-6 w-6 mr-6">
