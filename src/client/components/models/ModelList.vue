@@ -1,9 +1,11 @@
 <script setup>
 import { onMounted, ref, computed } from "vue";
 import ModelCardVue from "./ModelCard.vue";
+import ModelListTable from "./ModelListTable.vue";
 import { useRouter } from "vue-router";
 import { fetchModels, deleteModel } from "@services/modelService";
 import { useToast } from "primevue/usetoast";
+import { modelDeveloperItems } from "@/consts/model";
 
 const router = useRouter();
 const toast = useToast();
@@ -16,7 +18,7 @@ const modelsSearch = computed(() => {
   // multiply the models to simulate a bigger list
   return models.value.filter((model) =>
     model.name.toLowerCase().includes(search.value.toLowerCase())
-  );
+  ).filter(model => selectedFilter.value ? model.developer === selectedFilter.value.code : true);
 });
 
 const models = ref([]);
@@ -32,6 +34,14 @@ const modelCreateItems = [
 
 const visible = ref(false);
 const modelForDeletion = ref(null);
+const selectedFilter = ref(null);
+
+const viewSelected = ref("cards");
+const selectOptions = ref([
+  { icon: 'pi pi-th-large', value: 'cards' },
+  { icon: 'pi pi-bars', value: 'list' },
+]);
+
 
 onMounted(async () => {
   fetchModels().then((data) => {
@@ -56,11 +66,9 @@ const deleteModelReq = async () => {
   visible.value = false;
   toast.add({ severity: 'success', summary: 'Success', detail: 'Model deleted', life: 5000 });
 };
-
 </script>
 <template>
   <section class="flex flex-col gap-4 mt-0 py-4 items-center overflow-x-hidden">
-    <!-- HEADER -->
     <section class=" flex flex-col gap-2 items-center">
       <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
       <p class="text-gray-500 leading-loose sm:text-xl/relaxed">
@@ -76,12 +84,28 @@ const deleteModelReq = async () => {
           <InputText fluid v-model="search" placeholder="Search models" />
         </IconField>
 
+        <!-- FILTERS -->
+        <Divider class="hidden md:block" layout="vertical" />
+        <Dropdown showClear v-model="selectedFilter" :options="modelDeveloperItems" optionLabel="name"
+          placeholder="Filter Model Type" class="w-full md:w-auto" />
+
+        <!-- Button to change from cards to list -->
+        <SelectButton v-model="viewSelected" :options="selectOptions" optionLabel="value" optionValue="value"
+          dataKey="value" aria-labelledby="custom">
+          <template #option="slotProps">
+            <i :class="slotProps.option.icon"></i>
+          </template>
+        </SelectButton>
       </div>
     </section>
 
     <!-- CARDS -->
-    <section class="grid grid-cols-1  gap-4 w-full pt-8 px-8 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
+    <section v-if="viewSelected == 'cards'"
+      class="grid grid-cols-1 gap-4 w-full pt-8 px-8 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
       <ModelCardVue v-for="model in modelsSearch" :key="model.id" :model="model" @delete="openDialog" />
+    </section>
+    <section v-else-if="viewSelected == 'list'" class="w-full px-8">
+      <ModelListTable :models="modelsSearch" @delete="openDialog" />
     </section>
 
     <Dialog v-model:visible="visible" header="Delete Model" :style="{ width: '40vw' }">
