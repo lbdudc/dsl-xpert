@@ -146,7 +146,7 @@ onMounted(() => {
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
             <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder=""
-                autocomplete="off" :feedback="false" fluid toggleMask />
+                autocomplete="on" :feedback="false" fluid toggleMask />
             <label for="hfToken">HuggingFace Token</label>
         </FloatLabel>
 

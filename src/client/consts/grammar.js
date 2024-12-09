@@ -13,3 +13,13 @@ export const grammarTypeItems = [
     }
 ];
 
+export const hyperParameterPresets = {
+    "chatgpt-4o-latest": {
+        temperature: 0.7,
+        maximumLength: 4095,
+        topP: 1,
+        repetitionPenalty: 0,
+        stopSequences: ["\\n"],
+    }
+};
+

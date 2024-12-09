@@ -114,7 +114,7 @@ onMounted(async () => {
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
             <Password fluid v-model="model.apiKey" name="apiKey" label="HuggingFace API key"
-                placeholder="Enter HuggingFace API key" autocomplete="off" :feedback="false" toggleMask>
+                placeholder="Enter HuggingFace API key" autocomplete="on" :feedback="false" toggleMask>
             </Password>
         </FloatLabel>
 
