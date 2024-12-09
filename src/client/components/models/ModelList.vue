@@ -36,32 +36,31 @@ onMounted(async () => {
 });
 </script>
 <template>
-  <div class="flex flex-col w-screen p-4 gap-8 px-10">
-
+  <section class="flex flex-col gap-4 mt-0 py-4 items-center overflow-x-hidden">
     <!-- HEADER -->
-    <div class="flex flex-col gap-2 items-center">
+    <section class=" flex flex-col gap-2 items-center">
       <h1 class="text-3xl font-bold tracking-tighter sm:text-4xl">Models</h1>
       <p class="text-gray-500 leading-loose sm:text-xl/relaxed">
         Create a new model or manage existing ones.
       </p>
-      <div class="flex gap-2 md:flex-row md:justify-center">
+      <div class="flex gap-4 flex-col w-screen px-8 md:px-0 md:w:full md:flex-row md:justify-center">
 
-        <SplitButton label="New Model" @click="router.push({ name: 'ModelCreate', query: { m: 'openai' } })"
+        <SplitButton fluid label="New Model" @click="router.push({ name: 'ModelCreate', query: { m: 'openai' } })"
           :model="modelCreateItems" class="w-full md:w-auto" severity="success" icon="pi pi-plus" />
 
         <IconField>
           <InputIcon class="pi pi-search" />
-          <InputText v-model="search" placeholder="Search models" />
+          <InputText fluid v-model="search" placeholder="Search models" />
         </IconField>
 
       </div>
-    </div>
+    </section>
 
     <!-- CARDS -->
-    <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 gap-4 w-full pt-8">
+    <section class="grid grid-cols-1  gap-4 w-full pt-8 px-8 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4">
       <ModelCardVue v-for="model in modelsSearch" :key="model.id" :model="model" />
-    </div>
-  </div>
+    </section>
+  </section>
 </template>
 
 <style lang="scss" scoped></style>

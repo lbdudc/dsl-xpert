@@ -133,7 +133,7 @@ const errors = reactive(props.errors);
         <ExampleTabs v-if="props.model" :exampleErrorTabs="props.exampleErrorTabs" :model="model" :errors="errors"
             @update:activeTab="refreshDSLDefinition" @focusout="emitContent" />
     </section>
-    <ProgressSpinner v-if="loading" class="flex justify-center items-center h-96 overflow-hidden" />
+    <ProgressSpinner v-if="loading" class="flex justify-center items-center" />
 </template>
 
 <style scoped>

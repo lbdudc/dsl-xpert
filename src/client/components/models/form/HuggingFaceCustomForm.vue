@@ -37,7 +37,7 @@ const connectWebSocket = () => {
     };
 
     socket.value.onmessage = (event) => {
-        wsMessage.value += "\n"+event.data; // Update message with incoming data
+        wsMessage.value += "\n" + event.data; // Update message with incoming data
     };
 
     socket.value.onclose = () => {
@@ -119,29 +119,34 @@ onMounted(() => {
 
     <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <InputText size="small" name="hfModelName" id="hfModelName" v-model="hfModelName" label="Search Model Name" />
+            <InputText size="small" name="hfModelName" id="hfModelName" v-model="hfModelName"
+                label="Search Model Name" />
             <label for="hfModelName">Model Name</label>
         </FloatLabel>
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <InputText size="small" name="hfModelAuthor" id="hfModelAuthor" v-model="hfModelAuthor" label="Search Model Author" />
+            <InputText size="small" name="hfModelAuthor" id="hfModelAuthor" v-model="hfModelAuthor"
+                label="Search Model Author" />
             <label for="hfModelAuthor">Model Author</label>
         </FloatLabel>
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <InputText size="small" name="hfModelFilter" id="hfModelFilter" v-model="hfModelFilter" label="Search Model Filter" />
+            <InputText size="small" name="hfModelFilter" id="hfModelFilter" v-model="hfModelFilter"
+                label="Search Model Filter" />
             <label for="hfModelFilter">Model Filter</label>
         </FloatLabel>
 
         <div class="flex flex-row items-center justify-between">
             <FloatLabel class="flex flex-col gap-4 flex-1" variant="on">
-                <InputText size="small" name="hfModelSort" id="hfModelSort" v-model="hfModelSort" label="Search Model Sort" />
+                <InputText size="small" name="hfModelSort" id="hfModelSort" v-model="hfModelSort"
+                    label="Search Model Sort" />
                 <label for="hfModelSort">Model Sort</label>
             </FloatLabel>
         </div>
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder="" autocomplete="off" :feedback="false" fluid toggleMask />
+            <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder=""
+                autocomplete="off" :feedback="false" fluid toggleMask />
             <label for="hfToken">HuggingFace Token</label>
         </FloatLabel>
 
@@ -150,10 +155,12 @@ onMounted(() => {
 
     <Divider />
 
-    <section class="max-h-[370px] overflow-hidden">
-        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" :itemSize="5" class="flex flex-col items-center justify-center" style="height: 370px">
+    <section>
+        <VirtualScroller v-if="!loadingModels && hfModels?.length != 0" :items="hfModels" :itemSize="5"
+            class="flex flex-col items-center justify-center" style="height: 370px">
             <template v-slot:item="{ item, options }">
-                <div class="grid grid-cols-4 gap-2 w-full hover:bg-gray-100 hover:cursor-pointer hover:text-slate-950" @click="openModelDialog(item)">
+                <div class="grid grid-cols-4 gap-2 w-full hover:bg-gray-100 hover:cursor-pointer hover:text-slate-950"
+                    @click="openModelDialog(item)">
                     <div class="flex items-center justify-start truncate ...">{{ item.id }}</div>
                     <div class="flex items-center justify-start">
                         <i class="pi pi-thumbs-up mr-1" /> {{ item.likes }}
@@ -168,7 +175,9 @@ onMounted(() => {
                 </div>
             </template>
         </VirtualScroller>
-        <div v-else-if="hfModels?.length == 0" class="flex items-center justify-center mt-10 h-full text-2xl">No models found</div>
+        <div v-else-if="hfModels?.length == 0" class="flex items-center justify-center mt-10 h-full text-2xl">No models
+            found
+        </div>
         <ProgressSpinner v-else="hfModels?.length == 0" />
     </section>
 

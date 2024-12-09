@@ -7,19 +7,9 @@ const toast = useToast();
 </script>
 
 <template>
-  <div class="main-container">
+  <div class="flex flex-col h-screen w-screen">
     <Toast position="bottom-left" />
-    <NavBar />
-    <router-view />
+    <NavBar class="flex items-center justify-between w-full" />
+    <router-view class="flex-1 overflow-y-auto" />
   </div>
 </template>
-
-<style scoped>
-.main-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  width: 100vw;
-  overflow-x: hidden;
-}
-</style>
