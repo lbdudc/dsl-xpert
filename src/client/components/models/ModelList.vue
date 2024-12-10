@@ -86,16 +86,19 @@ const deleteModelReq = async () => {
 
         <!-- FILTERS -->
         <Divider class="hidden md:block" layout="vertical" />
-        <Dropdown showClear v-model="selectedFilter" :options="modelDeveloperItems" optionLabel="name"
-          placeholder="Filter Model Type" class="w-full md:w-auto" />
 
-        <!-- Button to change from cards to list -->
-        <SelectButton v-model="viewSelected" :options="selectOptions" optionLabel="value" optionValue="value"
-          dataKey="value" aria-labelledby="custom">
-          <template #option="slotProps">
-            <i :class="slotProps.option.icon"></i>
-          </template>
-        </SelectButton>
+        <div class="flex gap-4 items-center w-full md:w-auto">
+          <Dropdown showClear v-model="selectedFilter" :options="modelDeveloperItems" optionLabel="name"
+            placeholder="Filter Model Type" class="w-full md:w-auto" />
+
+          <!-- Button to change from cards to list -->
+          <SelectButton v-model="viewSelected" :options="selectOptions" optionLabel="value" optionValue="value"
+            dataKey="value" aria-labelledby="custom">
+            <template #option="slotProps">
+              <i :class="slotProps.option.icon"></i>
+            </template>
+          </SelectButton>
+        </div>
       </div>
     </section>
 

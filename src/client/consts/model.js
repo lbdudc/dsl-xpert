@@ -4,6 +4,12 @@ export const initialValues = {
     id: null,
     developer: null,
     modelType: null,
+    request: {
+        method: "POST",
+        url: "",
+        body: null,
+        headers: [],
+    },
     name: null,
     apiKey: "",
     temperature: 0.2,
