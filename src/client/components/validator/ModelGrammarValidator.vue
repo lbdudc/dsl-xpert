@@ -1,6 +1,4 @@
 <script setup>
-import { editor } from "monaco-editor";
-import { onMounted, ref, watch } from "vue";
 import LangiumGrammarValidator from "@components/validator/LangiumGrammarValidator.vue";
 import NoGrammarValidator from "@components/validator/NoGrammarValidator.vue";
 
@@ -24,45 +22,6 @@ const props = defineProps({
 });
 
 const emit = defineEmits(["updateContent"]);
-const monaco = ref(null);
-
-const loadClient = async (grammarType) => {
-
-  // try {
-  //   const module = await import(`./${grammarType.code}/wrapperLangium.js`);
-  //   const startClient = module.startLangiumClientClassic;
-
-  //   if (startClient) {
-  //     const client = await startClient(monaco.value);
-  //     const editor = client.editorApp.editor;
-  //     editor.trigger("keyboard",
-  //       "type",
-  //       { text: props.model.definition }
-  //     )
-  //   }
-  // } catch (error) {
-  //   console.error(`Error loading module for ${grammarType.code}:`, error);
-  //   return null;
-  // }
-};
-
-
-const emitContent = () => {
-  const content = monaco.value.innerText;
-  const filteredContent = content
-    .split("\n")
-    .filter((line) => isNaN(line.trim()))
-    .join("\n");
-  emit("updateContent", filteredContent);
-};
-
-// watch(
-//   () => props.grammarType,
-//   (newValue) => {
-//     loadClient(newValue);
-//   },
-//   { immediate: true }
-// );
 </script>
 
 <template>
