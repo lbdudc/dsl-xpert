@@ -5,64 +5,70 @@ export default class CurlController {
     static async test(req, res) {
 
         // req receives a text field with the curl command
-        const curlCommand = req.body.text;
-        if (!curlCommand) {
-            return res.status(400).json({ error: 'No curl command provided' });
+        const { method, url, body, headers } = req.body
+        if (!method || !url) {
+            return res.status(400).json({ error: 'Invalid curl command' });
         }
-
-        console.log('curlCommand', curlCommand);
 
         // Parse the curl command to get the method and the URL
         try {
-            const { method, url, headers } = parseCurl(curlCommand);
+            const customHeaders = new Headers();
+            headers.forEach((header) => {
+                customHeaders.append(header.key, header.value);
+            });
 
             // Fetch the URL
             const response = await fetch(url, {
                 method,
-                headers: {
-                    ...headers
-                }
+                headers: customHeaders,
+                body: body ? JSON.stringify(body) : null
             });
 
+            const result = await response.json();
             // Return the response status
-            console.log('response', response);
-            res.json({
+            res.status(response.status).json({
                 ok: response.ok,
                 status: response.status,
-                statusText: response.statusText
+                statusText: response.statusText,
+                resBody: result
             });
-
         } catch (error) {
             console.error(error);
-            res.status(400).json({ error: 'Invalid curl command' });
+            res.status(200).json({
+                ok: false,
+                error: error.cause
+            });
         }
     }
+
+    // static async mock(req, res) {
+    //     // mock the response from openAI API
+    //     res.status(200).json({
+    //         "id": "chatcmpl-abc123",
+    //         "object": "chat.completion",
+    //         "created": 1677858242,
+    //         "model": "gpt-4o-mini",
+    //         "usage": {
+    //             "prompt_tokens": 13,
+    //             "completion_tokens": 7,
+    //             "total_tokens": 20,
+    //             "completion_tokens_details": {
+    //                 "reasoning_tokens": 0,
+    //                 "accepted_prediction_tokens": 0,
+    //                 "rejected_prediction_tokens": 0
+    //             }
+    //         },
+    //         "choices": [
+    //             {
+    //                 "message": {
+    //                     "role": "assistant",
+    //                     "content": "\n\nThis is a test!"
+    //                 },
+    //                 "logprobs": null,
+    //                 "finish_reason": "stop",
+    //                 "index": 0
+    //             }
+    //         ]
+    //     });
+    // }
 }
-
-
-const parseCurl = (curlCommand) => {
-    const args = curlCommand.split(/\s+/);
-    const method = args.includes('--request') ? args[args.indexOf('--request') + 1] : 'GET';
-    const url = args[args.indexOf('--location') + 1] || args.find(arg => arg.startsWith('http'));
-
-    // get the headers
-    const headers = new Headers();
-    // clean the headers from the command, the blank spaces and simple quotes
-    const headerIndex = args.indexOf('--header');
-
-    if (headerIndex !== -1) {
-        const headersArray = args.slice(headerIndex + 1);
-
-        headersArray.forEach((header, index) => {
-            if (index % 2 === 0) {
-                const headerKey = header.replace(/'/g, '');
-                const headerValue = headersArray[index + 1].replace(/'/g, '');
-                headers.append(headerKey, headerValue);
-            }
-        });
-    }
-
-    const newUrl = url.replace(/'/g, '');
-
-    return { method, url: newUrl, headers };
-};
