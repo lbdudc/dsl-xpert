@@ -22,6 +22,9 @@ const ModelSchema = new Schema({
     type: String,
     required: true,
   },
+  request: {
+    type: Object
+  },
   apiKey: {
     type: String,
   },
