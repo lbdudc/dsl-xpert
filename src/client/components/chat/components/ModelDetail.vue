@@ -64,6 +64,10 @@ const goToForm = () => {
         </span>
 
         <span class="text-sm">
+          <span>Top K:</span> {{ model.topK }}
+        </span>
+
+        <span class="text-sm">
           <span>Top P:</span> {{ model.topP }}
         </span>
 

@@ -17,6 +17,7 @@ class ChatRequest(BaseModel):
     temperature: float = 0.2
     max_length: int = 4096
     repetition_penalty: float = 1.0
+    top_K: int = 50
     top_P: float = 0.9
     seed: int = 6
     stop_sequences: Optional[str] = None  # Optional parameter
@@ -75,6 +76,7 @@ async def websocket_chat(websocket: WebSocket):
             max_length=chat_request.max_length,
             temperature=chat_request.temperature,
             repetition_penalty=chat_request.repetition_penalty,
+            top_k=chat_request.top_K,
             top_p=chat_request.top_P,
         )
 

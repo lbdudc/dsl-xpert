@@ -73,6 +73,14 @@ const applyPreset = () => {
                 <label for="maximumLength">Maximum length</label>
             </FloatLabel>
 
+            <FloatLabel v-if="model.developer !== 'openai'" class="flex flex-col gap-4" variant="in">
+                <InputText name="topK" id="topK" v-model="model.topK" label="Top K"
+                    placeholder="Enter a top K number for the model" type="number"
+                    v-tooltip.top='"Limits the selection of the next token to only the top K most probable tokens as predicted by the probability distribution of the model."'>
+                </InputText>
+                <label for="topK">Top K</label>
+            </FloatLabel>
+
             <FloatLabel class="flex flex-col gap-4" variant="in">
                 <InputText name="topP" id="topP" v-model="model.topP" label="Top P"
                     placeholder="Enter a top P number for the model" type="number"

@@ -71,6 +71,7 @@ const getModelOutput = async () => {
       temperature: props.model.temperature,
       max_tokens: props.model.maximumLength,
       repetition_penalty: props.model.repetitionPenalty,
+      top_K: props.model.topK,
       top_P: props.model.topP,
       stopSequences: props.model.stopSequences,
       seed: props.model.seed,

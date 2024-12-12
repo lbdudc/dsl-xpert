@@ -30,11 +30,15 @@ const ModelSchema = new Schema({
   },
   temperature: {
     type: Number,
-    default: 0.2,
+    default: 0.1,
   },
   maximumLength: {
     type: Number,
     default: 4095,
+  },
+  topK: {
+    type: Number,
+    default: 50,
   },
   topP: {
     type: Number,
