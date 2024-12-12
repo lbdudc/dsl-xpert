@@ -111,7 +111,7 @@ export default class ModelController {
             messages: messagesHistory,
             model: modelType,
             temperature: temperature,
-            max_tokens: maximumLength,
+            max_completion_tokens: maximumLength,
             top_p: topP,
             frequency_penalty: repetitionPenalty,
             presence_penalty: repetitionPenalty,
