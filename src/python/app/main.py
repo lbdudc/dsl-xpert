@@ -1,6 +1,6 @@
 import sys
 import asyncio
-from fastapi import FastAPI, WebSocket
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 from transformers import pipeline, set_seed
 import logging
@@ -33,7 +33,7 @@ class WebSocketStdout(StringIO):
         asyncio.create_task(self.websocket.send_text(message))  # Send to WebSocket
 
 # WebSocket route for real-time updates
-@app.websocket("/ws/chat")
+@app.websocket("/ws")
 async def websocket_chat(websocket: WebSocket):
     await websocket.accept()
 
