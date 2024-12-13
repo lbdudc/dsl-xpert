@@ -32,6 +32,14 @@ const items = ref([]);
         <h1 class="text-left text-xl font-bold">DSL-Xpert</h1>
       </router-link>
     </template>
+    <template #end>
+      <div class="flex items-center gap-4 mr-2">
+        <Button label="about" variant="text" @click="router.push({ name: 'About' })" />
+        <a href="https://github.com/lbdudc/dsl-xpert" target="_blank">
+          <i class="pi pi-github"></i>
+        </a>
+      </div>
+    </template>
   </Menubar>
 </template>
 

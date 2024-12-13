@@ -36,6 +36,11 @@ const routes = [
     path: `${base}404`,
     name: "NotFound",
     component: () => import("@/components/404.vue"),
+  },
+  {
+    path: `${base}about`,
+    name: "About",
+    component: () => import("./pages/About.vue"),
   }
 ];
 

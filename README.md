@@ -1,6 +1,6 @@
 # DSL-Xpert
 
-This tool provides a web interface  and a REST API to manage Large Language Models (LLM) for Domain Specific Languages (DSL). It allows to create, train and use LLMs for specific domains. The tool is designed to be used as a library or as a standalone application.
+This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat. It can validate the generated grammar instances while chatting with the LLM. It has integrations with OpenAI's GPT models, HuggingFace Inference API, custom HuggingFace Models running it locally, and WebLLM to run it on the client side with zero configuration and connect to your custom server using REST requests.
 
 - [Getting Started](#getting-started)
   - [Installation](#installation)
@@ -8,7 +8,6 @@ This tool provides a web interface  and a REST API to manage Large Language Mode
     - [Docker](#docker)
     - [Standalone server](#standalone-server)
     - [HuggingFace](#huggingface)
-    - [Library](#library)
 - [Usage](#usage)
   - [API Routes](#api-routes)
 - [Author](#author)
@@ -83,35 +82,6 @@ docker run -d --name mycontainer -p 80:80 myimage
 docker build -t myimage .
 ```
 
-### Library
-
-TBD
-
-To use it as a library, it is necessary to install it as a dependency:
-
-```bash
-npm install @lbdudc/dsl-xpert
-```
-
-And then import it in the code:
-
-```javascript
-import { createModel, getModel } from '@lbdudc/dsl-xpert';
-
-// Create a new model
-const model = createModel({
-    name: 'my-model',
-    model: 'gpt-3.5-turbo',
-    domain: 'my-domain',
-    description: 'My model description'
-});
-
-// Or get the model if already exists
-const model = getModel('my-model');
-
-model.chat('Hello, how are you?').then(console.log);
-```
-
 ### Usage
 
 The project provides a web interface to manage the LLMs. The interface allows to create, train and use LLMs. Also, it provides a REST API to manage the LLMs the same way as the web interface.
@@ -126,52 +96,86 @@ The API provides the following routes:
 - `PUT /models/:id`: Update a model by id
 - `DELETE /models/:id`: Delete a model by id
 - `POST /models/:id/chat`: Chat with a model by id
-  - Request body: { message: String }
 
 Model schema:
 
 ```json
 {
-    "id": {
-        "type": String,
-        "required": true,
-        "unique": true
-    },
-    "name": {
-        "type": String,
-        "required": true,
-        "unique": true
-    },
-    "description": {
-        "type": String,
-        "default": null
-    },
-    "developer": {
-        "type": String,
-        "required": true
-    },
-    "modelType": {
-        "type": String,
-        "required": true
-    },
-    "temperature": {
-        "type": Number,
-        "required": false,
-        "default": 1
-    },
-    "seed": {
-        "type": Number,
-        "required": false,
-        "default": null
-    },
-    "definition": {
-        "type": String,
-        "required": true
-    },
-    "created_date": {
-        "type": Date,
-        "default": Date.now
-    }
+ "name": {
+    "type": "String",
+    "required": true,
+    "unique": true,
+  },
+  "description": {
+    "type": "String",
+    "default": null,
+  },
+  "developer": {
+    "type": "String",
+    "required": true,
+  },
+  "modelType": {
+    "type": "String",
+    "required": true,
+  },
+  "request": {
+    "type": "Object"
+  },
+  "apiKey": {
+    "type": "String",
+  },
+  "iv": {
+    "type": "String",
+  },
+  "temperature": {
+    "type": "Number",
+    "default": 0.1,
+  },
+  "maximumLength": {
+    "type": "Number",
+    "default": 4095,
+  },
+  "topK": {
+    "type": "Number",
+    "default": 50,
+  },
+  "topP": {
+    "type": "Number",
+    "default": 1,
+  },
+  "repetitionPenalty": {
+    "type": "Number",
+    "default": 0,
+  },
+  "stopSequences": {
+    "type": ["String"],
+    "default": [";", "###"],
+  },
+  "seed": {
+    "type": "Number",
+    "default": 6,
+  },
+  "definition": {
+    "type": "String",
+    "required": true,
+  },
+  "grammarType": {
+    "type": "Object",
+    "required": true,
+  },
+  "definitionExamples": {
+    "type": [
+      {
+        "userInstruction": "String",
+        "modelAnswer": "String",
+      },
+    ],
+    "required": true,
+  },
+  "created_date": {
+    "type": "Date",
+    "default": "Date.now",
+  },
 }
 ```
 
