@@ -9,7 +9,7 @@
     "dev:client": "cd src/client && vite",
     "dev:serve": "node ./src/server/index.js",
     "dev": "concurrently \"npm run dev:client\" \"npm run dev:serve\"",
-    "dev:pyserve": "python -m uvicorn src.python.app.main:app --host localhost --port 6000",
+    "dev:pyserve": "python -m uvicorn src.python.app.main:app --host localhost --port 8000 --reload",
     "lint_eslint": "eslint --ext js,vue --fix src test",
     "lint_prettier": "prettier --write --ignore-unknown src test",
     "lint": "npm-run-all lint_eslint lint_prettier",

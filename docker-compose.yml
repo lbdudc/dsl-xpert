@@ -12,6 +12,7 @@ services:
       - SERVER_PORT=5000 ## This is the internal port of the Express Node server
       - CLIENT_URL=http://localhost:5173
       - VITE_SERVER_URL=http://localhost:5555 ## This is the URL of the Nginx server
+      - HUGGINGFACE_CUSTOM_URL=http://localhost:5555 ## This is the URL of the Nginx server
       - MONGODB_URI=mongodb://mongodb:27017/llm-dsl-builder
     networks:
       - llm-network

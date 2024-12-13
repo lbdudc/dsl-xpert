@@ -1,6 +1,7 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
 import { fetchModels, fetchModelDetails } from "@services/huggingFaceService";
+import { HUGGINGFACE_CUSTOM_URL } from "@consts/server";
 
 // WebSocket related variables and functions
 const socket = ref(null);
@@ -29,7 +30,7 @@ const hfModelSort = ref("");
 
 // WebSocket functions
 const connectWebSocket = () => {
-    socket.value = new WebSocket("ws://127.0.0.1:8000/ws/chat"); // Update with actual WebSocket endpoint
+    socket.value = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
 
     socket.value.onopen = () => {
         isConnected.value = true;
