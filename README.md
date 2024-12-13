@@ -1,8 +1,26 @@
 # DSL-Xpert
 
-This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat. It can validate the generated grammar instances while chatting with the LLM. It has integrations with OpenAI's GPT models, HuggingFace Inference API, custom HuggingFace Models running it locally, and WebLLM to run it on the client side with zero configuration and connect to your custom server using REST requests.
-
 ![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) ![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.2.0-brightgreen.svg) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lbdudc/dsl-xpert)[![DOI](https://zenodo.org/badge/DOI/10.1145/3652620.3687782.svg)](https://doi.org/10.1145/3652620.3687782)
+
+This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat.
+
+![image of the models created](./src/client/public/index_image.png)
+
+It can validate the generated grammar instances while chatting with the LLM using [Langium](http://langium.org/).
+
+![image of the tool](./src/client/public/form_example.png)
+
+It has integrations with:
+
+- **OpenAI** models
+- **HuggingFace Inference API**
+- **HuggingFace transformers**: running it locally
+- [WebLLM](https://webllm.mlc.ai/)
+- Connect to any server using **API REST requests**
+
+![image of chat](./src/client/public/chat_example.png)
+
+Then the user can chat with the LLM using the grammar defined.
 
 - [Usage](#usage)
   - [Docker](#docker)
