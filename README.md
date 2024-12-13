@@ -2,7 +2,8 @@
 
 This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat. It can validate the generated grammar instances while chatting with the LLM. It has integrations with OpenAI's GPT models, HuggingFace Inference API, custom HuggingFace Models running it locally, and WebLLM to run it on the client side with zero configuration and connect to your custom server using REST requests.
 
-- [About the project](#about-the-project)
+![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) ![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.2.0-brightgreen.svg) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lbdudc/dsl-xpert)[![DOI](https://zenodo.org/badge/DOI/10.1145/3652620.3687782.svg)](https://doi.org/10.1145/3652620.3687782)
+
 - [Usage](#usage)
   - [Docker](#docker)
   - [Standalone server](#standalone-server)
@@ -10,12 +11,6 @@ This tool provides a web interface to define domain-specific languages and uses 
 - [API Routes](#api-routes)
 - [Author](#author)
 - [License](#license)
-
-## About the project
-
-More information about the application can be found in the following links:
-
-<https://dl.acm.org/doi/10.1145/3652620.3687782>
 
 ## Usage
 
@@ -30,7 +25,7 @@ Prerequisites:
 - Docker
 - Docker Compose
 
-```bash
+```sh
 docker-compose up
 ```
 
@@ -50,7 +45,7 @@ Prerequisites:
 - MongoDB
 - Python (optional only if the user wants to use the custom huggingface models)
 
-```bash
+```sh
 
 # (Optional), check the .nvmrc file
 # for seeing what is the node version
@@ -67,7 +62,7 @@ This will start:
 
 It will be necessary to have a MongoDB database running, and set the variable in the `.env` file:
 
-```bash
+```env
 MONGODB_URI=mongodb://localhost:27017/llm-dsl-builder
 ```
 
@@ -77,7 +72,7 @@ We already have added the HuggingFace Custom Server into the `docker-compose.yml
 
 But in thr standalone version, the user can run the server using the command:
 
-```bash
+```sh
 npm run dev:pyserver
 ```
 
