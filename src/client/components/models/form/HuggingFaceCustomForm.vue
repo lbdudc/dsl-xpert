@@ -1,12 +1,6 @@
 <script setup>
 import { onMounted, reactive, ref } from "vue";
 import { fetchModels, fetchModelDetails } from "@services/huggingFaceService";
-import { HUGGINGFACE_CUSTOM_URL } from "@consts/server";
-
-// WebSocket related variables and functions
-const socket = ref(null);
-const wsMessage = ref(""); // Store real-time messages
-const isConnected = ref(false); // Track WebSocket connection state
 
 // Props and other variables
 const props = defineProps({
@@ -27,43 +21,6 @@ const hfModelAuthor = ref("");
 const hfToken = ref("");
 const hfModelFilter = ref("");
 const hfModelSort = ref("");
-
-// WebSocket functions
-const connectWebSocket = () => {
-    socket.value = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
-
-    socket.value.onopen = () => {
-        isConnected.value = true;
-        console.log("WebSocket connected");
-    };
-
-    socket.value.onmessage = (event) => {
-        wsMessage.value += "\n" + event.data; // Update message with incoming data
-    };
-
-    socket.value.onclose = () => {
-        isConnected.value = false;
-        console.log("WebSocket disconnected");
-    };
-
-    socket.value.onerror = (error) => {
-        console.error("WebSocket error:", error);
-    };
-};
-
-const sendCustomRequest = () => {
-    if (socket.value && socket.value.readyState === WebSocket.OPEN) {
-        const requestPayload = {
-            prompt: "Your custom prompt here",
-            model_name: "distilgpt2",
-            model_tag: "text-generation",
-            temperature: 0.7,
-            max_length: 100
-        };
-
-        socket.value.send(JSON.stringify(requestPayload));
-    }
-};
 
 const fetchModelsClient = async () => {
     loadingModels.value = true;
@@ -97,13 +54,14 @@ const openModelDialog = (item) => {
 const selectHfModel = () => {
     if (hfModelSelected.value) {
         model.modelType = hfModelSelected.value.modelId;
+        model.modelTag = hfModelSelected.value.pipeline_tag;
+        model.apiKey = hfToken.value;
         hfModelDialog.value = false;
     }
 };
 
 onMounted(() => {
     fetchModelsClient();
-    connectWebSocket(); // Connect to WebSocket when the component is mounted
 });
 </script>
 
@@ -146,7 +104,7 @@ onMounted(() => {
         </div>
 
         <FloatLabel class="flex flex-col gap-4" variant="on">
-            <Password size="small" v-model="hfToken" name="hfToken" label="HuggingFace Token" placeholder=""
+            <Password size="small" v-model="model.apiKey" name="hfToken" label="HuggingFace Token" placeholder=""
                 autocomplete="on" :feedback="false" fluid toggleMask />
             <label for="hfToken">HuggingFace Token</label>
         </FloatLabel>
@@ -194,20 +152,5 @@ onMounted(() => {
             </div>
         </div>
     </Dialog>
-
-    <!-- Section for real-time WebSocket message display -->
-    <section class="mt-6">
-        <Button @click="sendCustomRequest" :disabled="!isConnected">Send Custom Request</Button>
-        <div v-if="wsMessage" class="mt-4 p-4 bg-gray-100 border border-gray-300 text-red-500">
-            <h3 class="font-semibold">Real-time Response:</h3>
-            <pre>{{ wsMessage }}</pre>
-        </div>
-    </section>
 </template>
 
-<style>
-/* Additional styles for WebSocket message display */
-section {
-    margin-top: 20px;
-}
-</style>
