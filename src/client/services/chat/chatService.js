@@ -1,6 +1,26 @@
-import { SERVER_URL, HUGGINGFACE_INFERENCES_API_URL } from "@consts/server";
+import { SERVER_URL, HUGGINGFACE_INFERENCES_API_URL, HUGGINGFACE_CUSTOM_URL } from "@consts/server";
 import { modelDeveloperItems } from "@consts/model";
 import { CreateMLCEngine, prebuiltAppConfig } from "@mlc-ai/web-llm";
+
+let socket = null;
+
+const connectWebSocket = () => {
+    socket = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
+
+    socket.onopen = () => {
+        console.log("WebSocket connected");
+    };
+
+    socket.onclose = () => {
+        console.log("WebSocket disconnected");
+    };
+
+    socket.onerror = (error) => {
+        console.error("WebSocket error:", error);
+    };
+
+	return socket;
+};
 
 /**
  * @description This service is responsible for selecting the server to reason with.
@@ -32,13 +52,11 @@ export class ServerSelectorService {
 
 				// Callback function to update model loading progress
 				return CreateMLCEngine(modelType, { initProgressCallback: callbackFunct });
-			case "huggingface":
-				res = await this.loadHubbingFaceModel(model);
-				break;
+			case "huggingface-custom":
+				return connectWebSocket()
 			default:
 				return new Error("Model not valid, use one of the following: getDefinition, getExamples, getInstructions");
 		}
-		return res;
 	}
 
 	/**
@@ -147,32 +165,60 @@ const callHuggingFaceInferenceChat = async (messageObject) => {
 }
 
 const callHuggingFaceCustomChat = async (messageObject) => {
-	const { userMessage, modelName, modelTag, temperature, maxLength, repetitionPenalty, topP, seed, stopSequences, apiKey } = messageObject;
+	const { userMessage, modelType, modelTag, temperature, maxLength, repetitionPenalty, topK, topP, seed, stopSequences, apiKey } = messageObject;
 
-	const response = await fetch(`${HUGGINGFACE_SERVER_URL}/api/chat`, {
-		method: "POST",
-		headers: {
-			"Content-Type": "application/json",
-			"Authorization": `Bearer ${apiKey}`,
-		},
-		body: JSON.stringify({
-			prompt: userMessage,
-			model_name: modelName,
-			model_tag: modelTag,
-			temperature: temperature,
-			max_length: maxLength,
+	if (socket && socket.readyState === WebSocket.OPEN) {
+        const requestPayload = {
+            prompt: userMessage.map(message => message.content).join(". "),
+            model_name: modelType,
+            model_tag: modelTag,
+            temperature: temperature,
+            max_length: maxLength,
 			repetition_penalty: repetitionPenalty,
+			top_K: topK,
 			top_P: topP,
 			seed: seed,
+			apiKey: apiKey,
 			stop_sequences: stopSequences
-		}),
-	});
-	if (!response.ok) {
-		const error = await response.text();
-		throw new Error(JSON.stringify(JSON.parse(error), null, 4));
-	}
-	const data = await response.json();
-	return data;
+        };
+
+		return new Promise((resolve, reject) => {
+            // Listener for the WebSocket response
+            const onMessage = (event) => {
+                try {
+                    const response = event.data;
+                    socket.removeEventListener("message", onMessage); // Clean up listener
+
+                    // Add the assistant response to the userMessage array
+                    const assistantResponse = response;
+                    userMessage.push({
+                        content: assistantResponse,
+                        role: "assistant",
+                    });
+
+                    // Return the updated message history
+                    resolve({
+                        messagesHistory: userMessage,
+                    });
+                } catch (error) {
+                    reject(new Error("Failed to parse WebSocket response: " + error.message));
+                }
+            };
+
+            socket.addEventListener("message", onMessage);
+
+            try {
+                socket.send(JSON.stringify(requestPayload));
+                console.log("Request sent:", requestPayload);
+            } catch (error) {
+                socket.removeEventListener("message", onMessage); // Clean up listener
+                reject(new Error("Failed to send WebSocket request: " + error.message));
+            }
+        });
+
+    } else {
+        return Promise.reject(new Error("WebSocket is not open. Cannot send request."));
+    }
 };
 
 

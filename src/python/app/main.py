@@ -8,6 +8,7 @@ from io import StringIO
 from typing import Optional
 
 app = FastAPI()
+connection_model_state = {}    # To control first-time messages (model not loaded before)
 
 # Define the request body using Pydantic
 class ChatRequest(BaseModel):
@@ -20,7 +21,8 @@ class ChatRequest(BaseModel):
     top_K: int = 50
     top_P: float = 0.9
     seed: int = 6
-    stop_sequences: Optional[str] = None  # Optional parameter
+    apiKey: str
+    stop_sequences: Optional[list[str]] = None  # Optional parameter
 
 # Custom class to capture the tqdm progress bar output
 class WebSocketStdout(StringIO):
@@ -37,6 +39,10 @@ class WebSocketStdout(StringIO):
 async def websocket_chat(websocket: WebSocket):
     await websocket.accept()
 
+    # Initialize the state for this WebSocket connection (first time)
+    connection_id = str(id(websocket))
+    connection_model_state[connection_id] = {"model_loaded": False}
+
     try:
         # Accept the request and extract data (you could send it from the client side)
         request = await websocket.receive_text()
@@ -46,8 +52,9 @@ async def websocket_chat(websocket: WebSocket):
         prompt = chat_request.prompt
         model_name = chat_request.model_name
 
-        # Notify the client that model loading has started
-        await websocket.send_text("Loading model...")
+        if not connection_model_state[connection_id]["model_loaded"]:
+            # Notify the client that model loading has started
+            await websocket.send_text("[FEEDBACK] Loading model...")
 
         # Set seed for reproducibility
         set_seed(chat_request.seed)
@@ -57,18 +64,23 @@ async def websocket_chat(websocket: WebSocket):
         sys.stdout = captured_stdout  # Redirect print to WebSocket
 
         try:
+            # Log in with your Hugging Face API Key
+            login(token=chat_request.apiKey)
+
             # Load the model pipeline for generation, capturing progress logs
             model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True)
 
-            # Notify client once model is loaded
-            await websocket.send_text(f"Model {model_name} loaded successfully!")
+            if not connection_model_state[connection_id]["model_loaded"]:
+                # Notify client once model is loaded
+                await websocket.send_text(f"[FEEDBACK] Model {model_name} loaded successfully!")
 
         except Exception as e:
             await websocket.send_text(f"Error loading model: {str(e)}")
             return  # Exit if model loading failed
 
-        # Notify client that generation is starting
-        await websocket.send_text("Starting text generation...")
+        if not connection_model_state[connection_id]["model_loaded"]:
+            # Notify client that generation is starting
+            await websocket.send_text("[FEEDBACK] Starting text generation...")
 
         # Generate response
         result = model_pipeline(
@@ -89,10 +101,8 @@ async def websocket_chat(websocket: WebSocket):
                 generated_text = generated_text.split(stop)[0]
 
         # Send generated text back to the client
+        connection_model_state[connection_id]["model_loaded"] = True
         await websocket.send_text(f"Generated Text: {generated_text}")
-
-        # Notify client when the generation is complete
-        await websocket.send_text("Generation complete.")
 
     except WebSocketDisconnect:
         print("Client disconnected.")

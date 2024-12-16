@@ -66,8 +66,8 @@ const getModelOutput = async () => {
       id: props.model.id,
       modelType: props.model.modelType,
       apiKey: props.model.apiKey,
-      modelName: "distilgpt2", // Needs to be set to huggingFaceModelName
-      modelTag: "text-generation", // Needs to be set to huggingFaceModelTag
+      modelName: props.model.name,
+      modelTag: props.model.modelTag,
       temperature: props.model.temperature,
       max_tokens: props.model.maximumLength,
       repetition_penalty: props.model.repetitionPenalty,
