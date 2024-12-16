@@ -183,42 +183,44 @@ const callHuggingFaceCustomChat = async (messageObject) => {
         };
 
 		return new Promise((resolve, reject) => {
-            // Listener for the WebSocket response
-            const onMessage = (event) => {
-                try {
-                    const response = event.data;
-                    socket.removeEventListener("message", onMessage); // Clean up listener
-
-                    // Add the assistant response to the userMessage array
-                    const assistantResponse = response;
-                    userMessage.push({
-                        content: assistantResponse,
-                        role: "assistant",
-                    });
-
-                    // Return the updated message history
-                    resolve({
-                        messagesHistory: userMessage,
-                    });
-                } catch (error) {
-                    reject(new Error("Failed to parse WebSocket response: " + error.message));
-                }
-            };
-
-            socket.addEventListener("message", onMessage);
-
-            try {
-                socket.send(JSON.stringify(requestPayload));
-                console.log("Request sent:", requestPayload);
-            } catch (error) {
-                socket.removeEventListener("message", onMessage); // Clean up listener
-                reject(new Error("Failed to send WebSocket request: " + error.message));
-            }
-        });
-
-    } else {
-        return Promise.reject(new Error("WebSocket is not open. Cannot send request."));
-    }
+			// Listener for the WebSocket response
+			const onMessage = (event) => {
+				try {
+					const response = event.data; // plain text response
+	
+					// Add the assistant response to the userMessage array immediately
+					userMessage.push({
+						content: response,
+						role: "assistant",
+					});
+	
+					// Update the conversation history (resolve and return after each response)
+					resolve({
+						messagesHistory: userMessage,
+						assistantResponse: response, // You can return each response individually if needed
+					});
+	
+					// Optionally, keep the listener active for more responses
+					// This is the key change: don't remove the listener immediately if more responses are expected
+				} catch (error) {
+					reject(new Error("Failed to parse WebSocket response: " + error.message));
+				}
+			};
+	
+			// Add the listener for the response
+			socket.addEventListener("message", onMessage);
+	
+			try {
+				// Send the request
+				socket.send(JSON.stringify(requestPayload));
+				console.log("Request sent:", requestPayload);
+			} catch (error) {
+				// Clean up listener in case of sending error
+				socket.removeEventListener("message", onMessage);
+				reject(new Error("Failed to send WebSocket request: " + error.message));
+			}
+		});
+	}
 };
 
 

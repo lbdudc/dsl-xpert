@@ -54,7 +54,7 @@ async def websocket_chat(websocket: WebSocket):
 
         if not connection_model_state[connection_id]["model_loaded"]:
             # Notify the client that model loading has started
-            await websocket.send_text("[FEEDBACK] Loading model...")
+            await websocket.send_text("[FEEDBACK] Loading model... - Check status on terminal!")
 
         # Set seed for reproducibility
         set_seed(chat_request.seed)
@@ -64,11 +64,11 @@ async def websocket_chat(websocket: WebSocket):
         sys.stdout = captured_stdout  # Redirect print to WebSocket
 
         try:
-            # Log in with your Hugging Face API Key
-            login(token=chat_request.apiKey)
+            # Set the token as an environment variable
+            #os.environ["HF_TOKEN"] = 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
 
             # Load the model pipeline for generation, capturing progress logs
-            model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True)
+            model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True, truncation=True)
 
             if not connection_model_state[connection_id]["model_loaded"]:
                 # Notify client once model is loaded
@@ -95,10 +95,10 @@ async def websocket_chat(websocket: WebSocket):
         generated_text = result[0]["generated_text"]
 
         # Truncate generated text using stop sequences if provided
-        if chat_request.stop_sequences:
-            stop_seq = [seq for seq in chat_request.stop_sequences.split("<stopSequence>") if seq.strip()]
-            for stop in stop_seq:
-                generated_text = generated_text.split(stop)[0]
+        #if chat_request.stop_sequences:
+        #    stop_seq = [seq for seq in chat_request.stop_sequences.split("<stopSequence>") if seq.strip()]
+        #    for stop in stop_seq:
+        #        generated_text = generated_text.split(stop)[0]
 
         # Send generated text back to the client
         connection_model_state[connection_id]["model_loaded"] = True
