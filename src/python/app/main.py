@@ -8,7 +8,6 @@ from io import StringIO
 from typing import Optional
 
 app = FastAPI()
-connection_model_state = {}    # To control first-time messages (model not loaded before)
 
 # Define the request body using Pydantic
 class ChatRequest(BaseModel):
@@ -39,10 +38,6 @@ class WebSocketStdout(StringIO):
 async def websocket_chat(websocket: WebSocket):
     await websocket.accept()
 
-    # Initialize the state for this WebSocket connection (first time)
-    connection_id = str(id(websocket))
-    connection_model_state[connection_id] = {"model_loaded": False}
-
     try:
         # Accept the request and extract data (you could send it from the client side)
         request = await websocket.receive_text()
@@ -52,57 +47,55 @@ async def websocket_chat(websocket: WebSocket):
         prompt = chat_request.prompt
         model_name = chat_request.model_name
 
-        if not connection_model_state[connection_id]["model_loaded"]:
+        if prompt == "firstLoad":
             # Notify the client that model loading has started
-            await websocket.send_text("[FEEDBACK] Loading model... - Check status on terminal!")
+            await websocket.send_text("[DSL-Xpert] Loading model... - Check status on terminal!")
 
-        # Set seed for reproducibility
-        set_seed(chat_request.seed)
+            # Redirect stdout to capture tqdm download progress
+            captured_stdout = WebSocketStdout(websocket)
+            sys.stdout = captured_stdout  # Redirect print to WebSocket
 
-        # Redirect stdout to capture tqdm download progress
-        captured_stdout = WebSocketStdout(websocket)
-        sys.stdout = captured_stdout  # Redirect print to WebSocket
+            try:
+                # Set the token as an environment variable
+                # os.environ["HF_TOKEN"] = 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
 
-        try:
-            # Set the token as an environment variable
-            #os.environ["HF_TOKEN"] = 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
+                # Load the model pipeline for generation, capturing progress logs
+                model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True)
+
+                # Notify client once model is loaded
+                await websocket.send_text(f"[DSL-Xpert] Model {model_name} loaded successfully!")
+
+            except Exception as e:
+                await websocket.send_text(f"[DSL-Xpert] Error loading model: {str(e)}")
+                return  # Exit if model loading failed
+
+        else:
+            # Set seed for reproducibility
+            set_seed(chat_request.seed)
 
             # Load the model pipeline for generation, capturing progress logs
-            model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True, truncation=True)
+            model_pipeline = pipeline(task=chat_request.model_tag, model=model_name, trust_remote_code=True)
 
-            if not connection_model_state[connection_id]["model_loaded"]:
-                # Notify client once model is loaded
-                await websocket.send_text(f"[FEEDBACK] Model {model_name} loaded successfully!")
+            # Generate response
+            result = model_pipeline(
+                prompt,
+                max_length=chat_request.max_length,
+                temperature=chat_request.temperature,
+                repetition_penalty=chat_request.repetition_penalty,
+                top_k=chat_request.top_K,
+                top_p=chat_request.top_P,
+            )
 
-        except Exception as e:
-            await websocket.send_text(f"Error loading model: {str(e)}")
-            return  # Exit if model loading failed
+            generated_text = result[0]["generated_text"]
 
-        if not connection_model_state[connection_id]["model_loaded"]:
-            # Notify client that generation is starting
-            await websocket.send_text("[FEEDBACK] Starting text generation...")
+            # Truncate generated text using stop sequences if provided
+            #if chat_request.stop_sequences:
+            #    stop_seq = [seq for seq in chat_request.stop_sequences.split("<stopSequence>") if seq.strip()]
+            #    for stop in stop_seq:
+            #        generated_text = generated_text.split(stop)[0]
 
-        # Generate response
-        result = model_pipeline(
-            prompt,
-            max_length=chat_request.max_length,
-            temperature=chat_request.temperature,
-            repetition_penalty=chat_request.repetition_penalty,
-            top_k=chat_request.top_K,
-            top_p=chat_request.top_P,
-        )
-
-        generated_text = result[0]["generated_text"]
-
-        # Truncate generated text using stop sequences if provided
-        #if chat_request.stop_sequences:
-        #    stop_seq = [seq for seq in chat_request.stop_sequences.split("<stopSequence>") if seq.strip()]
-        #    for stop in stop_seq:
-        #        generated_text = generated_text.split(stop)[0]
-
-        # Send generated text back to the client
-        connection_model_state[connection_id]["model_loaded"] = True
-        await websocket.send_text(f"Generated Text: {generated_text}")
+            # Send generated text back to the client
+            await websocket.send_text(generated_text)
 
     except WebSocketDisconnect:
         print("Client disconnected.")

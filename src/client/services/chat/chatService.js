@@ -4,22 +4,77 @@ import { CreateMLCEngine, prebuiltAppConfig } from "@mlc-ai/web-llm";
 
 let socket = null;
 
-const connectWebSocket = () => {
-    socket = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
+const connectWebSocket = (model, onMessageCallback) => {
+	return new Promise((resolve, reject) => {
+	  socket = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
+  
+	  socket.onopen = () => {
+		console.log("WebSocket connected.");
+		const { modelType, modelTag, temperature, maxLength, repetitionPenalty, topK, topP, seed, stopSequences, apiKey } = model;
+		const requestPayload = {
+			prompt: "firstLoad",
+			model_name: modelType,
+			model_tag: modelTag,
+			temperature: temperature,
+			max_length: maxLength,
+			repetition_penalty: repetitionPenalty,
+			top_K: topK,
+			top_P: topP,
+			seed: seed,
+			apiKey: apiKey,
+			stop_sequences: stopSequences
+		};
+		socket.send(JSON.stringify(requestPayload))
+	  };
+  
+	  socket.onclose = () => {
+		console.log("WebSocket disconnected.");
+	  };
+  
+	  socket.onerror = (error) => {
+		console.error("WebSocket error:", error);
+		reject(error);
+	  };
+  
+	  socket.onmessage = (event) => {
+		const data = event.data;
+		console.log("WebSocket message:", data);
+  
+		// Call the callback function with the data
+		if (onMessageCallback && typeof onMessageCallback === "function") {
+		  onMessageCallback(data || ""); // Pass message text to callback
+		}
 
-    socket.onopen = () => {
-        console.log("WebSocket connected");
-    };
+		if (data.includes("loaded successfully!")) {
+			resolve(); // Resolve the promise to end "settingUpModel" state
+		  }
+	  };
+	});
+  };
 
-    socket.onclose = () => {
-        console.log("WebSocket disconnected");
-    };
+export const reconnectWebSocket = () => {
+	return new Promise((resolve, reject) => {
+		if (socket && socket.readyState === WebSocket.OPEN) {
+		socket.close(); // Close the previous WebSocket if it's open
+		}
 
-    socket.onerror = (error) => {
-        console.error("WebSocket error:", error);
-    };
+		// Create a new WebSocket connection
+		socket = new WebSocket(`${HUGGINGFACE_CUSTOM_URL}/ws`);
 
-	return socket;
+		socket.onopen = () => {
+		console.log("WebSocket connected.");
+		resolve(socket); // Resolve the promise when WebSocket is open
+		};
+
+		socket.onerror = (error) => {
+		console.error("WebSocket error:", error);
+		reject(error); // Reject the promise if there's an error
+		};
+
+		socket.onclose = () => {
+		console.log("WebSocket disconnected.");
+		};
+	});
 };
 
 /**
@@ -53,7 +108,9 @@ export class ServerSelectorService {
 				// Callback function to update model loading progress
 				return CreateMLCEngine(modelType, { initProgressCallback: callbackFunct });
 			case "huggingface-custom":
-				return connectWebSocket()
+				return connectWebSocket(model, callbackFunct).then(() => {
+					return reconnectWebSocket();
+				  })
 			default:
 				return new Error("Model not valid, use one of the following: getDefinition, getExamples, getInstructions");
 		}
@@ -168,58 +225,55 @@ const callHuggingFaceCustomChat = async (messageObject) => {
 	const { userMessage, modelType, modelTag, temperature, maxLength, repetitionPenalty, topK, topP, seed, stopSequences, apiKey } = messageObject;
 
 	if (socket && socket.readyState === WebSocket.OPEN) {
-        const requestPayload = {
-            prompt: userMessage.map(message => message.content).join(". "),
-            model_name: modelType,
-            model_tag: modelTag,
-            temperature: temperature,
-            max_length: maxLength,
+		const requestPayload = {
+			prompt: userMessage.map(message => message.content).join(". "),
+			model_name: modelType,
+			model_tag: modelTag,
+			temperature: temperature,
+			max_length: maxLength,
 			repetition_penalty: repetitionPenalty,
 			top_K: topK,
 			top_P: topP,
 			seed: seed,
 			apiKey: apiKey,
 			stop_sequences: stopSequences
-        };
+		};
 
 		return new Promise((resolve, reject) => {
-			// Listener for the WebSocket response
 			const onMessage = (event) => {
 				try {
-					const response = event.data; // plain text response
-	
-					// Add the assistant response to the userMessage array immediately
-					userMessage.push({
-						content: response,
-						role: "assistant",
-					});
-	
-					// Update the conversation history (resolve and return after each response)
-					resolve({
-						messagesHistory: userMessage,
-						assistantResponse: response, // You can return each response individually if needed
-					});
-	
-					// Optionally, keep the listener active for more responses
-					// This is the key change: don't remove the listener immediately if more responses are expected
+				const response = event.data;
+				console.log("Received WebSocket response:", response); // Log the server's response
+		
+				// Add the assistant response to the userMessage array immediately
+				userMessage.push({
+					content: response,
+					role: "assistant",
+				});
+		
+				// Resolve the promise with the updated conversation history
+				resolve({
+					messagesHistory: userMessage,
+				});
+		
 				} catch (error) {
-					reject(new Error("Failed to parse WebSocket response: " + error.message));
+				reject(new Error("Failed to parse WebSocket response: " + error.message));
 				}
 			};
-	
-			// Add the listener for the response
-			socket.addEventListener("message", onMessage);
-	
+		
+			// Update socket listener
+			socket.onmessage = onMessage; 
+		
 			try {
-				// Send the request
 				socket.send(JSON.stringify(requestPayload));
 				console.log("Request sent:", requestPayload);
 			} catch (error) {
-				// Clean up listener in case of sending error
-				socket.removeEventListener("message", onMessage);
 				reject(new Error("Failed to send WebSocket request: " + error.message));
 			}
-		});
+			});
+
+	} else {
+		return Promise.reject(new Error("WebSocket is not open or is unavailable."));
 	}
 };
 

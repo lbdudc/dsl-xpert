@@ -1,6 +1,6 @@
 <script setup>
 import { ref, reactive, onMounted, watch } from "vue";
-import { ServerSelectorService } from "@services/chat/chatService.js";
+import { ServerSelectorService, reconnectWebSocket } from "@services/chat/chatService.js";
 import { tokenCounter, createChat, } from "@services/chat/contextUtils.js";
 import MessageVue from "./Message.vue";
 
@@ -10,7 +10,10 @@ const message = ref("");
 const conversation = reactive([]);
 const nTokensConversation = ref(0);
 const loadingResponse = ref(false);
-const settingUpModel = ref(false);
+const settingUpWebLLMModel = ref(false);
+const settingUpHFCustomModel = ref(false);
+
+let wsMessage = ref(""); // Store real-time messages
 
 const emit = defineEmits(["add:message"]);
 
@@ -105,17 +108,25 @@ let engine = null;
 
 // Callback function to update model loading progress
 const initProgressCallback = (initProgress) => {
-  progress.value = Math.round(initProgress.progress * 100);
-  progressText.value = initProgress.text;
+  if (typeof initProgress === "string") {
+    settingUpWebLLMModel.value = false;
+    wsMessage.value = initProgress;
+  } else {
+    settingUpHFCustomModel.value = false;
+    progress.value = Math.round(initProgress.progress * 100);
+    progressText.value = initProgress.text;
+  }
 }
 
 onMounted(async () => {
-  settingUpModel.value = true;
+  settingUpWebLLMModel.value = true;
+  settingUpHFCustomModel.value = true;
 
   // Load the engine model
   engine = await chatReasoner.loadModel(props.model, initProgressCallback);
 
-  settingUpModel.value = false;
+  settingUpWebLLMModel.value = false;
+  settingUpHFCustomModel.value = false;
 });
 
 
@@ -133,11 +144,19 @@ watch(() => props.chatMessage, (newVal) => {
 </script>
 
 <template>
-  <section v-if="settingUpModel"
+  <section v-if="settingUpWebLLMModel"
     class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center mx-16 gap-8">
     <ProgressBar :value="progress" class="w-full"></ProgressBar>
     <span class="text-sm text-gray-500">
       {{ progressText }}
+    </span>
+  </section>
+
+  <!-- Section for real-time WebSocket message display -->
+  <section v-if="settingUpHFCustomModel"
+    class="flex items-center justify-center w-full h-screen">
+    <span class="text-lg text-gray-900 p-4 bg-gray-100 rounded shadow-md">
+      {{ wsMessage }}
     </span>
   </section>
 
