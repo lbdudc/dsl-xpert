@@ -71,7 +71,7 @@ const resolver = async (values) => {
     }
 
     if (
-        (model.developer == "openai" || model.developer == "huggingface-inference") &&
+        (model.developer == "openai" || model.developer == "huggingface-inference" || model.developer == "huggingface-custom") &&
         (!model.apiKey || model.apiKey == "")
     ) {
         errors.value.apiKey = [{ message: 'API Key is required' }];

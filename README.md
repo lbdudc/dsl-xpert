@@ -1,25 +1,38 @@
 # DSL-Xpert
 
-This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat. It can validate the generated grammar instances while chatting with the LLM. It has integrations with OpenAI's GPT models, HuggingFace Inference API, custom HuggingFace Models running it locally, and WebLLM to run it on the client side with zero configuration and connect to your custom server using REST requests.
+![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg) ![Node.js Version](https://img.shields.io/badge/node-%3E%3D%2020.2.0-brightgreen.svg) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/lbdudc/dsl-xpert)[![DOI](https://zenodo.org/badge/DOI/10.1145/3652620.3687782.svg)](https://doi.org/10.1145/3652620.3687782)
 
-- [Getting Started](#getting-started)
-  - [Installation](#installation)
-    - [Prerequisites](#prerequisites)
-    - [Docker](#docker)
-    - [Standalone server](#standalone-server)
-    - [HuggingFace](#huggingface)
+This tool provides a web interface to define domain-specific languages and uses large language models (LLM) to interact with those grammars via chat.
+
+![image of the models created](./src/client/public/index_image.png)
+
+It can validate the generated grammar instances while chatting with the LLM using [Langium](http://langium.org/).
+
+![image of the tool](./src/client/public/form_example.png)
+
+It has integrations with:
+
+- **OpenAI** models
+- **HuggingFace Inference API**
+- **HuggingFace transformers**: running it locally
+- [WebLLM](https://webllm.mlc.ai/)
+- Connect to any server using **API REST requests**
+
+![image of chat](./src/client/public/chat_example.png)
+
+Then the user can chat with the LLM using the grammar defined.
+
 - [Usage](#usage)
-  - [API Routes](#api-routes)
+  - [Docker](#docker)
+  - [Standalone server](#standalone-server)
+  - [HuggingFace custom (only for standalone server)](#huggingface-custom-only-for-standalone-server)
+- [API Routes](#api-routes)
 - [Author](#author)
 - [License](#license)
 
-## Getting Started
-
-## Installation
+## Usage
 
 The project can be run in different ways. The following sections describe how to run the project using Docker or as a standalone server.
-
-### Prerequisites
 
 ### Docker
 
@@ -30,63 +43,60 @@ Prerequisites:
 - Docker
 - Docker Compose
 
-```bash
+```sh
 docker-compose up
 ```
 
-This will start the server, client, and a database using MongoDB. The server will be available at `http://localhost:5555/api` and the client at `http://localhost:5555`.
+This will start tha application it wil run:
 
-You can change the port by setting the `VITE_SERVER_URL` environment variable in the `docker-compose.yml` file.
-
-```yaml
- llm-dsl-builder:
-    environment:
-      - SERVER_PORT=5000 ## This is the internal port of the Express Node server
-      - CLIENT_URL=http://localhost:5173
-      - VITE_SERVER_URL=http://localhost:5555 ## This is the URL of the Nginx server
-      - MONGODB_URI=mongodb://mongodb:27017/llm-dsl-builder
-```
+- Web App:  `http://localhost:5555`
+- API: `http://localhost:5555/api`
 
 ### Standalone server
 
-The server can be run as a standalone application. To do so, execute the following commands:
+The application also can be run without docker, as a standalone application. To do so, execute the following commands:
 
 Prerequisites:
 
+- NVM
 - Node.js
 - MongoDB
+- Python (optional only if the user wants to use the custom huggingface models)
 
-```bash
+```sh
+
+# (Optional), check the .nvmrc file
+# for seeing what is the node version
 nvm use
+
 npm install
 npm run dev
 ```
 
-This will start the server at `http://localhost:5000/api` and the client at `http://localhost:5173`.
+This will start:
 
-It will be necessary to have a MongoDB database running. The connection string must be set in the `.env` file. The file must be created in the root of the project and must contain the following content:
+- Client at `http://localhost:5173`
+- Server at `http://localhost:5173/api`
 
-```bash
+It will be necessary to have a MongoDB database running, and set the variable in the `.env` file:
+
+```env
 MONGODB_URI=mongodb://localhost:27017/llm-dsl-builder
 ```
 
-### HuggingFace
+### HuggingFace custom (only for standalone server)
 
-To run the huggingface server in local, you can use the following command:
+We already have added the HuggingFace Custom Server into the `docker-compose.yml` file, so it will be running by default.
 
-```bash
-cd ./src/python
+But in thr standalone version, the user can run the server using the command:
 
-docker run -d --name mycontainer -p 80:80 myimage
-
-docker build -t myimage .
+```sh
+npm run dev:pyserver
 ```
 
-### Usage
+This will start the python server at `ws://localhost:8000/ws`,the client is already configured to interact with this server.
 
-The project provides a web interface to manage the LLMs. The interface allows to create, train and use LLMs. Also, it provides a REST API to manage the LLMs the same way as the web interface.
-
-#### API Routes
+### API Routes
 
 The API provides the following routes:
 
@@ -95,89 +105,6 @@ The API provides the following routes:
 - `GET /models/:id`: Get a model by id
 - `PUT /models/:id`: Update a model by id
 - `DELETE /models/:id`: Delete a model by id
-- `POST /models/:id/chat`: Chat with a model by id
-
-Model schema:
-
-```json
-{
- "name": {
-    "type": "String",
-    "required": true,
-    "unique": true,
-  },
-  "description": {
-    "type": "String",
-    "default": null,
-  },
-  "developer": {
-    "type": "String",
-    "required": true,
-  },
-  "modelType": {
-    "type": "String",
-    "required": true,
-  },
-  "request": {
-    "type": "Object"
-  },
-  "apiKey": {
-    "type": "String",
-  },
-  "iv": {
-    "type": "String",
-  },
-  "temperature": {
-    "type": "Number",
-    "default": 0.1,
-  },
-  "maximumLength": {
-    "type": "Number",
-    "default": 4095,
-  },
-  "topK": {
-    "type": "Number",
-    "default": 50,
-  },
-  "topP": {
-    "type": "Number",
-    "default": 1,
-  },
-  "repetitionPenalty": {
-    "type": "Number",
-    "default": 0,
-  },
-  "stopSequences": {
-    "type": ["String"],
-    "default": [";", "###"],
-  },
-  "seed": {
-    "type": "Number",
-    "default": 6,
-  },
-  "definition": {
-    "type": "String",
-    "required": true,
-  },
-  "grammarType": {
-    "type": "Object",
-    "required": true,
-  },
-  "definitionExamples": {
-    "type": [
-      {
-        "userInstruction": "String",
-        "modelAnswer": "String",
-      },
-    ],
-    "required": true,
-  },
-  "created_date": {
-    "type": "Date",
-    "default": "Date.now",
-  },
-}
-```
 
 ## Author
 

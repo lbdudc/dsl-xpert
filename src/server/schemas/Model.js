@@ -22,6 +22,10 @@ const ModelSchema = new Schema({
     type: String,
     required: true,
   },
+  modelTag: {
+    type: String,
+    default: "text-generation",
+  },
   request: {
     type: Object
   },

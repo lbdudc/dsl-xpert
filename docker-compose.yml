@@ -8,13 +8,11 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ".:/app" # Mount the entire project directory to /app in the container
-    # ports:
-    #   - "5000:5000" # Map the Express Node server port
-    #   - "5173:5173" # Map the Vite client port
     environment:
       - SERVER_PORT=5000 ## This is the internal port of the Express Node server
       - CLIENT_URL=http://localhost:5173
       - VITE_SERVER_URL=http://localhost:5555 ## This is the URL of the Nginx server
+      - VITE_HUGGINGFACE_CUSTOM_URL=ws://localhost:5555
       - MONGODB_URI=mongodb://mongodb:27017/llm-dsl-builder
     networks:
       - llm-network
@@ -26,10 +24,18 @@ services:
       timeout: 10s
       retries: 20
 
+  python-server:
+    container_name: python-server
+    build:
+      context: ./src/python # Path to Python server Dockerfile
+      dockerfile: Dockerfile
+    volumes:
+      - "./src/python:/code" # Mount Python server code
+    networks:
+      - llm-network
+
   mongodb:
     image: mongo:latest
-    ports:
-      - "27017:27017"
     networks:
       - llm-network
     volumes:

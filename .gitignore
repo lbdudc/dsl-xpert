@@ -9,5 +9,6 @@ spec.dsl
 src/client/dist
 temp_config.json
 src/lps/**
+src/python/app/__pycache__
 .env
 .env.local

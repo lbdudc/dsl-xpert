@@ -28,7 +28,7 @@ const sendDelete = () => {
 <template>
   <div class="min-h-[300px] rounded-md  bg-gradient-to-r  p-1" :class="{
     'from-green-500 via-emerald-500 to-teal-500': props.model.developer === 'openai',
-    'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference' || 'huggingface-vustom'),
+    'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference') || (props.model.developer === 'huggingface-custom'),
     'from-purple-500 via-indigo-500 to-blue-500': props.model.developer === 'webllm',
     'from-pink-500 via-red-500 to-orange-500': props.model.developer === 'curl',
   }">
@@ -55,14 +55,14 @@ const sendDelete = () => {
         <div class="flex flex-col flex-wrap gap-2">
           <Chip :label="props.model.developer" icon="pi pi-user" class="text-xs  bg-gradient-to-r" :class="{
             'from-green-500 via-emerald-500 to-teal-500': props.model.developer === 'openai',
-            'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference' || 'huggingface-vustom'),
+            'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference') || (props.model.developer === 'huggingface-custom'),
             'from-purple-500 via-indigo-500 to-blue-500': props.model.developer === 'webllm',
             'from-pink-500 via-red-500 to-orange-500': props.model.developer === 'curl',
           }" />
           <Chip :label="props.model.modelType" icon="pi pi-desktop"
             class="text-xs text-ellipsis overflow-hidden ... bg-gradient-to-r" :class="{
               'from-green-500 via-emerald-500 to-teal-500': props.model.developer === 'openai',
-              'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference' || 'huggingface-vustom'),
+              'from-yellow-400 via-orange-500 to-yellow-600': props.model.developer === ('huggingface-inference') || (props.model.developer === 'huggingface-custom'),
               'from-purple-500 via-indigo-500 to-blue-500': props.model.developer === 'webllm',
               'from-pink-500 via-red-500 to-orange-500': props.model.developer === 'curl',
             }" />
