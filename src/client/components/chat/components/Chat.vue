@@ -11,6 +11,7 @@ const conversation = reactive([]);
 const nTokensConversation = ref(0);
 const loadingResponse = ref(false);
 const settingUpWebLLMModel = ref(false);
+const hasWebGPUSupport = ref(false);
 const settingUpHFCustomModel = ref(false);
 
 let wsMessage = ref(""); // Store real-time messages
@@ -120,6 +121,13 @@ const initProgressCallback = (initProgress) => {
 
 onMounted(async () => {
   settingUpWebLLMModel.value = true;
+  hasWebGPUSupport.value = navigator.gpu ? true : false;
+
+  if (!hasWebGPUSupport.value) {
+    settingUpWebLLMModel.value = false;
+    return;
+  }
+
   settingUpHFCustomModel.value = true;
 
   // Load the engine model
@@ -145,7 +153,7 @@ watch(() => props.chatMessage, (newVal) => {
 
 <template>
   <section v-if="settingUpWebLLMModel"
-    class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center mx-16 gap-8">
+    class="w-full bg-gray-00 border-gray-200 flex flex-col items-center justify-center mx-16 gap-8">
     <ProgressBar :value="progress" class="w-full"></ProgressBar>
     <span class="text-sm text-gray-500">
       {{ progressText }}
@@ -153,20 +161,25 @@ watch(() => props.chatMessage, (newVal) => {
   </section>
 
   <!-- Section for real-time WebSocket message display -->
-  <section v-if="settingUpHFCustomModel"
+  <!-- <section v-if="!settingUpHFCustomModel"
     class="flex items-center justify-center w-full h-screen">
     <span class="text-lg text-gray-900 p-4 bg-gray-100 rounded shadow-md">
       {{ wsMessage }}
     </span>
-  </section>
+  </section> -->
 
-  <div v-else class="w-1/2 bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
+  <div v-else class="w-full bg-gray-00 border-gray-200 flex flex-col items-center justify-center">
     <div class="flex flex-col items-center justify-center w-full h-full">
       <!-- Component Start -->
       <div class="flex flex-col flex-grow w-full bg-slate-200 shadow-xl rounded-lg overflow-hidden">
         <div class="flex flex-col flex-grow h-0 p-4 overflow-auto">
+          <div v-if="props.model.developer == 'webllm' && !hasWebGPUSupport" class="flex flex-col items-center justify-center mt-3">
+            <span class="text-sm text-gray-900">
+              Your browser does not support WebGPU. Please use a browser that supports WebGPU.
+            </span>
+          </div>
           <!-- Render chat messages dynamically -->
-          <div v-for="(message, index) in conversation" :key="index" :class="{ 'ml-auto justify-end': message.isUser }"
+          <div v-else v-for="(message, index) in conversation" :key="index" :class="{ 'ml-auto justify-end': message.isUser }"
             class="flex w-full mt-2 space-x-3 max-w-xs mr-4">
             <MessageVue :message="message" :hasValidator="props.model.grammarType.code == 'langium'" />
           </div>
@@ -177,7 +190,7 @@ watch(() => props.chatMessage, (newVal) => {
         </div>
 
         <div class="flex flex-row items-center">
-          <TextArea row-height="15" class="flex-grow" rows="2" placeholder="Type your message…" v-model="message"
+          <TextArea :disabled="props.model.developer == 'webllm' && !hasWebGPUSupport" row-height="15" class="flex-grow" rows="2" placeholder="Type your message…" v-model="message"
             @keydown.enter="getModelOutput">
           </TextArea>
         </div>
