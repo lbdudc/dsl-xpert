@@ -106,6 +106,12 @@ The API provides the following routes:
 - `PUT /models/:id`: Update a model by id
 - `DELETE /models/:id`: Delete a model by id
 
+## Grammars
+
+The grammars are defined using the Langium syntax. The user can define the grammar in the web interface, and it will be validated using Langium.
+
+Examples can be found in the `/grammars` folder.
+
 ## Author
 
 - Victor Lamas
